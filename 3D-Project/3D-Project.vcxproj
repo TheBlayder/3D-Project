@@ -127,7 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D11Helper.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PipelineHelper.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="WindowHelper.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D3D11Helper.h" />
+    <ClInclude Include="PipelineHelper.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="WindowHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
