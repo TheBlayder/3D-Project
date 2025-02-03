@@ -19,8 +19,8 @@ public:
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	bool SetupWindow(HINSTANCE hInstance, int nCmdShow);
 
-	UINT GetWidth();
-	UINT GetHeight();
+	UINT GetWidth() const;
+	UINT GetHeight() const;
 };
 
 

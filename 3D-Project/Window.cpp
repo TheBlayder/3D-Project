@@ -48,12 +48,12 @@ bool Window::SetupWindow(HINSTANCE hInstance, int nCmdShow)
 	return true;
 }
 
-UINT Window::GetWidth()
+UINT Window::GetWidth() const
 {
 	return this->width;
 }
 
-UINT Window::GetHeight()
+UINT Window::GetHeight() const
 {
 	return this->height;
 }
