@@ -21,7 +21,7 @@
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D3D11Helper.cpp">
+    <ClCompile Include="D3D11SetUp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PipelineHelper.cpp">
@@ -35,7 +35,7 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D3D11Helper.h">
+    <ClInclude Include="D3D11SetUp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PipelineHelper.h">

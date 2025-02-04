@@ -130,14 +130,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="D3D11Helper.cpp" />
+    <ClCompile Include="D3D11SetUp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PipelineHelper.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="D3D11Helper.h" />
+    <ClInclude Include="D3D11SetUp.h" />
     <ClInclude Include="PipelineHelper.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Window.h" />

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "Window.h"
+#include "Renderer.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -22,7 +23,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 
-	// === MAIN LOOP === 
+	// === MAIN LOOP ===
+	Renderer renderer;
+
 	MSG msg = { };
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{

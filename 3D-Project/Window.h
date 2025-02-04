@@ -8,10 +8,10 @@ class Window
 {
 private:
 
+	HWND hWindow;
 	UINT width, height;
 
 public:
-	HWND hWindow;
 
 	Window(UINT width, UINT height);
 	~Window();
@@ -19,6 +19,7 @@ public:
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	bool SetupWindow(HINSTANCE hInstance, int nCmdShow);
 
+	HWND GetWindowHandle() const;
 	UINT GetWidth() const;
 	UINT GetHeight() const;
 };
