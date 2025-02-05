@@ -44,10 +44,11 @@ bool D3D11SetUp::CreateSwapChain(ID3D11Device*& device, ID3D11DeviceContext*& im
 
 	// Create a struct to hold information about the swap chain
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc.Width = window->GetWidth();
 	swapChainDesc.BufferDesc.Height = window->GetHeight();
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = 1;
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 165;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -84,7 +85,7 @@ bool D3D11SetUp::CreateRenderTargetView(ID3D11Device*& device, IDXGISwapChain*& 
 {
 	ID3D11Texture2D* backBuffer = nullptr;
 	HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
-	return SUCCEEDED(hr);;
+	return SUCCEEDED(hr);
 }
 
 bool D3D11SetUp::CreateDepthStencilView(ID3D11Device*& device, Window* window, ID3D11Texture2D*& dsTexture, ID3D11DepthStencilView*& dsView)
