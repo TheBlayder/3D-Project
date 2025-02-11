@@ -17,8 +17,8 @@ private:
 	bool LoadShaders(ID3D11Device* device, ID3D11VertexShader*& vShader, ID3D11PixelShader*& pShader, std::string& vShaderByteCode);
 	bool CreateInputLayout(ID3D11Device* device, ID3D11InputLayout*& inputLayout, const std::string& vShaderByteCode);
 	bool CreateVertexBuffer(ID3D11Device* device, ID3D11Buffer*& vertexBuffer);
-	bool CreatePScBuffer();
-	bool CreateVScBuffer();
+	bool CreateVSConstantBuffer();
+	bool CreatePSConstantBuffer();
 	bool CreateTexture(ID3D11Device* device, ID3D11Texture2D*& texture, ID3D11ShaderResourceView*& SRVTexture, unsigned char*& textureData);
 	bool CreateSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState);
 };
