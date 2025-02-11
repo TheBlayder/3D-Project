@@ -64,7 +64,7 @@ bool PipelineSetUp::SetUp(ID3D11Device*& device, ID3D11DeviceContext*& immediate
 	}
 }
 
-bool PipelineSetUp::LoadShaders(ID3D11Device* device, ID3D11VertexShader*& vShader, ID3D11PixelShader*& pShader, std::string& vShaderByteCode)
+bool PipelineSetUp::LoadShaders(ID3D11Device*& device, ID3D11VertexShader*& vShader, ID3D11PixelShader*& pShader, std::string& vShaderByteCode)
 {
 	std::string shaderData;
 	std::ifstream reader;
@@ -114,7 +114,7 @@ bool PipelineSetUp::LoadShaders(ID3D11Device* device, ID3D11VertexShader*& vShad
 	return true;
 }
 
-bool PipelineSetUp::CreateInputLayout(ID3D11Device* device, ID3D11InputLayout*& inputLayout, const std::string& vShaderByteCode)
+bool PipelineSetUp::CreateInputLayout(ID3D11Device*& device, ID3D11InputLayout*& inputLayout, const std::string& vShaderByteCode)
 {
 	D3D11_INPUT_ELEMENT_DESC inputDesc[3] =
 	{
@@ -128,12 +128,12 @@ bool PipelineSetUp::CreateInputLayout(ID3D11Device* device, ID3D11InputLayout*& 
 	return !FAILED(hr);
 }
 
-bool PipelineSetUp::CreateVertexBuffer(ID3D11Device* device, ID3D11Buffer*& vertexBuffer)
+bool PipelineSetUp::CreateVertexBuffer(ID3D11Device*& device, ID3D11Buffer*& vertexBuffer)
 {
-	return false;
+	return true;
 }
 
-bool PipelineSetUp::CreateTexture(ID3D11Device* device, ID3D11Texture2D*& texture, ID3D11ShaderResourceView*& SRVTexture, unsigned char*& textureData)
+bool PipelineSetUp::CreateTexture(ID3D11Device*& device, ID3D11Texture2D*& texture, ID3D11ShaderResourceView*& SRVTexture, unsigned char*& textureData)
 {
 	int width, height, channels;
 
@@ -195,7 +195,7 @@ bool PipelineSetUp::CreateTexture(ID3D11Device* device, ID3D11Texture2D*& textur
 	}
 }
 
-bool PipelineSetUp::CreateSamplerState(ID3D11Device* device, ID3D11SamplerState*& samplerState)
+bool PipelineSetUp::CreateSamplerState(ID3D11Device*& device, ID3D11SamplerState*& samplerState)
 {
 	D3D11_SAMPLER_DESC samplerDesc;
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
