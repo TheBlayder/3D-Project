@@ -135,12 +135,14 @@
   <ItemGroup>
     <ClCompile Include="D3D11SetUp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjectParser.cpp" />
     <ClCompile Include="PipelineSetup.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="D3D11SetUp.h" />
+    <ClInclude Include="ObjectParser.h" />
     <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Window.h" />
