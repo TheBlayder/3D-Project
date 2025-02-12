@@ -8,7 +8,7 @@ ObjectParser::~ObjectParser()
 {
 }
 
-void ObjectParser::LoadObjectFromFile(const std::string& filePath)
+bool ObjectParser::LoadObjectFromFile(const std::string& filePath)
 {
 
 	using namespace DirectX;
@@ -21,7 +21,7 @@ void ObjectParser::LoadObjectFromFile(const std::string& filePath)
 	if (!file)
 	{
 		std::cerr << "Error opening file: " << filePath << std::endl;
-		return;
+		return false;
 	}
 
 	while (1)
@@ -43,9 +43,17 @@ void ObjectParser::LoadObjectFromFile(const std::string& filePath)
 			
 			//Normalize
 			float length = sqrt(normal.x * normal.x + normal.y * normal.y + normal.z * normal.z);
-			normal.x /= length;
-			normal.y /= length;
-			normal.z /= length;
+			if (length == 0)
+			{
+				std::cerr << "Error: Normal length is 0!" << std::endl;
+				return false;
+			}
+			else if (length != 1)
+			{
+				normal.x /= length;
+				normal.y /= length;
+				normal.z /= length;
+			}
 
 			normals.push_back(normal);
 		}
@@ -57,20 +65,21 @@ void ObjectParser::LoadObjectFromFile(const std::string& filePath)
 		}
 		else if (strcmp(lineHeader, "f") == 0)
 		{
-			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
+			unsigned int vertexIndex[3], normalIndex[3], uvIndex[3];
 			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n",
-				&vertexIndex[0], &uvIndex[0], &normalIndex[0],
-				&vertexIndex[1], &uvIndex[1], &normalIndex[1],
-				&vertexIndex[2], &uvIndex[2], &normalIndex[2]);
+				&vertexIndex[0], &normalIndex[0], &uvIndex[0],
+				&vertexIndex[1], &normalIndex[1], &uvIndex[1],
+				&vertexIndex[2], &normalIndex[2], &uvIndex[2]);
 			if (matches != 9)
 			{
 				std::cerr << "File can't be read by parser!" << std::endl;
-				return;
+				return false;
 			}
 		}
 	}
 
 	fclose(file);
+	return true;
 
 	// COMMENT TO SELF
 	// Still need to output and handle the data
