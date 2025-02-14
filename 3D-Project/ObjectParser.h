@@ -16,6 +16,6 @@ public:
 	ObjectParser();
 	~ObjectParser();
 
-	void LoadObjectFromFile(const std::string& filePath);
+	bool LoadObjectFromFile(const std::string& filePath);
 };
 
