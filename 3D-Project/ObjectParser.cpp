@@ -1,5 +1,7 @@
 #include "ObjectParser.h"
 
+using namespace DirectX;
+
 ObjectParser::ObjectParser()
 {
 }
@@ -8,28 +10,26 @@ ObjectParser::~ObjectParser()
 {
 }
 
-bool ObjectParser::LoadObjectFromFile(const std::string& filePath)
+bool ObjectParser::LoadObjectFromFile(const std::string* filePath, std::vector<XMFLOAT3>& vertices, std::vector<XMFLOAT3>& normals, std::vector<XMFLOAT2>& UVs)
 {
-
-	using namespace DirectX;
-	std::vector<XMFLOAT3> vertices;
-	std::vector<XMFLOAT3> normals;
-	std::vector<XMFLOAT2> uvs;
-
 	FILE* file;
-	errno_t err = fopen_s(&file, filePath.c_str(), "r"); // Open the .obj file
+	errno_t err = fopen_s(&file, (*filePath).c_str(), "r"); // Open the .obj file
 	if (!file)
 	{
 		std::cerr << "Error opening file: " << filePath << std::endl;
 		return false;
 	}
 
-	while (1)
+	bool endOfFile = false;
+	while (!endOfFile)
 	{
 		char lineHeader[128];
 		int res = fscanf_s(file, "%s", lineHeader, (unsigned)_countof(lineHeader));
 		if (res == EOF)
-			break;
+		{
+			endOfFile = true;
+			continue;
+		}
 		if (strcmp(lineHeader, "v") == 0)
 		{
 			XMFLOAT3 vertex;
@@ -61,11 +61,11 @@ bool ObjectParser::LoadObjectFromFile(const std::string& filePath)
 		{
 			XMFLOAT2 uv;
 			fscanf_s(file, "%f %f\n", &uv.x, &uv.y);
-			uvs.push_back(uv);
+			UVs.push_back(uv);
 		}
-		else if (strcmp(lineHeader, "f") == 0)
+		else if (strcmp(lineHeader, "f") == 0) // Vet inte hur jag ska använda detta
 		{
-			unsigned int vertexIndex[3], normalIndex[3], uvIndex[3];
+			unsigned int vertexIndex[3], normalIndex[3], uvIndex[3]; // Inte användt
 			int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n",
 				&vertexIndex[0], &normalIndex[0], &uvIndex[0],
 				&vertexIndex[1], &normalIndex[1], &uvIndex[1],
@@ -80,7 +80,4 @@ bool ObjectParser::LoadObjectFromFile(const std::string& filePath)
 
 	fclose(file);
 	return true;
-
-	// COMMENT TO SELF
-	// Still need to output and handle the data
 }
