@@ -36,7 +36,7 @@ int APIENTRY wWinMain(
 	ID3D11DepthStencilView* dsView = nullptr;
 	D3D11_VIEWPORT viewport;
 
-	D3D11SetUp* d3d11SetUp = new D3D11SetUp;
+	D3D11SetUp* d3d11SetUp = new D3D11SetUp();
 	if (!d3d11SetUp->SetUp(device, immediateContext, swapChain, rtv, dsTexture, dsView, viewport, window))
 	{
 		std::cerr << "Error setting up D3D11!" << std::endl;
@@ -67,6 +67,11 @@ int APIENTRY wWinMain(
 
 	UINT stride, offset, nrOfVertices;
 	Renderer* renderer = new Renderer();
+	if(!renderer)
+	{
+		std::cerr << "Error creating renderer!" << std::endl;
+		return -1;
+	}
 
 	MSG msg = { };
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
