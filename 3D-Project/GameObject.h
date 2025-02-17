@@ -33,6 +33,6 @@ public:
 	bool IsStatic() const;
 	void UpdateWorldMatrix(DX::XMMATRIX*& worldMatrix, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg);
 
-	DX::XMMATRIX* GetWorldMatrix() const;
+	const DX::XMMATRIX* GetWorldMatrix() const;
 };
 

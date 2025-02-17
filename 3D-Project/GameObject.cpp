@@ -58,7 +58,7 @@ void GameObject::UpdateWorldMatrix(DX::XMMATRIX*& worldMatrix, const DX::XMFLOAT
 	CreateWorldMatrix(worldMatrix, worldScale, worldPosition, worldRotation);
 }
 
-XMMATRIX* GameObject::GetWorldMatrix() const
+const XMMATRIX* GameObject::GetWorldMatrix() const
 {	
 	return worldMatrix;
 }
