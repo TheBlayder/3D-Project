@@ -128,7 +128,7 @@ bool PipelineSetUp::CreateInputLayout(ID3D11Device*& device, ID3D11InputLayout*&
 	return !FAILED(hr);
 }
 
-bool PipelineSetUp::CreateVertexBuffer(ID3D11Device*& device, ID3D11Buffer*& vertexBuffer)
+bool PipelineSetUp::CreateVertexBuffer(ID3D11Device*& device, ID3D11Buffer*& vertexBuffer, GameObject*& object)
 {
 	return true;
 }
