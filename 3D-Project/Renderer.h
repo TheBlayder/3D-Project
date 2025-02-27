@@ -2,6 +2,8 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
+#include "EngineHandler.h"
+
 class Renderer
 {
 public:
