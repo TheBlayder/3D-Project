@@ -40,7 +40,9 @@ EngineHandler::~EngineHandler()
 	m_swapChain->Release();
 	m_immediateContext->Release();
 	m_device->Release();
+
 	// Release heap objects
+	delete m_renderer;
 	delete m_pipelineSetUp;
 	delete m_d3d11SetUp;
 	delete m_window;
