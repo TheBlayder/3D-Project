@@ -11,7 +11,7 @@ public:
 	~Renderer();
 
 private:
-	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 public:
 	void RenderFrame(
