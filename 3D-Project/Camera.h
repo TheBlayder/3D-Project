@@ -6,19 +6,19 @@ namespace DX = DirectX;
 class Camera
 {
 private:
-	DX::XMFLOAT4 position;
-	DX::XMFLOAT4 direction; // Make sure this is normalized
+	DX::XMFLOAT4 m_position;
+	DX::XMFLOAT4 m_direction; // Make sure this is normalized
 
-	DX::XMFLOAT4 focusPosition;
-	DX::XMFLOAT4 up;
+	DX::XMFLOAT4 m_focusPosition;
+	DX::XMFLOAT4 m_up;
 
-	float fovInDeg;
-	float aspectRatio;
-	float nearPlane;
-	float farPlane;
+	float m_fovInDeg;
+	float m_aspectRatio;
+	float m_nearPlane;
+	float m_farPlane;
 
-	DX::XMMATRIX* viewMatrix;
-	DX::XMMATRIX* projMatrix;
+	DX::XMMATRIX* m_viewMatrix;
+	DX::XMMATRIX* m_projMatrix;
 
 	void CreateViewMatrix(DX::XMMATRIX*& viewMatrix, const DX::XMFLOAT4& pos, const DX::XMFLOAT4& focusPos, DX::XMFLOAT4& up);
 	void CreateProjMatrix(DX::XMMATRIX*& projMatrix, const float& fovInDeg, const float& aspectRatio, const float& nearPlane, const float& farPlane);
