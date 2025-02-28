@@ -43,12 +43,6 @@ int APIENTRY wWinMain(
 		float deltaTime = time.count();
 	}
 
-	// === CLEANUP ===
-	//
-	
-
-	// Release heap objects
-	
 
 	return 0;
 }
