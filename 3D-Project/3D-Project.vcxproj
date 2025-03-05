@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseGameObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D11SetUp.cpp" />
     <ClCompile Include="EngineHandler.cpp" />
@@ -144,6 +145,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseGameObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="D3D11SetUp.h" />
     <ClInclude Include="EngineHandler.h" />
