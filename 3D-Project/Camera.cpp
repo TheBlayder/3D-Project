@@ -1,18 +1,18 @@
 #include "Camera.h"
 
 Camera::Camera(DX::XMFLOAT4& position, DX::XMFLOAT4& direction)
-    : position(position), direction(direction), up(DX::XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f))
+    : m_position(position), m_direction(direction), m_up(DX::XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f))
 {
-    viewMatrix = new DX::XMMATRIX();
-    projMatrix = new DX::XMMATRIX();
-	CreateViewMatrix(viewMatrix, position, DX::XMFLOAT4(0.f,0.f,0.f,1.f), up);
-    CreateProjMatrix(projMatrix, fovInDeg, aspectRatio, nearPlane, farPlane);
+    m_viewMatrix = new DX::XMMATRIX();
+    m_projMatrix = new DX::XMMATRIX();
+	CreateViewMatrix(m_viewMatrix, position, DX::XMFLOAT4(0.f,0.f,0.f,1.f), m_up);
+    CreateProjMatrix(m_projMatrix, m_fovInDeg, m_aspectRatio, m_nearPlane, m_farPlane);
 }
 
 Camera::~Camera()
 {
-    delete viewMatrix;
-    delete projMatrix;
+    delete m_viewMatrix;
+    delete m_projMatrix;
 }
 
 void Camera::CreateViewMatrix(DX::XMMATRIX*& viewMatrix, const DX::XMFLOAT4& pos, const DX::XMFLOAT4& focusPos, DX::XMFLOAT4& up)
@@ -30,43 +30,43 @@ void Camera::CreateProjMatrix(DX::XMMATRIX*& projMatrix, const float& fovInDeg, 
 
 void Camera::updateViewMatrix()
 {
-    DX::XMVECTOR posVec = DX::XMLoadFloat4(&position);
-    DX::XMVECTOR dirVec = DX::XMLoadFloat4(&direction);
+    DX::XMVECTOR posVec = DX::XMLoadFloat4(&m_position);
+    DX::XMVECTOR dirVec = DX::XMLoadFloat4(&m_direction);
     DX::XMVECTOR focusPosVec = DX::XMVectorAdd(posVec, dirVec);
-    DX::XMVECTOR upVec = DX::XMLoadFloat4(&up);
-    *viewMatrix = DX::XMMatrixLookAtLH(posVec, focusPosVec, upVec);
+    DX::XMVECTOR upVec = DX::XMLoadFloat4(&m_up);
+    *m_viewMatrix = DX::XMMatrixLookAtLH(posVec, focusPosVec, upVec);
 }
 
 // === GETTERS AND SETTERS ===
 
 void Camera::SetPosition(const DX::XMFLOAT4& pos)
 {
-    position = pos;
+    m_position = pos;
     updateViewMatrix();
 }
 
 void Camera::SetDirection(const DX::XMFLOAT4& dir)
 {
-    direction = dir;
+    m_direction = dir;
     updateViewMatrix();
 }
 
 const DX::XMFLOAT4& Camera::GetPosition() const
 {
-    return position;
+    return m_position;
 }
 
 const DX::XMFLOAT4& Camera::GetDirection() const
 {
-    return direction;
+    return m_direction;
 }
 
 const DX::XMMATRIX* Camera::GetViewMatrix() const
 {
-    return viewMatrix;
+    return m_viewMatrix;
 }
 
 const DX::XMMATRIX* Camera::GetProjMatrix() const
 {
-    return projMatrix;
+    return m_projMatrix;
 }

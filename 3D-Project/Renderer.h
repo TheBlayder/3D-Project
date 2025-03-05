@@ -2,6 +2,8 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 
+#include "EngineHandler.h"
+
 class Renderer
 {
 public:
@@ -9,7 +11,7 @@ public:
 	~Renderer();
 
 private:
-	float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 public:
 	void RenderFrame(

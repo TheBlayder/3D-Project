@@ -8,8 +8,8 @@ class Window
 {
 private:
 
-	HWND hWindow;
-	UINT width, height;
+	HWND m_hWindow;
+	UINT m_width, m_height;
 
 public:
 
