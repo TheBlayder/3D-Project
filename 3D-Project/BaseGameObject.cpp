@@ -2,10 +2,11 @@
 
 using namespace DirectX;
 
-BaseGameObject::BaseGameObject(const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg)
-	: m_worldScale(scale), m_worldPosition(pos), m_worldRotation(rotationInDeg), m_staticObject(false)
+BaseGameObject::BaseGameObject(const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath)
+	: m_worldScale(scale), m_worldPosition(pos), m_worldRotation(rotationInDeg), m_staticObject(false), m_texturePath(texturePath)
 {
 	CreateWorldMatrix(m_worldMatrix, m_worldScale, m_worldPosition, m_worldRotation);
+	Init();
 }
 
 void BaseGameObject::CreateWorldMatrix(XMMATRIX*& worldMatrix, const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg)
@@ -17,6 +18,11 @@ void BaseGameObject::CreateWorldMatrix(XMMATRIX*& worldMatrix, const XMFLOAT3& s
 }
 
 // === GETTERS ===
+
+const bool BaseGameObject::IsStatic() const
+{
+	return m_staticObject;
+}
 
 const XMMATRIX* BaseGameObject::GetWorldMatrix() const
 {

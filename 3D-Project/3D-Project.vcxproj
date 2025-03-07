@@ -135,9 +135,9 @@
   <ItemGroup>
     <ClCompile Include="BaseGameObject.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Cube.cpp" />
     <ClCompile Include="D3D11SetUp.cpp" />
     <ClCompile Include="EngineHandler.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectParser.cpp" />
     <ClCompile Include="PipelineSetup.cpp" />
@@ -145,11 +145,12 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\OneDrive\OneDrive - BTH Student\_SKOLARBETE_\3D-Prog\Assignment 2\RasterizerDemo\RasterizerDemo\RasterizerDemo\stb_image.h" />
     <ClInclude Include="BaseGameObject.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Cube.h" />
     <ClInclude Include="D3D11SetUp.h" />
     <ClInclude Include="EngineHandler.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="ObjectParser.h" />
     <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="Renderer.h" />

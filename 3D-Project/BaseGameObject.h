@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
+#include <iostream>
 
 namespace DX = DirectX;
 
@@ -21,15 +22,23 @@ protected:
 	float m_worldRotation;
 	DX::XMMATRIX* m_worldMatrix;
 
+	// Texture data
+	std::string m_texturePath; // NOT USED YET
+	unsigned char* m_textureData;
+	int m_textureWidth;
+	int m_textureHeight;
+	int m_textureChannels;
+
 	bool m_staticObject; // If the object is static, it will not be updated every frame
 	void CreateWorldMatrix(DX::XMMATRIX*& worldMatrix, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg);
 
 	virtual void Init() = 0;
 
 public:
-	BaseGameObject(const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg);
+	BaseGameObject(const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath);
 	virtual ~BaseGameObject() = default;
 
+	const bool IsStatic() const;
 	const DX::XMMATRIX* GetWorldMatrix() const;
 	const std::vector<DX::XMFLOAT3>& GetVertices() const;
 	const std::vector<DX::XMFLOAT3>& GetNormals() const;
