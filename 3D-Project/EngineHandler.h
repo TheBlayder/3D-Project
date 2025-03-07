@@ -9,8 +9,8 @@
 #include "D3D11SetUp.h"
 #include "PipelineSetUp.h"
 #include "Renderer.h"
-#include "GameObject.h"
 #include "ObjectParser.h"
+#include "BaseGameObject.h"
 #include "Camera.h"
 
 
@@ -23,7 +23,7 @@ private:
 	Renderer* m_renderer;
 
 	Camera* m_camera;
-	std::vector<GameObject*> m_gameObjects;
+	std::vector<BaseGameObject*> m_gameObjects;
 
 
 	ID3D11Device* m_device = nullptr;
