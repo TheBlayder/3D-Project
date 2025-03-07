@@ -10,6 +10,8 @@
 #include "PipelineSetUp.h"
 #include "stb_image.h"
 
+#define _CRTDBG_MAP_ALLOC
+
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -43,6 +45,8 @@ int APIENTRY wWinMain(
 		float deltaTime = time.count();
 	}
 
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtDumpMemoryLeaks();
 
 	return 0;
 }
