@@ -2,13 +2,6 @@
 
 using namespace DirectX;
 
-ObjectParser::ObjectParser()
-{
-}
-
-ObjectParser::~ObjectParser()
-{
-}
 
 bool ObjectParser::LoadObjectFromFile(const std::string* filePath, std::vector<XMFLOAT3>& vertices, std::vector<XMFLOAT3>& normals, std::vector<XMFLOAT2>& UVs)
 {
@@ -23,7 +16,8 @@ bool ObjectParser::LoadObjectFromFile(const std::string* filePath, std::vector<X
 	bool endOfFile = false;
 	while (!endOfFile)
 	{
-		char lineHeader[128];
+		char lineHeader[128] = {0};
+
 		int res = fscanf_s(file, "%s", lineHeader, (unsigned)_countof(lineHeader));
 		if (res == EOF)
 		{

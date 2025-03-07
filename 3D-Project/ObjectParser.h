@@ -15,8 +15,8 @@ private:
 
 
 public:
-	ObjectParser();
-	~ObjectParser();
+	ObjectParser() = default;
+	~ObjectParser() = default;
 
 	bool LoadObjectFromFile(const std::string* filePath, std::vector<DX::XMFLOAT3>& verticies, std::vector<DX::XMFLOAT3>& normals, std::vector<DX::XMFLOAT2>& UVs);
 };
