@@ -25,9 +25,9 @@ protected:
 	// Texture data
 	std::string m_texturePath; // NOT USED YET
 	unsigned char* m_textureData;
-	int m_textureWidth;
-	int m_textureHeight;
-	int m_textureChannels;
+	size_t m_textureWidth;
+	size_t m_textureHeight;
+	size_t m_textureChannels;
 
 	bool m_staticObject; // If the object is static, it will not be updated every frame
 	void CreateWorldMatrix(DX::XMMATRIX*& worldMatrix, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg);
