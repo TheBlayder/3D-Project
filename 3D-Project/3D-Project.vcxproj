@@ -142,6 +142,7 @@
     <ClCompile Include="ObjectParser.cpp" />
     <ClCompile Include="PipelineSetup.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +155,7 @@
     <ClInclude Include="ObjectParser.h" />
     <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
