@@ -74,6 +74,5 @@ const DX::XMFLOAT3& Camera::GetUp() const
 
 DX::XMFLOAT4X4 Camera::GetViewProjMatrix() const
 {
-    // Implement view projection matrix calculation here
     return DX::XMFLOAT4X4();
 }

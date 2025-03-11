@@ -47,7 +47,7 @@ ID3D11Buffer* ConstantBuffer::GetBuffer() const
 	return m_buffer;
 }
 
-size_t ConstantBuffer::GetSize() const
+UINT ConstantBuffer::GetSize() const
 {
 	return m_size;
 }

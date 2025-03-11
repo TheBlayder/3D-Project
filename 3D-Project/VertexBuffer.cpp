@@ -21,14 +21,14 @@ void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT&
 	this->vertexSize = vertexSize;
 	this->nrOfVertices = nrOfVertices;
 
-	D3D11_BUFFER_DESC vBufferDesc = {};
+	D3D11_BUFFER_DESC vBufferDesc;
 	vBufferDesc.ByteWidth = vertexSize * nrOfVertices;
 	vBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vBufferDesc.CPUAccessFlags = 0;
 	vBufferDesc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA vBufferData = {};
+	D3D11_SUBRESOURCE_DATA vBufferData;
 	vBufferData.pSysMem = vertices;
 	vBufferData.SysMemPitch = 0;
 	vBufferData.SysMemSlicePitch = 0;
