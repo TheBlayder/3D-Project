@@ -38,8 +38,8 @@ public:
 	BaseGameObject(const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath);
 	virtual ~BaseGameObject() = default;
 
-	const bool IsStatic() const;
-	const DX::XMMATRIX* GetWorldMatrix() const;
+	bool IsStatic() const;
+	DX::XMMATRIX* GetWorldMatrix() const;
 	const std::vector<DX::XMFLOAT3>& GetVertices() const;
 	const std::vector<DX::XMFLOAT3>& GetNormals() const;
 	const std::vector<DX::XMFLOAT2>& GetUVs() const;

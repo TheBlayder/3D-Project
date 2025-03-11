@@ -19,12 +19,12 @@ void BaseGameObject::CreateWorldMatrix(XMMATRIX*& worldMatrix, const XMFLOAT3& s
 
 // === GETTERS ===
 
-const bool BaseGameObject::IsStatic() const
+bool BaseGameObject::IsStatic() const
 {
 	return m_staticObject;
 }
 
-const XMMATRIX* BaseGameObject::GetWorldMatrix() const
+XMMATRIX* BaseGameObject::GetWorldMatrix() const
 {
 	return m_worldMatrix;
 }
