@@ -1,40 +1,54 @@
 #pragma once
+
 #include "d3d11.h"
 #include "DirectXMath.h"
+#include "ConstantBuffer.h"
 
 namespace DX = DirectX;
+
+struct ProjectionData
+{
+	float fovInDeg = 0.f;
+	float aspectRatio = 0.f;
+	float nearPlane = 0.f;
+	float m_farPlane = 0.f;
+};
+
 class Camera
 {
 private:
-	DX::XMFLOAT4 m_position;
-	DX::XMFLOAT4 m_direction; // Make sure this is normalized
+	DX::XMFLOAT3 m_position = {0.f, 0.f, 0.f};
+	DX::XMFLOAT3 m_forward = { 0.f, 0.f, 1.f }; // Make sure this is normalized
+	DX::XMFLOAT3 m_right = {1.f, 0.f, 0.f};
+	DX::XMFLOAT3 m_up = { 0.f, 1.f, 0.f };
 
-	DX::XMFLOAT4 m_focusPosition;
-	DX::XMFLOAT4 m_up;
+	ProjectionData m_projData;
 
-	float m_fovInDeg;
-	float m_aspectRatio;
-	float m_nearPlane;
-	float m_farPlane;
+	ConstantBuffer* m_cameraBuffer;
+	
+	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
+	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
 
-	DX::XMMATRIX* m_viewMatrix;
-	DX::XMMATRIX* m_projMatrix;
-
-	void CreateViewMatrix(DX::XMMATRIX*& viewMatrix, const DX::XMFLOAT4& pos, const DX::XMFLOAT4& focusPos, DX::XMFLOAT4& up);
-	void CreateProjMatrix(DX::XMMATRIX*& projMatrix, const float& fovInDeg, const float& aspectRatio, const float& nearPlane, const float& farPlane);
-
-	void updateViewMatrix();
 public:
-	Camera(DX::XMFLOAT4& posistion, DX::XMFLOAT4& direction);
+	Camera() = default;
+	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 	~Camera();
 
-	void SetPosition(const DX::XMFLOAT4& position);
-	void SetDirection(const DX::XMFLOAT4& direction);
+	// Movement
+	void MoveForward(float amount); // Forward & Backward
+	void MoveRight(float amount); // Right & Left
 
-	const DX::XMFLOAT4& GetPosition() const;
-	const DX::XMFLOAT4& GetDirection() const;
+	void RotateRight(float amount); // Side to side
 
-	const DX::XMMATRIX* GetViewMatrix() const;
-	const DX::XMMATRIX* GetProjMatrix() const;
+	// Constant buffer
+	void UpdateConstantBuffer(ID3D11DeviceContext* context);
+
+	// Getters
+	ID3D11Buffer* GetConstantBuffer() const;
+	const DX::XMFLOAT3& GetPosition() const;
+	const DX::XMFLOAT3& GetForward() const;
+	const DX::XMFLOAT3& GetRight() const;
+	const DX::XMFLOAT3& GetUp() const;
+	DX::XMFLOAT4X4 GetViewProjMatrix() const;
 };
 

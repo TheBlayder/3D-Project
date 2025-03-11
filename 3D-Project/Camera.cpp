@@ -1,72 +1,79 @@
+
 #include "Camera.h"
 
-Camera::Camera(DX::XMFLOAT4& position, DX::XMFLOAT4& direction)
-    : m_position(position), m_direction(direction), m_up(DX::XMFLOAT4(0.0f, 1.0f, 0.0f, 0.0f))
+void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
 {
-    m_viewMatrix = new DX::XMMATRIX();
-    m_projMatrix = new DX::XMMATRIX();
-	CreateViewMatrix(m_viewMatrix, position, DX::XMFLOAT4(0.f,0.f,0.f,1.f), m_up);
-    CreateProjMatrix(m_projMatrix, m_fovInDeg, m_aspectRatio, m_nearPlane, m_farPlane);
+	m_position.x += direction.x * amount;
+	m_position.y += direction.y * amount;
+	m_position.z += direction.z * amount;
+}
+
+void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
+{
+	// Implement rotation logic here
+}
+
+Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
+    : m_position(initialPosition), m_projData(projData)
+{
+    m_cameraBuffer = new ConstantBuffer(device, sizeof(ProjectionData), &projData);
 }
 
 Camera::~Camera()
 {
-    delete m_viewMatrix;
-    delete m_projMatrix;
+    delete m_cameraBuffer;
 }
 
-void Camera::CreateViewMatrix(DX::XMMATRIX*& viewMatrix, const DX::XMFLOAT4& pos, const DX::XMFLOAT4& focusPos, DX::XMFLOAT4& up)
+// === MOVEMENT ===
+void Camera::MoveForward(float amount)
 {
-    DX::XMVECTOR posVec = DX::XMLoadFloat4(&pos);
-    DX::XMVECTOR focusPosVec = DX::XMLoadFloat4(&focusPos);
-    DX::XMVECTOR upVec = DX::XMLoadFloat4(&up);
-    *viewMatrix = DX::XMMatrixLookAtLH(posVec, focusPosVec, upVec);
+	MoveInDirection(amount, m_forward);
 }
 
-void Camera::CreateProjMatrix(DX::XMMATRIX*& projMatrix, const float& fovInDeg, const float& aspectRatio, const float& nearPlane, const float& farPlane)
+void Camera::MoveRight(float amount)
 {
-    *projMatrix = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(fovInDeg), aspectRatio, nearPlane, farPlane);
+	MoveInDirection(amount, m_right);
 }
 
-void Camera::updateViewMatrix()
+void Camera::RotateRight(float amount)
 {
-    DX::XMVECTOR posVec = DX::XMLoadFloat4(&m_position);
-    DX::XMVECTOR dirVec = DX::XMLoadFloat4(&m_direction);
-    DX::XMVECTOR focusPosVec = DX::XMVectorAdd(posVec, dirVec);
-    DX::XMVECTOR upVec = DX::XMLoadFloat4(&m_up);
-    *m_viewMatrix = DX::XMMatrixLookAtLH(posVec, focusPosVec, upVec);
+	RotateAroundAxis(amount, m_up);
 }
 
-// === GETTERS AND SETTERS ===
-
-void Camera::SetPosition(const DX::XMFLOAT4& pos)
+// === CONSTANT BUFFER ===
+void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
-    m_position = pos;
-    updateViewMatrix();
+	m_cameraBuffer->Update(context, nullptr); // Lista ut vad som ska skickas in här
 }
 
-void Camera::SetDirection(const DX::XMFLOAT4& dir)
+// === GETTERS ===
+ID3D11Buffer* Camera::GetConstantBuffer() const
 {
-    m_direction = dir;
-    updateViewMatrix();
+    return m_cameraBuffer->GetBuffer();
 }
 
-const DX::XMFLOAT4& Camera::GetPosition() const
+const DX::XMFLOAT3& Camera::GetPosition() const
 {
     return m_position;
 }
 
-const DX::XMFLOAT4& Camera::GetDirection() const
+const DX::XMFLOAT3& Camera::GetForward() const
 {
-    return m_direction;
+    return m_forward;
 }
 
-const DX::XMMATRIX* Camera::GetViewMatrix() const
+const DX::XMFLOAT3& Camera::GetRight() const
 {
-    return m_viewMatrix;
+    return m_right;
 }
 
-const DX::XMMATRIX* Camera::GetProjMatrix() const
+const DX::XMFLOAT3& Camera::GetUp() const
 {
-    return m_projMatrix;
+    return m_up;
+}
+
+DX::XMFLOAT4X4 Camera::GetViewProjMatrix() const
+{
+    // Implement view projection matrix calculation here
+    return DX::XMFLOAT4X4();
 }
