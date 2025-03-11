@@ -1,0 +1,63 @@
+#include "ConstantBuffer.h"
+
+#include <iostream>
+
+ConstantBuffer::ConstantBuffer(ID3D11Device* device, size_t byteSize, void* initData)
+{
+	Init(device, byteSize, initData);
+}
+
+ConstantBuffer::~ConstantBuffer()
+{
+	if (m_buffer)
+	{
+		m_buffer->Release();
+		m_buffer = nullptr;
+	}
+}
+
+bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
+{
+	D3D11_BUFFER_DESC cBufferDesc;
+	cBufferDesc.ByteWidth = byteSize;
+	cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cBufferDesc.MiscFlags = 0;
+	cBufferDesc.StructureByteStride = 0;
+
+	D3D11_SUBRESOURCE_DATA cBufferData;
+	cBufferData.pSysMem = initData;
+	cBufferData.SysMemPitch = 0;
+	cBufferData.SysMemSlicePitch = 0;
+
+	HRESULT hr = device->CreateBuffer(&cBufferDesc, &cBufferData, &m_buffer);
+	if (FAILED(hr))
+	{
+		std::cerr << "Failed to create constant buffer!" << std::endl;
+		return false;
+	}
+
+	m_size = byteSize;
+	return true;
+}
+
+ID3D11Buffer* ConstantBuffer::GetBuffer() const
+{
+	return m_buffer;
+}
+
+size_t ConstantBuffer::GetSize() const
+{
+	return m_size;
+}
+
+void ConstantBuffer::Update(ID3D11DeviceContext* context, void* data)
+{
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	context->Map(m_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	memcpy(mappedResource.pData, data, m_size);
+	context->Unmap(m_buffer, 0);
+}
