@@ -7,22 +7,33 @@ VertexBuffer::VertexBuffer(ID3D11Device*& device, const void* vertices, const UI
 	Init(device, vertices, vertexSize, nrOfVertices);
 }
 
+VertexBuffer::~VertexBuffer()
+{
+	if (m_vertexBuffer)
+	{
+		m_vertexBuffer->Release();
+		m_vertexBuffer = nullptr;
+	}
+}
+
 void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices)
 {
 	this->vertexSize = vertexSize;
 	this->nrOfVertices = nrOfVertices;
 
-	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufferDesc.ByteWidth = vertexSize * nrOfVertices;
-	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferDesc.CPUAccessFlags = 0;
-	bufferDesc.MiscFlags = 0;
+	D3D11_BUFFER_DESC vBufferDesc = {};
+	vBufferDesc.ByteWidth = vertexSize * nrOfVertices;
+	vBufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	vBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vBufferDesc.CPUAccessFlags = 0;
+	vBufferDesc.MiscFlags = 0;
 
-	D3D11_SUBRESOURCE_DATA initData = {};
-	initData.pSysMem = vertices;
+	D3D11_SUBRESOURCE_DATA vBufferData = {};
+	vBufferData.pSysMem = vertices;
+	vBufferData.SysMemPitch = 0;
+	vBufferData.SysMemSlicePitch = 0;
 	
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &m_vertexBuffer);
+	HRESULT hr = device->CreateBuffer(&vBufferDesc, &vBufferData, &m_vertexBuffer);
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create vertex buffer!" << std::endl;

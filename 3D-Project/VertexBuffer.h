@@ -12,7 +12,7 @@ private:
 public:
 	VertexBuffer() = default;
 	VertexBuffer(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices);
-	~VertexBuffer() = default;
+	~VertexBuffer();
 
 	void Init(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices);
 
