@@ -42,7 +42,7 @@ protected:
 	virtual void Init() = 0;
 
 public:
-	BaseGameObject(ID3D11Device*& device, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath);
+	BaseGameObject(ID3D11Device*& device, const WorldData& worldData, const std::string& texturePath);
 	virtual ~BaseGameObject() = default;
 
 	bool IsStatic() const;

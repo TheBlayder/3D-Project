@@ -3,14 +3,13 @@
 
 using namespace DirectX;
 
-BaseGameObject::BaseGameObject(ID3D11Device*& device, const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath)
-	: m_staticObject(false), m_texturePath(texturePath)
+BaseGameObject::BaseGameObject(ID3D11Device*& device, const WorldData& worldData, const std::string& texturePath)
+	: m_staticObject(false), m_worldData(worldData), m_texturePath(texturePath)
 {
-	m_worldData.scale = scale;
-	m_worldData.position = pos;
-	m_worldData.rotationY = rotationInDeg;
-	
-	m_worldBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &CreateWorldMatrix(m_worldData.scale, m_worldData.position, m_worldData.rotationY));
+	using namespace DirectX;
+	XMFLOAT4X4 worldMatrix;
+	CreateWorldMatrix(worldMatrix, m_worldData.scale, m_worldData.position, m_worldData.rotationY);
+	m_worldBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &worldMatrix);
 
 	Init();
 }
@@ -24,7 +23,10 @@ bool BaseGameObject::IsStatic() const
 
 void BaseGameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
-	m_worldBuffer->Update(context, &CreateWorldMatrix(m_worldData.scale, m_worldData.position, m_worldData.rotationY));
+	using namespace DirectX;
+	XMFLOAT4X4 worldMatrix;
+	CreateWorldMatrix(worldMatrix, m_worldData.scale, m_worldData.position, m_worldData.rotationY);
+	m_worldBuffer->Update(context, &worldMatrix);
 }
 
 ID3D11Buffer* BaseGameObject::GetConstantBuffer() const
