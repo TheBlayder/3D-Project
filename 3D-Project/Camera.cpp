@@ -13,14 +13,23 @@ void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
 	// Implement rotation logic here
 }
 
+DX::XMFLOAT4X4& Camera::GenerateViewProjMatrix()
+{
+	using namespace DirectX;
+	XMFLOAT4X4 viewMatrix, projMatrix, viewProjMatrix;
+
+	CreateViewMatrix(viewMatrix, m_position, m_forward, m_up);
+	CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
+	CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
+}
+
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
     : m_position(initialPosition), m_projData(projData)
 {
 	using namespace DirectX;
 
-	XMFLOAT4X4 viewMatrix = CreateViewMatrix(m_position, m_forward, m_up);
-	XMFLOAT4X4 projMatrix = CreateProjectionMatrix(m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
-    m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &CreateViewProjMatrix(viewMatrix, projMatrix));
+	XMFLOAT4X4 viewProjMatrix = GenerateViewProjMatrix();
+    m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
 }
 
 Camera::~Camera()
@@ -48,10 +57,8 @@ void Camera::RotateRight(float amount)
 void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
 	using namespace DirectX;
-	// Duplicerad kod?? 
-	XMFLOAT4X4 viewMatrix = CreateViewMatrix(m_position, m_forward, m_up);
-	XMFLOAT4X4 projMatrix = CreateProjectionMatrix(m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
-	m_cameraBuffer->Update(context, &CreateViewProjMatrix(viewMatrix, projMatrix));
+	XMFLOAT4X4 viewProjMatrix = GenerateViewProjMatrix();
+	m_cameraBuffer->Update(context, &viewProjMatrix);
 }
 
 // === GETTERS ===

@@ -29,6 +29,8 @@ private:
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
 	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
 
+	DX::XMFLOAT4X4& GenerateViewProjMatrix();
+
 public:
 	Camera() = default;
 	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
