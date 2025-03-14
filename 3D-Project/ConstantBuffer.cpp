@@ -10,16 +10,16 @@ ConstantBuffer::ConstantBuffer(ID3D11Device* device, size_t byteSize, void* init
 ConstantBuffer::~ConstantBuffer()
 {
 	if (m_buffer)
-	{
 		m_buffer->Release();
-		m_buffer = nullptr;
-	}
+
 }
 
 bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 {
+	m_size = static_cast<UINT>(byteSize);
+
 	D3D11_BUFFER_DESC cBufferDesc;
-	cBufferDesc.ByteWidth = byteSize;
+	cBufferDesc.ByteWidth = m_size;
 	cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	cBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -38,7 +38,6 @@ bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 		return false;
 	}
 
-	m_size = byteSize;
 	return true;
 }
 

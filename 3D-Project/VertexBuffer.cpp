@@ -10,10 +10,7 @@ VertexBuffer::VertexBuffer(ID3D11Device*& device, const void* vertices, const UI
 VertexBuffer::~VertexBuffer()
 {
 	if (m_vertexBuffer)
-	{
 		m_vertexBuffer->Release();
-		m_vertexBuffer = nullptr;
-	}
 }
 
 void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices)
