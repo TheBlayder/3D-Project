@@ -1,5 +1,5 @@
-
 #include "Camera.h"
+#include "MathFuncs.h"
 
 void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
 {
@@ -16,7 +16,11 @@ void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
     : m_position(initialPosition), m_projData(projData)
 {
-    m_cameraBuffer = new ConstantBuffer(device, sizeof(ProjectionData), &projData);
+	using namespace DirectX;
+
+	XMFLOAT4X4 viewMatrix = CreateViewMatrix(m_position, m_forward, m_up);
+	XMFLOAT4X4 projMatrix = CreateProjectionMatrix(m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
+    m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &CreateViewProjMatrix(viewMatrix, projMatrix));
 }
 
 Camera::~Camera()
@@ -43,7 +47,11 @@ void Camera::RotateRight(float amount)
 // === CONSTANT BUFFER ===
 void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
-	m_cameraBuffer->Update(context, nullptr); // Lista ut vad som ska skickas in här
+	using namespace DirectX;
+	// Duplicerad kod?? 
+	XMFLOAT4X4 viewMatrix = CreateViewMatrix(m_position, m_forward, m_up);
+	XMFLOAT4X4 projMatrix = CreateProjectionMatrix(m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
+	m_cameraBuffer->Update(context, &CreateViewProjMatrix(viewMatrix, projMatrix));
 }
 
 // === GETTERS ===
@@ -70,9 +78,4 @@ const DX::XMFLOAT3& Camera::GetRight() const
 const DX::XMFLOAT3& Camera::GetUp() const
 {
     return m_up;
-}
-
-DX::XMFLOAT4X4 Camera::GetViewProjMatrix() const
-{
-    return DX::XMFLOAT4X4();
 }

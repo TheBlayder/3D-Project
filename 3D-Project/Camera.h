@@ -49,6 +49,5 @@ public:
 	const DX::XMFLOAT3& GetForward() const;
 	const DX::XMFLOAT3& GetRight() const;
 	const DX::XMFLOAT3& GetUp() const;
-	DX::XMFLOAT4X4 GetViewProjMatrix() const;
 };
 

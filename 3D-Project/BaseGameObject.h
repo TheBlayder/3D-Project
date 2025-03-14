@@ -5,7 +5,16 @@
 #include <string>
 #include <iostream>
 
+#include "ConstantBuffer.h"
+
 namespace DX = DirectX;
+
+struct WorldData
+{
+	DX::XMFLOAT3 scale = { 1.f, 1.f, 1.f };
+	DX::XMFLOAT3 position = { 0.f, 0.f, 0.f };
+	float rotationY = 0.f;
+};
 
 // BASE CLASS - Abstract class
 class BaseGameObject
@@ -17,10 +26,9 @@ protected:
 	std::vector<DX::XMFLOAT2> m_UVs;
 
 	// World data
-	DX::XMFLOAT3 m_worldScale;
-	DX::XMFLOAT3 m_worldPosition;
-	float m_worldRotation;
-	DX::XMMATRIX* m_worldMatrix;
+	WorldData m_worldData;
+
+	ConstantBuffer* m_worldBuffer;
 
 	// Texture data
 	std::string m_texturePath; // NOT USED YET
@@ -30,16 +38,18 @@ protected:
 	size_t m_textureChannels;
 
 	bool m_staticObject; // If the object is static, it will not be updated every frame
-	void CreateWorldMatrix(DX::XMMATRIX*& worldMatrix, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg);
 
 	virtual void Init() = 0;
 
 public:
-	BaseGameObject(const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath);
+	BaseGameObject(ID3D11Device*& device, const DX::XMFLOAT3& scale, const DX::XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath);
 	virtual ~BaseGameObject() = default;
 
 	bool IsStatic() const;
-	DX::XMMATRIX* GetWorldMatrix() const;
+
+	void UpdateConstantBuffer(ID3D11DeviceContext* context);
+
+	ID3D11Buffer* GetConstantBuffer() const;
 	const std::vector<DX::XMFLOAT3>& GetVertices() const;
 	const std::vector<DX::XMFLOAT3>& GetNormals() const;
 	const std::vector<DX::XMFLOAT2>& GetUVs() const;

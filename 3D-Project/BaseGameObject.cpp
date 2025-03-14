@@ -1,20 +1,18 @@
 #include "BaseGameObject.h"
+#include "MathFuncs.h"
 
 using namespace DirectX;
 
-BaseGameObject::BaseGameObject(const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath)
-	: m_worldScale(scale), m_worldPosition(pos), m_worldRotation(rotationInDeg), m_staticObject(false), m_texturePath(texturePath)
+BaseGameObject::BaseGameObject(ID3D11Device*& device, const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg, const std::string& texturePath)
+	: m_staticObject(false), m_texturePath(texturePath)
 {
-	CreateWorldMatrix(m_worldMatrix, m_worldScale, m_worldPosition, m_worldRotation);
-	Init();
-}
+	m_worldData.scale = scale;
+	m_worldData.position = pos;
+	m_worldData.rotationY = rotationInDeg;
+	
+	m_worldBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &CreateWorldMatrix(m_worldData.scale, m_worldData.position, m_worldData.rotationY));
 
-void BaseGameObject::CreateWorldMatrix(XMMATRIX*& worldMatrix, const XMFLOAT3& scale, const XMFLOAT3& pos, const float& rotationInDeg)
-{
-	XMMATRIX scalingMatrix = XMMatrixScaling(scale.x, scale.y, scale.z);
-	XMMATRIX translationMatrix = XMMatrixTranslation(pos.x, pos.y, pos.z);
-	XMMATRIX rotationnMatrix = XMMatrixRotationY(DX::XMConvertToRadians(rotationInDeg));
-	*worldMatrix = XMMatrixMultiplyTranspose(XMMatrixMultiply(scalingMatrix, translationMatrix), rotationnMatrix);
+	Init();
 }
 
 // === GETTERS ===
@@ -24,9 +22,14 @@ bool BaseGameObject::IsStatic() const
 	return m_staticObject;
 }
 
-XMMATRIX* BaseGameObject::GetWorldMatrix() const
+void BaseGameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
-	return m_worldMatrix;
+	m_worldBuffer->Update(context, &CreateWorldMatrix(m_worldData.scale, m_worldData.position, m_worldData.rotationY));
+}
+
+ID3D11Buffer* BaseGameObject::GetConstantBuffer() const
+{
+	return m_worldBuffer->GetBuffer();
 }
 
 const std::vector<DX::XMFLOAT3>& BaseGameObject::GetVertices() const
