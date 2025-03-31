@@ -51,7 +51,7 @@ UINT ConstantBuffer::GetSize() const
 	return m_size;
 }
 
-void ConstantBuffer::Update(ID3D11DeviceContext* context, void* data)
+void ConstantBuffer::Update(ID3D11DeviceContext* context, void* data, const UINT& size)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
