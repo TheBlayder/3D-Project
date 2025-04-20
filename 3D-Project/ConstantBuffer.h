@@ -19,6 +19,6 @@ public:
 	ID3D11Buffer* GetBuffer() const;
 	UINT GetSize() const;
 
-	void Update(ID3D11DeviceContext* context, void* data);
+	void Update(ID3D11DeviceContext* context, void* data, const UINT& size);
 };
 

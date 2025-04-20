@@ -6,8 +6,8 @@ class VertexBuffer
 {
 private:
 	ID3D11Buffer* m_vertexBuffer;
-	UINT nrOfVertices = 0;
-	UINT vertexSize = 0;
+	UINT m_nrOfVertices = 0;
+	UINT m_vertexSize = 0;
 
 public:
 	VertexBuffer() = default;
@@ -19,5 +19,7 @@ public:
 	ID3D11Buffer* GetBuffer() const;
 	UINT GetVertexSize() const;
 	UINT GetNrOfVertices() const;
+
+	void Update(ID3D11DeviceContext* context, const void* vertices, const UINT& size);
 };
 

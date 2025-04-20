@@ -26,7 +26,7 @@ void BaseGameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 	using namespace DirectX;
 	XMFLOAT4X4 worldMatrix;
 	CreateWorldMatrix(worldMatrix, m_worldData.scale, m_worldData.position, m_worldData.rotationY);
-	m_worldBuffer->Update(context, &worldMatrix);
+	m_worldBuffer->Update(context, &worldMatrix, sizeof(worldMatrix));
 }
 
 ID3D11Buffer* BaseGameObject::GetConstantBuffer() const
