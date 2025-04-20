@@ -13,17 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\Objects">
-      <UniqueIdentifier>{2797b5c4-ff41-484c-b39f-811b6ba29369}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Engine">
       <UniqueIdentifier>{1dc3a229-d501-4abd-a97a-48b49f518428}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Engine">
       <UniqueIdentifier>{91d7d9e3-5cf1-40ef-9920-2b66d58d64e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Objects">
-      <UniqueIdentifier>{786d4f9a-55f8-46c3-b727-3d03b82ae916}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Buffers">
       <UniqueIdentifier>{da8efebb-4b72-45e0-95b7-54437469a896}</UniqueIdentifier>
@@ -31,12 +25,21 @@
     <Filter Include="Source Files\Buffers">
       <UniqueIdentifier>{27978460-f817-443a-ab6b-920f24abf4ad}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{c0926328-6304-42ff-a23a-cfeccfd79e0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{7c964b05-bc0a-459a-8c1e-298e1c4c6e14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Objects">
+      <UniqueIdentifier>{786d4f9a-55f8-46c3-b727-3d03b82ae916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Objects">
+      <UniqueIdentifier>{2797b5c4-ff41-484c-b39f-811b6ba29369}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D3D11SetUp.cpp">
@@ -55,13 +58,13 @@
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="ObjectParser.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
     <ClCompile Include="BaseGameObject.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
-      <Filter>Source Files\Objects</Filter>
+      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
@@ -69,13 +72,19 @@
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ObjectParser.h">
-      <Filter>Header Files\Objects</Filter>
+      <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
     <ClInclude Include="D3D11SetUp.h">
       <Filter>Header Files\Engine</Filter>
@@ -93,13 +102,13 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="BaseGameObject.h">
-      <Filter>Header Files\Objects</Filter>
+      <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\OneDrive\OneDrive - BTH Student\_SKOLARBETE_\3D-Prog\Assignment 2\RasterizerDemo\RasterizerDemo\RasterizerDemo\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">
-      <Filter>Header Files\Objects</Filter>
+      <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
     <ClInclude Include="VertexBuffer.h">
       <Filter>Header Files\Buffers</Filter>
@@ -109,6 +118,15 @@
     </ClInclude>
     <ClInclude Include="MathFuncs.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
