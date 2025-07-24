@@ -10,14 +10,15 @@ private:
 
 	HWND m_hWindow;
 	UINT m_width, m_height;
+	HINSTANCE m_hInstance;
 
 public:
 
-	Window(UINT width, UINT height);
+	Window(const HINSTANCE hInstance, int nCmdShow, UINT width = 0, UINT height = 0);
 	~Window();
 
-	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	bool SetupWindow(HINSTANCE hInstance, int nCmdShow);
+	static LRESULT CALLBACK StaticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	HWND GetWindowHandle() const;
 	UINT GetWidth() const;

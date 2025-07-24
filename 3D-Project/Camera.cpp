@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "MathFuncs.h"
 
+namespace MH = MatrixHelper;
+
 void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
 {
 	m_position.x += direction.x * amount;
@@ -18,9 +20,9 @@ DX::XMFLOAT4X4& Camera::GenerateViewProjMatrix()
 	using namespace DirectX;
 	XMFLOAT4X4 viewMatrix, projMatrix, viewProjMatrix;
 
-	CreateViewMatrix(viewMatrix, m_position, m_forward, m_up);
-	CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
-	CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
+	MH::CreateViewMatrix(viewMatrix, m_position, m_forward, m_up);
+	MH::CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
+	MH::CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
 }
 
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)

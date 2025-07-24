@@ -20,10 +20,8 @@ int APIENTRY wWinMain(
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); // Check for memory leaks
 
-
-	// === WINDOW CREATION ===
-	const UINT WIN_WIDTH = 800;
 	const UINT WIN_HEIGHT = 600;
+	const UINT WIN_WIDTH = 800;
 	
 	EngineHandler engineHandler(hInstance, nCmdShow, WIN_HEIGHT, WIN_WIDTH);
 

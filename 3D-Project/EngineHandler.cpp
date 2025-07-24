@@ -1,9 +1,12 @@
 #include "EngineHandler.h"
 
+// *** Tänk över struktur och hur jag vill ha det i framtiden.
+// *** Kanske kasta undantag istället för att returnera false?
+
 EngineHandler::EngineHandler(HINSTANCE hInstance, int nCmdShow, const UINT height, const UINT width)
 {
-	m_window = new Window(height, width);
-	if (!m_window->SetupWindow(hInstance, nCmdShow))
+	m_window = new Window(hInstance, nCmdShow, height, width);
+	if (!m_window)
 	{
 		std::cerr << "Error setting up window!" << std::endl;
 		return;
@@ -64,4 +67,9 @@ ID3D11Device* EngineHandler::GetDevice() const
 ID3D11DeviceContext* EngineHandler::GetImmediateContext() const
 {
 	return m_immediateContext;
+}
+
+Renderer* EngineHandler::GetRenderer() const
+{
+	return m_renderer;
 }

@@ -42,12 +42,13 @@ private:
 	unsigned char* m_textureData = nullptr;
 
 public:
-	EngineHandler(HINSTANCE hInstance, int nCmdShow, const UINT height, const UINT width);
+	EngineHandler(HINSTANCE hInstance, int nCmdShow, const UINT height = 0, const UINT width = 0);
 	~EngineHandler();
 
 	Window* GetWindow() const;
 	ID3D11Device* GetDevice() const;
 	ID3D11DeviceContext* GetImmediateContext() const;
+	Renderer* GetRenderer() const;
 
 private:
 	

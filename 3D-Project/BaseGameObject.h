@@ -6,15 +6,9 @@
 #include <iostream>
 
 #include "ConstantBuffer.h"
+#include "Transform.h"
 
 namespace DX = DirectX;
-
-struct WorldData
-{
-	DX::XMFLOAT3 scale = { 1.f, 1.f, 1.f };
-	DX::XMFLOAT3 position = { 0.f, 0.f, 0.f };
-	float rotationY = 0.f;
-};
 
 // BASE CLASS - Abstract class
 class BaseGameObject
@@ -26,7 +20,7 @@ protected:
 	std::vector<DX::XMFLOAT2> m_UVs;
 
 	// World data
-	WorldData m_worldData;
+	Transform m_transform;
 
 	ConstantBuffer* m_worldBuffer;
 
@@ -37,15 +31,11 @@ protected:
 	size_t m_textureHeight;
 	size_t m_textureChannels;
 
-	bool m_staticObject; // If the object is static, it will not be updated every frame
-
 	virtual void Init() = 0;
 
 public:
-	BaseGameObject(ID3D11Device*& device, const WorldData& worldData, const std::string& texturePath);
+	BaseGameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath = "");
 	virtual ~BaseGameObject() = default;
-
-	bool IsStatic() const;
 
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 

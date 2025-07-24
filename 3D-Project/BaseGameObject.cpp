@@ -1,32 +1,26 @@
 #include "BaseGameObject.h"
-#include "MathFuncs.h"
+#include "HelperFuncs.h"
 
 using namespace DirectX;
+namespace MH = MatrixHelper;
 
-BaseGameObject::BaseGameObject(ID3D11Device*& device, const WorldData& worldData, const std::string& texturePath)
-	: m_staticObject(false), m_worldData(worldData), m_texturePath(texturePath)
+BaseGameObject::BaseGameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath)
+	: m_staticObject(false), m_transform(transform), m_texturePath(texturePath)
 {
-	using namespace DirectX;
 	XMFLOAT4X4 worldMatrix;
-	CreateWorldMatrix(worldMatrix, m_worldData.scale, m_worldData.position, m_worldData.rotationY);
-	m_worldBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &worldMatrix);
+	MH::CreateWorldMatrix(worldMatrix, m_transform.GetScaleF3(), m_transform.GetPositionF3(), m_transform.GetRotationF3());
+	m_worldBuffer = new ConstantBuffer(device, sizeof(XMFLOAT4X4), &worldMatrix);
 
 	Init();
 }
 
 // === GETTERS ===
 
-bool BaseGameObject::IsStatic() const
-{
-	return m_staticObject;
-}
-
 void BaseGameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
-	using namespace DirectX;
 	XMFLOAT4X4 worldMatrix;
-	CreateWorldMatrix(worldMatrix, m_worldData.scale, m_worldData.position, m_worldData.rotationY);
-	m_worldBuffer->Update(context, &worldMatrix, sizeof(worldMatrix));
+	MH::CreateWorldMatrix(worldMatrix, m_transform.GetScaleF3(), m_transform.GetPositionF3(), m_transform.GetRotationF3());
+	m_worldBuffer->Update(context, &worldMatrix);
 }
 
 ID3D11Buffer* BaseGameObject::GetConstantBuffer() const

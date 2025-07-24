@@ -3,6 +3,7 @@
 #include <string>
 
 #include "PipelineSetUp.h"
+#include "ReadCSO.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -67,20 +68,7 @@ bool PipelineSetUp::SetUp(ID3D11Device*& device, ID3D11DeviceContext*& immediate
 bool PipelineSetUp::LoadShaders(ID3D11Device*& device, ID3D11VertexShader*& vShader, ID3D11PixelShader*& pShader, std::string& vShaderByteCode)
 {
 	std::string shaderData;
-	std::ifstream reader;
-	reader.open("VertexShader.cso", std::ios::binary | std::ios::ate);
-	if (!reader.is_open())
-	{
-		std::cerr << "Could not open VS file!" << std::endl;
-		return false;
-	}
-
-	reader.seekg(0, std::ios::end);
-	shaderData.reserve(static_cast<unsigned int>(reader.tellg()));
-	reader.seekg(0, std::ios::beg);
-
-	shaderData.assign((std::istreambuf_iterator<char>(reader)),
-		std::istreambuf_iterator<char>());
+	CSOReader::ReadCSO("VertexShader.cso", shaderData);
 
 	if (FAILED(device->CreateVertexShader(shaderData.c_str(), shaderData.length(), nullptr, &vShader)))
 	{
@@ -90,20 +78,8 @@ bool PipelineSetUp::LoadShaders(ID3D11Device*& device, ID3D11VertexShader*& vSha
 
 	vShaderByteCode = shaderData;
 	shaderData.clear();
-	reader.close();
-	reader.open("PixelShader.cso", std::ios::binary | std::ios::ate);
-	if (!reader.is_open())
-	{
-		std::cerr << "Could not open PS file!" << std::endl;
-		return false;
-	}
 
-	reader.seekg(0, std::ios::end);
-	shaderData.reserve(static_cast<unsigned int>(reader.tellg()));
-	reader.seekg(0, std::ios::beg);
-
-	shaderData.assign((std::istreambuf_iterator<char>(reader)),
-		std::istreambuf_iterator<char>());
+	CSOReader::ReadCSO("PixelShader.cso", shaderData);
 
 	if (FAILED(device->CreatePixelShader(shaderData.c_str(), shaderData.length(), nullptr, &pShader)))
 	{

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -142,7 +142,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjectParser.cpp" />
     <ClCompile Include="PipelineSetup.cpp" />
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
@@ -156,12 +155,13 @@
     <ClInclude Include="Cube.h" />
     <ClInclude Include="D3D11SetUp.h" />
     <ClInclude Include="EngineHandler.h" />
-    <ClInclude Include="MathFuncs.h" />
+    <ClInclude Include="HelperFuncs.h" />
     <ClInclude Include="ObjectParser.h" />
     <ClInclude Include="PipelineSetUp.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
