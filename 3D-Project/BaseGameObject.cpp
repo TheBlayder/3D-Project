@@ -5,10 +5,10 @@ using namespace DirectX;
 namespace MH = MatrixHelper;
 
 BaseGameObject::BaseGameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath)
-	: m_staticObject(false), m_transform(transform), m_texturePath(texturePath)
+	: m_transform(transform), m_texturePath(texturePath)
 {
 	XMFLOAT4X4 worldMatrix;
-	MH::CreateWorldMatrix(worldMatrix, m_transform.GetScaleF3(), m_transform.GetPositionF3(), m_transform.GetRotationF3());
+	MH::CreateWorldMatrix(worldMatrix, m_transform);
 	m_worldBuffer = new ConstantBuffer(device, sizeof(XMFLOAT4X4), &worldMatrix);
 
 	Init();
@@ -19,7 +19,7 @@ BaseGameObject::BaseGameObject(ID3D11Device*& device, const Transform& transform
 void BaseGameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
 	XMFLOAT4X4 worldMatrix;
-	MH::CreateWorldMatrix(worldMatrix, m_transform.GetScaleF3(), m_transform.GetPositionF3(), m_transform.GetRotationF3());
+	MH::CreateWorldMatrix(worldMatrix, m_transform);
 	m_worldBuffer->Update(context, &worldMatrix);
 }
 

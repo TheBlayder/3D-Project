@@ -15,8 +15,8 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices)
 {
-	this->m_vertexSize = vertexSize;
-	this->m_nrOfVertices = nrOfVertices;
+	m_vertexSize = vertexSize;
+	m_nrOfVertices = nrOfVertices;
 
 	D3D11_BUFFER_DESC vBufferDesc;
 	vBufferDesc.ByteWidth = vertexSize * nrOfVertices;
@@ -50,14 +50,4 @@ UINT VertexBuffer::GetVertexSize() const
 UINT VertexBuffer::GetNrOfVertices() const
 {
 	return m_nrOfVertices;
-}
-
-void VertexBuffer::Update(ID3D11DeviceContext* context, const void* vertices, const UINT& size)
-{
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-	context->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	memcpy(mappedResource.pData, vertices, size);
-	context->Unmap(m_vertexBuffer, 0);
 }

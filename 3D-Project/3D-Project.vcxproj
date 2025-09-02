@@ -157,6 +157,7 @@
     <ClInclude Include="EngineHandler.h" />
     <ClInclude Include="HelperFuncs.h" />
     <ClInclude Include="ObjectParser.h" />
+    <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />

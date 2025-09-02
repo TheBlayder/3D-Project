@@ -134,6 +134,9 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="OBJ_Loader.h">
+      <Filter>Header Files\External-Libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
