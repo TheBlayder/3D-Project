@@ -3,7 +3,6 @@
 #include <iostream>
 #include <chrono>
 
-#include "EngineHandler.h"
 #include "Window.h"
 #include "Renderer.h"
 #include "D3D11SetUp.h"
@@ -23,7 +22,14 @@ int APIENTRY wWinMain(
 	const UINT WIN_HEIGHT = 600;
 	const UINT WIN_WIDTH = 800;
 	
-	EngineHandler engineHandler(hInstance, nCmdShow, WIN_HEIGHT, WIN_WIDTH);
+	Window window(hInstance, nCmdShow, WIN_HEIGHT, WIN_WIDTH);
+
+	Renderer renderer;
+	if (!renderer.Init(window))
+	{
+		std::cout << "Failed to initialize renderer" << std::endl;
+		return -1;
+	}
 
 	// === MAIN LOOP ===
 
