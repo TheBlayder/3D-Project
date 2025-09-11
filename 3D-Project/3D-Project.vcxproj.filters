@@ -66,10 +66,7 @@
     <ClCompile Include="ObjectParser.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="BaseGameObject.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Cube.cpp">
+    <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
@@ -101,10 +98,7 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="BaseGameObject.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Cube.h">
+    <ClInclude Include="GameObject.h">
       <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
     <ClInclude Include="VertexBuffer.h">
@@ -136,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="OBJ_Loader.h">
       <Filter>Header Files\External-Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

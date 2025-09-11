@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "MathFuncs.h"
+#include "HelperFuncs.h"
 
 namespace MH = MatrixHelper;
 
@@ -15,10 +15,10 @@ void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
 	// Implement rotation logic here
 }
 
-DX::XMFLOAT4X4& Camera::GenerateViewProjMatrix()
+void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 {
 	using namespace DirectX;
-	XMFLOAT4X4 viewMatrix, projMatrix, viewProjMatrix;
+	XMFLOAT4X4 viewMatrix, projMatrix;
 
 	MH::CreateViewMatrix(viewMatrix, m_position, m_forward, m_up);
 	MH::CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
@@ -30,7 +30,8 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT
 {
 	using namespace DirectX;
 
-	XMFLOAT4X4 viewProjMatrix = GenerateViewProjMatrix();
+	XMFLOAT4X4 viewProjMatrix;
+	GenerateViewProjMatrix(viewProjMatrix);
     m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
 }
 
@@ -59,7 +60,8 @@ void Camera::RotateRight(float amount)
 void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 {
 	using namespace DirectX;
-	XMFLOAT4X4 viewProjMatrix = GenerateViewProjMatrix();
+	XMFLOAT4X4 viewProjMatrix;
+	GenerateViewProjMatrix(viewProjMatrix);
 	m_cameraBuffer->Update(context, &viewProjMatrix);
 }
 

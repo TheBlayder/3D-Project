@@ -11,7 +11,7 @@
 namespace DX = DirectX;
 
 // BASE CLASS - Abstract class
-class BaseGameObject
+class GameObject
 {
 protected:
 	// Object data
@@ -34,8 +34,8 @@ protected:
 	virtual void Init() = 0;
 
 public:
-	BaseGameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath = "");
-	virtual ~BaseGameObject() = default;
+	GameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath = "");
+	virtual ~GameObject() = default;
 
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 

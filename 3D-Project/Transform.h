@@ -5,6 +5,11 @@ namespace DX = DirectX;
 
 class Transform
 {
+private:
+	DX::XMVECTOR m_position; 
+	DX::XMVECTOR m_rotation;
+	DX::XMVECTOR m_scale;
+
 public:
 	inline Transform();
 	inline Transform(const DX::XMVECTOR& position, const DX::XMVECTOR& rotation, const DX::XMVECTOR& scale);
@@ -20,11 +25,6 @@ public:
 	inline DX::XMFLOAT3 GetPositionF3() const;
 	inline DX::XMFLOAT3 GetRotationF3() const;
 	inline DX::XMFLOAT3 GetScaleF3() const;
-
-private:
-	DX::XMVECTOR m_position; 
-	DX::XMVECTOR m_rotation;
-	DX::XMVECTOR m_scale;    
 };
 
 inline Transform::Transform()
@@ -65,5 +65,3 @@ inline DX::XMFLOAT3 Transform::GetScaleF3() const
 	DX::XMStoreFloat3(&scale, m_scale);
 	return scale;
 }
-
-

@@ -29,7 +29,7 @@ private:
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
 	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
 
-	DX::XMFLOAT4X4& GenerateViewProjMatrix();
+	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
 
 public:
 	Camera() = default;
