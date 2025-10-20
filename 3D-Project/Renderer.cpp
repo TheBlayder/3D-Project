@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "ReadCSO.h"
 
 void Renderer::CreateViewport(const Window& window)
 {
@@ -57,13 +58,117 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	return SUCCEEDED(hr);
 }
 
-Renderer::Renderer()
+bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 {
+	std::string byteCode; // Temporary storage for shader bytecode
+	
+	// Vertex shader
+	if(!CSOReader::ReadCSO("VertexShader.cso", vShaderByteCodeOUT))
+	{
+		std::cerr << "Error reading vertex shader bytecode!" << std::endl;
+		return false;
+	}
+	
+	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.c_str(), vShaderByteCodeOUT.length(), nullptr, &m_vertexShader);
+	
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating vertex shader!" << std::endl;
+		return false;
+	}
+	
+	// Pixel shader
+	if(!CSOReader::ReadCSO("PixelShader.cso", byteCode))
+	{
+		std::cerr << "Error reading pixel shader bytecode!" << std::endl;
+		return false;
+	}
+
+	hr = m_device->CreatePixelShader(byteCode.c_str(), byteCode.length(), nullptr, &m_pixelShader);
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating pixel shader!" << std::endl;
+		return false;
+	}
+	byteCode.clear();
+
+
+	// Compute shader
+	if(!CSOReader::ReadCSO("ComputeShader.cso", byteCode))
+	{
+		std::cerr << "Error reading compute shader bytecode!" << std::endl;
+		return false;
+	}
+
+	hr = m_device->CreateComputeShader(byteCode.c_str(), byteCode.length(), nullptr, &m_computeShader);
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating compute shader!" << std::endl;
+		return false;
+	}
+	byteCode.clear();
+
+	return true;
 }
 
-Renderer::~Renderer()
+bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 {
+	D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"UV", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0} 
+	};
+
+	HRESULT hr = m_device->CreateInputLayout(
+		layoutDesc,
+		ARRAYSIZE(layoutDesc),
+		vShaderByteCode.c_str(),
+		vShaderByteCode.length(),
+		&m_inputLayout
+	);
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating input layout!" << std::endl;
+		return false;
+	}
+
+	m_immediateContext->IASetInputLayout(m_inputLayout);
+	m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return true;
 }
+
+bool Renderer::CreateUAV()
+{
+
+}
+
+bool Renderer::CreateSamplerState()
+{
+	D3D11_SAMPLER_DESC samplerDesc;
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 16;
+	samplerDesc.BorderColor[0] = 0.0f;
+	samplerDesc.BorderColor[1] = 0.0f;
+	samplerDesc.BorderColor[2] = 0.0f;
+	samplerDesc.BorderColor[3] = 0.0f;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	HRESULT hr = m_device->CreateSamplerState(&samplerDesc, &m_samplerState);
+	return !FAILED(hr);
+}
+
+Renderer::Renderer() {}
+
+Renderer::~Renderer() {}
 
 bool Renderer::Init(const Window& window)
 {
@@ -77,13 +182,34 @@ bool Renderer::Init(const Window& window)
 		return false;
 	}
 
-	// Set up input layout
+	// Set up shaders
+	std::string vShaderByteCode;
+	if(!CreateShaders(vShaderByteCode))
+	{
+		std::cerr << "Error creating shaders!" << std::endl;
+		return false;
+	}
 
+	// Set up input layout
+	if (!CreateInputLayout(vShaderByteCode))
+	{
+		std::cerr << "Error creating input layout!" << std::endl;
+		return false;
+	}
 
 	// Set up UAV
+	if (!CreateUAV())
+	{
+		std::cerr << "Error creating UAV!" << std::endl;
+		return false;
+	}
 
-
-
+	// Set up sampler state
+	if (!CreateSamplerState())
+	{
+		std::cerr << "Error creating sampler state!" << std::endl;
+		return false;
+	}
 
 
     return false;

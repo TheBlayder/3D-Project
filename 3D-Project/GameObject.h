@@ -44,4 +44,3 @@ public:
 	const std::vector<DX::XMFLOAT3>& GetNormals() const;
 	const std::vector<DX::XMFLOAT2>& GetUVs() const;
 };
-
