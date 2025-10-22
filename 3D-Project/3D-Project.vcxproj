@@ -136,10 +136,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="D3D11SetUp.cpp" />
-    <ClCompile Include="EngineHandler.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PipelineSetup.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
@@ -149,12 +146,9 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="D3D11SetUp.h" />
-    <ClInclude Include="EngineHandler.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HelperFuncs.h" />
     <ClInclude Include="OBJ_Loader.h" />
-    <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />

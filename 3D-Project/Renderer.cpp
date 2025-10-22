@@ -142,7 +142,7 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 
 bool Renderer::CreateUAV()
 {
-
+	return false;
 }
 
 bool Renderer::CreateSamplerState()
