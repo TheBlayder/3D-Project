@@ -8,7 +8,7 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Renderer.h"
-#include "BaseGameObject.h"
+#include "GameObject.h"
 
 namespace DX = DirectX;
 
@@ -17,7 +17,7 @@ class Scene
 private:
 	Camera* m_camera;
 	Player* m_player;
-	std::vector<BaseGameObject*> m_gameObjects;
+	std::vector<GameObject*> m_gameObjects;
 
 	Renderer* m_renderer;
 
@@ -35,9 +35,9 @@ public:
 	Player* GetPlayer() const;
 	void SetPlayer(Player* player);
 
-	void AddGameObject(BaseGameObject* gameObject);
-	void RemoveGameObject(BaseGameObject* gameObject);
-	std::vector<BaseGameObject*> GetGameObjects() const;
+	void AddGameObject(GameObject* gameObject);
+	void RemoveGameObject(GameObject* gameObject);
+	std::vector<GameObject*> GetGameObjects() const;
 
 	Renderer* GetRenderer() const;
 	void SetRenderer(Renderer* renderer);

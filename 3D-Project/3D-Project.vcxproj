@@ -139,7 +139,6 @@
     <ClCompile Include="D3D11SetUp.cpp" />
     <ClCompile Include="EngineHandler.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ObjectParser.cpp" />
     <ClCompile Include="PipelineSetup.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -147,7 +146,6 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\OneDrive\OneDrive - BTH Student\_SKOLARBETE_\3D-Prog\Assignment 2\RasterizerDemo\RasterizerDemo\RasterizerDemo\stb_image.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
@@ -155,12 +153,12 @@
     <ClInclude Include="EngineHandler.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HelperFuncs.h" />
-    <ClInclude Include="ObjectParser.h" />
     <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="PipelineSetUp.h" />
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />

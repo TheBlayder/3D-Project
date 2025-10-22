@@ -166,6 +166,27 @@ bool Renderer::CreateSamplerState()
 	return !FAILED(hr);
 }
 
+bool Renderer::CreateRasterizerState()
+{
+	// Default rasterizer state
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
+	rasterizerDesc.DepthClipEnable = TRUE;
+
+	HRESULT hr = m_device->CreateRasterizerState(&rasterizerDesc, &m_defaultRasterizerState);
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating rasterizer state!" << std::endl;
+		return false;
+	}
+
+	m_immediateContext->RSSetState(m_defaultRasterizerState);
+	return true;
+}
+
 Renderer::Renderer() {}
 
 Renderer::~Renderer() {}
@@ -176,43 +197,25 @@ bool Renderer::Init(const Window& window)
 	CreateViewport(window);
 
 	// Set up device and swapchain
-	if(!CreateDeviceAndSwapChain(window))
-	{
-		std::cerr << "Error creating device and swapchain!" << std::endl;
-		return false;
-	}
+	if(!CreateDeviceAndSwapChain(window)) return false;
 
 	// Set up shaders
 	std::string vShaderByteCode;
-	if(!CreateShaders(vShaderByteCode))
-	{
-		std::cerr << "Error creating shaders!" << std::endl;
-		return false;
-	}
+	if(!CreateShaders(vShaderByteCode)) return false;
 
 	// Set up input layout
-	if (!CreateInputLayout(vShaderByteCode))
-	{
-		std::cerr << "Error creating input layout!" << std::endl;
-		return false;
-	}
+	if (!CreateInputLayout(vShaderByteCode)) return false;
 
 	// Set up UAV
-	if (!CreateUAV())
-	{
-		std::cerr << "Error creating UAV!" << std::endl;
-		return false;
-	}
+	if (!CreateUAV()) return false;
 
 	// Set up sampler state
-	if (!CreateSamplerState())
-	{
-		std::cerr << "Error creating sampler state!" << std::endl;
-		return false;
-	}
+	if (!CreateSamplerState()) return false;
 
+	// Set up rasterizer state
+	if (!CreateRasterizerState()) return false;
 
-    return false;
+    return true;
 }
 
 ID3D11Device* Renderer::GetDevice()

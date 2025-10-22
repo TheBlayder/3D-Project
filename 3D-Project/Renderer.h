@@ -33,6 +33,7 @@ private:
 	bool CreateInputLayout(const std::string& vShaderByteCode);
 	bool CreateUAV();
 	bool CreateSamplerState();
+	bool CreateRasterizerState();
 
 public:
 	Renderer();
