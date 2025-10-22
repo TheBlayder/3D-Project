@@ -5,9 +5,6 @@
 
 #include "Window.h"
 #include "Renderer.h"
-#include "D3D11SetUp.h"
-#include "PipelineSetUp.h"
-#include "stb_image.h"
 
 #define _CRTDBG_MAP_ALLOC
 

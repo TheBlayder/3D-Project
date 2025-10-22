@@ -60,8 +60,6 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 
 bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 {
-	std::string byteCode; // Temporary storage for shader bytecode
-	
 	// Vertex shader
 	if(!CSOReader::ReadCSO("VertexShader.cso", vShaderByteCodeOUT))
 	{
@@ -77,6 +75,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 	
+	std::string byteCode; // Temporary storage for shader bytecode
 	// Pixel shader
 	if(!CSOReader::ReadCSO("PixelShader.cso", byteCode))
 	{
@@ -91,7 +90,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error creating pixel shader!" << std::endl;
 		return false;
 	}
-	byteCode.clear();
+	byteCode.clear(); // Clear bytecode for reuse
 
 
 	// Compute shader
