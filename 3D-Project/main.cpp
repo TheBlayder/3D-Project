@@ -31,9 +31,9 @@ int APIENTRY wWinMain(
 	// === MAIN LOOP ===
 
 	MSG msg = { };
+	using namespace std::chrono;
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{
-		using namespace std::chrono;
 		time_point<high_resolution_clock> start = high_resolution_clock::now();
 
 		TranslateMessage(&msg);
