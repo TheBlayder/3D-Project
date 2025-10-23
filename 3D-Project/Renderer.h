@@ -41,7 +41,7 @@ public:
 	~Renderer();
 
 	bool Init(const Window& window);
-	void Render(Scene*& scene); // Argument okända för tillfället
+	//void Render(Scene* scene); // Argument okända för tillfället
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();

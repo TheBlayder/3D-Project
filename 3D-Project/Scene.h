@@ -19,8 +19,6 @@ private:
 	Player* m_player;
 	std::vector<GameObject*> m_gameObjects;
 
-	Renderer* m_renderer;
-
 public:
 	Scene();
 	~Scene();
@@ -36,12 +34,5 @@ public:
 	void SetPlayer(Player* player);
 
 	void AddGameObject(GameObject* gameObject);
-	void RemoveGameObject(GameObject* gameObject);
 	std::vector<GameObject*> GetGameObjects() const;
-
-	Renderer* GetRenderer() const;
-	void SetRenderer(Renderer* renderer);
-
-
-
 };
