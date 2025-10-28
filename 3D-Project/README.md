@@ -1,9 +1,7 @@
 
-# PRIMITIVE TOPOLOGY:
-	TRIANGLE LIST
+# PRIMITIVE TOPOLOGY: TRIANGLE LIST
 
 # TODO:
-- Index Buffer support
 - Deferred Rendering
 	+ Multiple Render Targets
 	+ G-Buffer (Created but not integrated)

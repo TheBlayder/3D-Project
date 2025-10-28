@@ -136,9 +136,12 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
+    <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
+    <ClCompile Include="SubMesh.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -148,11 +151,14 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="HelperFuncs.h" />
+    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="OBJ_Loader.h" />
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="SubMesh.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />

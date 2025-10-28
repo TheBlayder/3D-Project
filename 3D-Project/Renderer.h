@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 
 #include "Window.h"
-#include "Scene.h"
+#include "BaseScene.h"
 #include "ConstantBuffer.h"
 
 class Renderer
@@ -16,6 +16,7 @@ private:
 	ID3D11UnorderedAccessView* m_uav = nullptr;
 
 	ID3D11InputLayout* m_inputLayout = nullptr;
+	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	ID3D11RasterizerState* m_defaultRasterizerState = nullptr;
 

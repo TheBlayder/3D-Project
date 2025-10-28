@@ -1,3 +1,11 @@
+// Textures coming from the submesh draw call
+Texture2D ambientTexture : register(t0);
+Texture2D diffuseTexture : register(t1);
+Texture2D specularTexture : register(t2);
+
+SamplerState samplerState : register(s0);
+
+
 struct PSInput
 {
     float4 position : SV_POSITION;

@@ -19,8 +19,6 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	if (_DEBUG)
 		flags = D3D11_CREATE_DEVICE_DEBUG;
 
-	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
-
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc.Width = window.GetWidth();
@@ -46,8 +44,8 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		flags,
-		featureLevels,
-		1,
+		nullptr,
+		0,
 		D3D11_SDK_VERSION,
 		&swapChainDesc,
 		&m_swapChain,
@@ -135,7 +133,7 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 	}
 
 	m_immediateContext->IASetInputLayout(m_inputLayout);
-	m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_immediateContext->IASetPrimitiveTopology(m_primitiveTopology);
 
 	return true;
 }
