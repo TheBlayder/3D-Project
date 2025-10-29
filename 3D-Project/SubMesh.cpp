@@ -16,10 +16,10 @@ void SubMesh::Init(size_t startIndexValue, size_t nrOfIndicesInSubMesh, ID3D11Sh
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
-	context->PSSetConstantBuffers(0, 0, nullptr);
-	context->PSSetShaderResources(0, 1, &m_ambientTexture);
-	context->PSSetShaderResources(1, 1, &m_diffuseTexture);
-	context->PSSetShaderResources(2, 1, &m_specularTexture);
+	//context->PSSetConstantBuffers(0, 0, nullptr);
+
+	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture, m_diffuseTexture, m_specularTexture };
+	context->PSSetShaderResources(0, 3, SRVs);
 
 	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
 }

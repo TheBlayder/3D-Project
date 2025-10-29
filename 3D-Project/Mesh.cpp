@@ -29,6 +29,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 	for(auto& mesh : loader.LoadedMeshes)
 	{
 		SubMesh subMesh;
+		
 	}
 
 
@@ -46,6 +47,7 @@ void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const
 
 void Mesh::PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const
 {
+	m_subMeshes[subMeshIndex].PerformDrawCall(context);
 }
 
 size_t Mesh::GetNrOfSubMeshes() const
@@ -55,15 +57,15 @@ size_t Mesh::GetNrOfSubMeshes() const
 
 ID3D11ShaderResourceView* Mesh::GetAmbientSRV(size_t subMeshIndex) const
 {
-	return nullptr;
+	return m_subMeshes[subMeshIndex].GetAmbientSRV();
 }
 
 ID3D11ShaderResourceView* Mesh::GetDiffuseSRV(size_t subMeshIndex) const
 {
-	return nullptr;
+	return m_subMeshes[subMeshIndex].GetDiffuseSRV();
 }
 
 ID3D11ShaderResourceView* Mesh::GetSpecularSRV(size_t subMeshIndex) const
 {
-	return nullptr;
+	return m_subMeshes[subMeshIndex].GetSpecularSRV();
 }
