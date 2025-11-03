@@ -15,6 +15,8 @@ private:
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
 
+	void CreateDefaultTexture(ID3D11Device* device, ID3D11ShaderResourceView** textureSRV);
+
 public:
 	Mesh() = default;
 	Mesh(ID3D11Device* device, const std::string& filePath);

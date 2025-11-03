@@ -8,6 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+
 Mesh::Mesh(ID3D11Device* device, const std::string& filePath)
 {
 	Init(device, filePath);
@@ -32,7 +33,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		
 	}
 
-
+	
 }
 
 void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const
@@ -68,4 +69,45 @@ ID3D11ShaderResourceView* Mesh::GetDiffuseSRV(size_t subMeshIndex) const
 ID3D11ShaderResourceView* Mesh::GetSpecularSRV(size_t subMeshIndex) const
 {
 	return m_subMeshes[subMeshIndex].GetSpecularSRV();
+}
+
+void Mesh::CreateDefaultTexture(ID3D11Device* device, ID3D11ShaderResourceView** textureSRV)
+{
+	unsigned char defaultTextureData[4] = { 255, 255, 255, 255 }; // White pixel
+	
+	D3D11_TEXTURE2D_DESC textureDesc;
+	textureDesc.Width = 1;
+	textureDesc.Height = 1;
+	textureDesc.MipLevels = 1;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	
+	D3D11_SUBRESOURCE_DATA textureData = {};
+	textureData.pSysMem = defaultTextureData;
+	textureData.SysMemPitch = sizeof(defaultTextureData);
+	
+	ID3D11Texture2D* texture = nullptr;
+	HRESULT hr = device->CreateTexture2D(&textureDesc, &textureData, &texture);
+	if (FAILED(hr))
+	{
+		throw std::runtime_error("Failed to create default texture.");
+	
+	}
+	
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = 1;
+	
+	hr = device->CreateShaderResourceView(texture, &srvDesc, textureSRV);
+	texture->Release();
+	
+	if (FAILED(hr))
+	{
+		throw std::runtime_error("Failed to create shader resource view for default texture.");
+	}
 }
