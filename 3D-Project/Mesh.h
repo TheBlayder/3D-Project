@@ -1,5 +1,7 @@
 #pragma once
 
+#define DIRECTXTK_WIC_LOADER_FLAGS
+
 #include <d3d11.h>
 #include <vector>
 #include <string>

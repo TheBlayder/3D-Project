@@ -1,7 +1,9 @@
 #include "Mesh.h"
 
+#include <DirectXMath.h>
 #include <stdexcept>
 #include <vector>
+#include "WICTextureLoader.h"
 
 #include "OBJ_Loader.h"
 
@@ -21,6 +23,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 	if (!isLoaded)
 	{
 		throw std::runtime_error("Failed to load mesh from file: " + filePath);
+		return;
 	}
 
 	size_t startIndex = 0;
@@ -30,6 +33,59 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 	for(auto& mesh : loader.LoadedMeshes)
 	{
 		SubMesh subMesh;
+		ID3D11ShaderResourceView* ambientSRV = nullptr;
+		ID3D11ShaderResourceView* diffuseSRV = nullptr;
+		ID3D11ShaderResourceView* specularSRV = nullptr;
+
+		// Load ambient texture
+		if (!mesh.MeshMaterial.map_Ka.empty())
+		{
+			// Load texture from file
+			std::string ambientTexturePath = mesh.MeshMaterial.map_Ka;
+			std::wstring ambientTexturePathW(ambientTexturePath.begin(), ambientTexturePath.end());
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, ambientTexturePathW.c_str(), nullptr, &ambientSRV);
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to load ambient texture: " + ambientTexturePath);
+			}
+		}
+		else
+		{
+			CreateDefaultTexture(device, &ambientSRV);
+		}
+
+		// Load diffuse texture
+		if (!mesh.MeshMaterial.map_Kd.empty())
+		{
+			// Load texture from file
+			std::string diffuseTexturePath = mesh.MeshMaterial.map_Kd;
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, diffuseTexturePath.c_str(), nullptr, &diffuseSRV);
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to load diffuse texture: " + diffuseTexturePath);
+			}
+		}
+		else
+		{
+			CreateDefaultTexture(device, &diffuseSRV);
+		}
+
+		// Load specular texture
+		if (!mesh.MeshMaterial.map_Ks.empty())
+		{
+			// Load texture from file
+			std::string specularTexturePath = mesh.MeshMaterial.map_Ks;
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, specularTexturePath.c_str(), nullptr, &specularSRV);
+			if (FAILED(hr))
+			{
+				throw std::runtime_error("Failed to load specular texture: " + specularTexturePath);
+			}
+		}
+		else
+		{
+			CreateDefaultTexture(device, &specularSRV);
+		}
+
 		
 	}
 
