@@ -3,6 +3,7 @@
 #include "d3d11.h"
 #include "DirectXMath.h"
 #include "ConstantBuffer.h"
+#include "Transform.h"
 
 namespace DX = DirectX;
 
@@ -17,16 +18,14 @@ struct ProjectionData
 class Camera
 {
 private:
-	DX::XMFLOAT3 m_position = {0.f, 0.f, 0.f};
-	DX::XMFLOAT3 m_forward = { 0.f, 0.f, 1.f }; // Make sure this is normalized
-	DX::XMFLOAT3 m_right = {1.f, 0.f, 0.f};
+	Transform m_transform;
 	DX::XMFLOAT3 m_up = { 0.f, 1.f, 0.f };
 
 	ProjectionData m_projData;
 	ConstantBuffer* m_cameraBuffer;
 	
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
-	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
+	void RotateAroundAxis(float amount);
 
 	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
 
@@ -37,16 +36,15 @@ public:
 
 	// Movement
 	void MoveForward(float amount); // Forward & Backward
-	void MoveRight(float amount); // Right & Left
-	void RotateRight(float amount); // Side to side
+	void RotateRight(float amount);
 
 	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
 	// Getters
 	ID3D11Buffer* GetConstantBuffer() const;
-	const DX::XMFLOAT3& GetPosition() const;
 	const DX::XMFLOAT3& GetForward() const;
+	const DX::XMFLOAT3& GetPosition() const;
 	const DX::XMFLOAT3& GetRight() const;
 	const DX::XMFLOAT3& GetUp() const;
 };

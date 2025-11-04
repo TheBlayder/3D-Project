@@ -5,14 +5,16 @@ namespace MH = MatrixHelper;
 
 void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
 {
-	m_position.x += direction.x * amount;
-	m_position.y += direction.y * amount;
-	m_position.z += direction.z * amount;
+	m_transform.SetPosition(DirectX::XMVectorAdd(m_transform.GetPosition(), DirectX::XMVectorScale(DirectX::XMLoadFloat3(&direction), amount)));
 }
 
-void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
+void Camera::RotateAroundAxis(float amount) // Will only rotate around the up axis for now
 {
-	// Implement rotation logic here
+	using namespace DirectX;
+	XMVECTOR currentRotation = m_transform.GetRotation();
+	XMVECTOR upVector = XMLoadFloat3(&m_up);
+	XMVECTOR rotationAmount = XMVectorScale(upVector, amount);
+	m_transform.SetRotation(XMVectorAdd(currentRotation, rotationAmount));
 }
 
 void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
@@ -20,15 +22,16 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 	using namespace DirectX;
 	XMFLOAT4X4 viewMatrix, projMatrix;
 
-	MH::CreateViewMatrix(viewMatrix, m_position, m_forward, m_up);
+	MH::CreateViewMatrix(viewMatrix, m_transform.GetPositionF3(), m_transform.GetRotationF3(), m_up);
 	MH::CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
 	MH::CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
 }
 
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
-    : m_position(initialPosition), m_projData(projData)
+    : m_projData(projData)
 {
 	using namespace DirectX;
+	m_transform.SetPosition(DirectX::XMLoadFloat3(&initialPosition));
 
 	XMFLOAT4X4 viewProjMatrix;
 	GenerateViewProjMatrix(viewProjMatrix);
@@ -43,17 +46,12 @@ Camera::~Camera()
 // === MOVEMENT ===
 void Camera::MoveForward(float amount)
 {
-	MoveInDirection(amount, m_forward);
-}
-
-void Camera::MoveRight(float amount)
-{
-	MoveInDirection(amount, m_right);
+	MoveInDirection(amount, m_transform.GetRotationF3());
 }
 
 void Camera::RotateRight(float amount)
 {
-	RotateAroundAxis(amount, m_up);
+	RotateAroundAxis(amount);
 }
 
 // === CONSTANT BUFFER ===
@@ -71,19 +69,21 @@ ID3D11Buffer* Camera::GetConstantBuffer() const
     return m_cameraBuffer->GetBuffer();
 }
 
-const DX::XMFLOAT3& Camera::GetPosition() const
-{
-    return m_position;
-}
-
 const DX::XMFLOAT3& Camera::GetForward() const
 {
-    return m_forward;
+	return m_transform.GetRotationF3();
+}
+
+const DX::XMFLOAT3& Camera::GetPosition() const
+{
+    return m_transform.GetPositionF3();
 }
 
 const DX::XMFLOAT3& Camera::GetRight() const
 {
-    return m_right;
+	DX::XMFLOAT3 right;
+	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetPosition(), DirectX::XMLoadFloat3(&m_up)));
+	return right;
 }
 
 const DX::XMFLOAT3& Camera::GetUp() const

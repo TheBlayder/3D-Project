@@ -33,6 +33,4 @@ namespace CSOReader
 
 		return true;
 	}
-
-
 }

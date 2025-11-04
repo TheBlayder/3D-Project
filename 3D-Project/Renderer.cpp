@@ -1,6 +1,13 @@
 #include "Renderer.h"
 #include "ReadCSO.h"
 
+Renderer::Renderer() {}
+
+Renderer::~Renderer() 
+{
+	
+}
+
 void Renderer::CreateViewport(const Window& window)
 {
 	D3D11_VIEWPORT viewport;
@@ -58,14 +65,21 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 
 bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 {
+	vShaderByteCodeOUT.clear();
+	
 	// Vertex shader
+
+	// ERROR SOMEWHERE HERE
+	// D3D11 ERROR: ID3D11Device::CreateVertexShader: Encoded Vertex Shader size doesn't match specified size. [ STATE_CREATION ERROR #166: CREATEVERTEXSHADER_INVALIDSHADERBYTECODE]
+	// ??????????
+
 	if(!CSOReader::ReadCSO("VertexShader.cso", vShaderByteCodeOUT))
 	{
 		std::cerr << "Error reading vertex shader bytecode!" << std::endl;
 		return false;
 	}
 	
-	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.c_str(), vShaderByteCodeOUT.length(), nullptr, &m_vertexShader);
+	HRESULT hr = m_device->CreateVertexShader(static_cast<const void*>(vShaderByteCodeOUT.data()), static_cast<SIZE_T>(vShaderByteCodeOUT.size()), nullptr, &m_vertexShader);
 	
 	if(FAILED(hr))
 	{
@@ -81,7 +95,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
-	hr = m_device->CreatePixelShader(byteCode.c_str(), byteCode.length(), nullptr, &m_pixelShader);
+	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, &m_pixelShader);
 
 	if(FAILED(hr))
 	{
@@ -98,7 +112,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
-	hr = m_device->CreateComputeShader(byteCode.c_str(), byteCode.length(), nullptr, &m_computeShader);
+	hr = m_device->CreateComputeShader(byteCode.data(), byteCode.size(), nullptr, &m_computeShader);
 
 	if(FAILED(hr))
 	{
@@ -183,10 +197,6 @@ bool Renderer::CreateRasterizerState()
 	m_immediateContext->RSSetState(m_defaultRasterizerState);
 	return true;
 }
-
-Renderer::Renderer() {}
-
-Renderer::~Renderer() {}
 
 bool Renderer::Init(const Window& window)
 {
