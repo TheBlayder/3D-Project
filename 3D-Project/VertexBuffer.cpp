@@ -42,6 +42,11 @@ ID3D11Buffer* VertexBuffer::GetBuffer() const
 	return m_vertexBuffer;
 }
 
+ID3D11Buffer** VertexBuffer::GetBufferPtr() const
+{
+	return m_vertexBufferPtr;
+}
+
 UINT VertexBuffer::GetVertexSize() const
 {
 	return m_vertexSize;

@@ -7,6 +7,7 @@ class ConstantBuffer
 {
 private:
 	ID3D11Buffer* m_buffer;
+	ID3D11Buffer** m_bufferPtr = &m_buffer;
 	UINT m_size;
 
 public:
@@ -17,6 +18,7 @@ public:
 	bool Init(ID3D11Device* device, size_t byteSize, void* initData = nullptr);
 
 	ID3D11Buffer* GetBuffer() const;
+	ID3D11Buffer** GetBufferPtr() const;
 	UINT GetSize() const;
 
 	void Update(ID3D11DeviceContext* context, void* data);

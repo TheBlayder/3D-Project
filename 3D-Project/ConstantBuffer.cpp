@@ -11,7 +11,6 @@ ConstantBuffer::~ConstantBuffer()
 {
 	if (m_buffer)
 		m_buffer->Release();
-
 }
 
 bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
@@ -44,6 +43,11 @@ bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 ID3D11Buffer* ConstantBuffer::GetBuffer() const
 {
 	return m_buffer;
+}
+
+ID3D11Buffer** ConstantBuffer::GetBufferPtr() const
+{
+	return m_bufferPtr;
 }
 
 UINT ConstantBuffer::GetSize() const
