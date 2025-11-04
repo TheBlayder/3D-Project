@@ -21,14 +21,14 @@ private:
 
 public:
 	Mesh() = default;
-	Mesh(ID3D11Device* device, const std::string& filePath);
+	Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName);
 	~Mesh() = default;
 	Mesh(const Mesh & other) = delete;
 	Mesh& operator=(const Mesh& other) = delete;
 	Mesh(Mesh&& other) = delete;
 	Mesh& operator=(Mesh&& other) = delete;
 
-	void Init(ID3D11Device* device, const std::string& filePath);
+	void Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName);
 
 	void BindMeshBuffers(ID3D11DeviceContext* context) const;
 	void PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const;

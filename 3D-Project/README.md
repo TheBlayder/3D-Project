@@ -14,10 +14,6 @@
 - Tessellation
 - Input System
 - Mesh Handling
-	+ Default texture for OBJs without material
-	+ One Vertex buffer per mesh (same buffer for all sub-meshes))
-	+ One Index buffer per mesh
-		- Keep track of sub-mesh offsets and counts
 	+ When rendering a mesh, the vertex buffer can be set once, but each submesh can be renderered seperately using DrawIndexed or DrawIndexedInstanced.
 - Dynamic Cube Environment Mapping
 	+ The shape of the reflective object must not be a cube/cuboid, e.g. it could be a sphere.

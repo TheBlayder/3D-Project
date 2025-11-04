@@ -12,16 +12,16 @@
 #include "stb_image.h"
 
 
-Mesh::Mesh(ID3D11Device* device, const std::string& filePath)
+Mesh::Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName)
 {
-	Init(device, filePath);
+	Init(device, folderPath, objectName);
 }
 
-void Mesh::Init(ID3D11Device* device, const std::string& filePath)
+void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName)
 {
+	const std::string filePath = folderPath + "/" + objectName;
 	objl::Loader loader;
-	bool isLoaded = loader.LoadFile(filePath);
-	if (!isLoaded)
+	if (!loader.LoadFile(filePath))
 	{
 		throw std::runtime_error("Failed to load mesh from file: " + filePath);
 		return;
@@ -29,7 +29,6 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 
 	size_t startIndex = 0;
 	std::vector<unsigned int> tempIndices;
-	std::vector<objl::Vertex> tempVertices;
 
 	for(auto& mesh : loader.LoadedMeshes)
 	{
@@ -38,13 +37,16 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		ID3D11ShaderResourceView* diffuseSRV = nullptr;
 		ID3D11ShaderResourceView* specularSRV = nullptr;
 
+		using namespace DirectX;
+
 		// Load ambient texture
+		XMFLOAT3 ambientComponent = XMFLOAT3(mesh.MeshMaterial.Ka.X, mesh.MeshMaterial.Ka.Y, mesh.MeshMaterial.Ka.Z);
 		if (!mesh.MeshMaterial.map_Ka.empty())
 		{
 			// Load texture from file
-			std::string ambientTexturePath = mesh.MeshMaterial.map_Ka;
-			std::wstring wStr;
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &ambientSRV);
+			std::string ambientTexturePath = folderPath + mesh.MeshMaterial.map_Ka;
+			std::wstring wStr(ambientTexturePath.begin(), ambientTexturePath.end());
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &ambientSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load ambient texture: " + ambientTexturePath);
@@ -56,12 +58,13 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		}
 
 		// Load diffuse texture
+		XMFLOAT3 diffuseComponent = XMFLOAT3(mesh.MeshMaterial.Kd.X, mesh.MeshMaterial.Kd.Y, mesh.MeshMaterial.Kd.Z);
 		if (!mesh.MeshMaterial.map_Kd.empty())
 		{
 			// Load texture from file
-			std::string diffuseTexturePath = mesh.MeshMaterial.map_Kd;
-			std::wstring wStr;
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &diffuseSRV);
+			std::string diffuseTexturePath = folderPath + mesh.MeshMaterial.map_Kd;
+			std::wstring wStr(diffuseTexturePath.begin(), diffuseTexturePath.end());
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &diffuseSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load diffuse texture: " + diffuseTexturePath);
@@ -73,12 +76,14 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		}
 
 		// Load specular texture
+		XMFLOAT3 specularComponent = XMFLOAT3(mesh.MeshMaterial.Ks.X, mesh.MeshMaterial.Ks.Y, mesh.MeshMaterial.Ks.Z);
+		float specularExponent = mesh.MeshMaterial.Ns == 0.0f ? 100.f : mesh.MeshMaterial.Ns; // Default exponent att 100 if none specified
 		if (!mesh.MeshMaterial.map_Ks.empty())
 		{
 			// Load texture from file
-			std::string specularTexturePath = mesh.MeshMaterial.map_Ks;
-			std::wstring wStr;
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &specularSRV);
+			std::string specularTexturePath = folderPath + mesh.MeshMaterial.map_Ks;
+			std::wstring wStr(specularTexturePath.begin(), specularTexturePath.end());
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &specularSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load specular texture: " + specularTexturePath);
@@ -89,18 +94,34 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 			CreateDefaultTexture(device, &specularSRV);
 		}
 
-		
+		// Initialize sub-mesh
+		subMesh.Init(device, startIndex, mesh.Indices.size(),
+			ambientSRV, diffuseSRV,  specularSRV,
+			ambientComponent, diffuseComponent, specularComponent, specularExponent);
+
+		m_subMeshes.push_back(std::move(subMesh));
+
+		// Append indices to tempIndices
+		for(auto& index : mesh.Indices)
+		{
+			tempIndices.push_back(index + startIndex);
+		}
+
+		startIndex += mesh.Indices.size(); // Update start index for next sub-mesh
 	}
 
-	
+	// Initialize vertex buffer
+	m_vertexBuffer.Init(device, loader.LoadedVertices.data(), sizeof(objl::Vertex), loader.LoadedVertices.size());
+
+	// Initialize index buffer
+	m_indexBuffer.Init(device, static_cast<UINT>(tempIndices.size()), tempIndices.data());
 }
 
 void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const
 {
-	ID3D11Buffer* vBuffer = m_vertexBuffer.GetBuffer();
 	UINT stride = m_vertexBuffer.GetVertexSize();
 	UINT offset = 0;
-	context->IASetVertexBuffers(0, 1, &vBuffer, &stride, &offset);
+	context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetBufferPtr(), &stride, &offset);
 
 	context->IASetIndexBuffer(m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 }

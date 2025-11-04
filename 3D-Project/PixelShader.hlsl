@@ -3,8 +3,27 @@ Texture2D ambientTexture : register(t0);
 Texture2D diffuseTexture : register(t1);
 Texture2D specularTexture : register(t2);
 
-SamplerState samplerState : register(s0);
+cbuffer materialProperties : register(b0)
+{
+    int hasAmbientTexture;
+    float3 ambientColor;
+    
+    int hasDiffuseTexture;
+    float3 diffuseColor;
+    
+    int hasSpecularTexture;
+    float3 specularColor;
+    
+    float shininess;
+};
 
+cbuffer CameraProperties : register(b1)
+{
+    //idk
+};
+
+
+SamplerState samplerState : register(s0);
 
 struct PSInput
 {

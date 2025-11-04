@@ -1,22 +1,37 @@
 #include "SubMesh.h"
 
-SubMesh::SubMesh(size_t startIndexValue, size_t nrOfIndicesInSubMesh, ID3D11ShaderResourceView* ambientTextureSRV, ID3D11ShaderResourceView* diffuseTextureSRV, ID3D11ShaderResourceView* specularTextureSRV)
+SubMesh::SubMesh(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndicesInSubMesh,
+	ID3D11ShaderResourceView* ambientTextureSRV, ID3D11ShaderResourceView* diffuseTextureSRV, ID3D11ShaderResourceView* specularTextureSRV,
+	DX::XMFLOAT3 ambientComponent, DX::XMFLOAT3 diffuseComponent, DX::XMFLOAT3 specularComponent, float specularExponent)
 {
-	Init(startIndexValue, nrOfIndicesInSubMesh, ambientTextureSRV, diffuseTextureSRV, specularTextureSRV);
+	Init(device, startIndexValue, nrOfIndicesInSubMesh, 
+		ambientTextureSRV, diffuseTextureSRV, specularTextureSRV, 
+		ambientComponent, diffuseComponent, specularComponent, specularExponent);
 }
 
-void SubMesh::Init(size_t startIndexValue, size_t nrOfIndicesInSubMesh, ID3D11ShaderResourceView* ambientTextureSRV, ID3D11ShaderResourceView* diffuseTextureSRV, ID3D11ShaderResourceView* specularTextureSRV)
+void SubMesh::Init(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndicesInSubMesh,
+	ID3D11ShaderResourceView* ambientTextureSRV, ID3D11ShaderResourceView* diffuseTextureSRV, ID3D11ShaderResourceView* specularTextureSRV,
+	DX::XMFLOAT3 ambientComponent, DX::XMFLOAT3 diffuseComponent, DX::XMFLOAT3 specularComponent, float specularExponent)
 {
 	m_startIndex = startIndexValue;
 	m_nrOfIndices = nrOfIndicesInSubMesh;
 	m_ambientTexture = ambientTextureSRV;
 	m_diffuseTexture = diffuseTextureSRV;
 	m_specularTexture = specularTextureSRV;
+
+	MaterialProperties materialProps = {
+		(bool)ambientTextureSRV, ambientComponent,
+		(bool)diffuseTextureSRV, diffuseComponent,
+		(bool)specularTextureSRV, specularComponent,
+		specularExponent
+	};
+
+	m_materialBuffer.Init(device, sizeof(MaterialProperties), &materialProps);
 }
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
-	//context->PSSetConstantBuffers(0, 0, nullptr);
+	context->PSSetConstantBuffers(0, 1, m_materialBuffer.GetBufferPtr());
 
 	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture, m_diffuseTexture, m_specularTexture };
 	context->PSSetShaderResources(0, 3, SRVs);
