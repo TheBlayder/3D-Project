@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <stdexcept>
 #include <vector>
+
 #include "WICTextureLoader.h"
 
 #include "OBJ_Loader.h"
@@ -42,8 +43,8 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		{
 			// Load texture from file
 			std::string ambientTexturePath = mesh.MeshMaterial.map_Ka;
-			std::wstring ambientTexturePathW(ambientTexturePath.begin(), ambientTexturePath.end());
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, ambientTexturePathW.c_str(), nullptr, &ambientSRV);
+			std::wstring wStr;
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &ambientSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load ambient texture: " + ambientTexturePath);
@@ -59,7 +60,8 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		{
 			// Load texture from file
 			std::string diffuseTexturePath = mesh.MeshMaterial.map_Kd;
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, diffuseTexturePath.c_str(), nullptr, &diffuseSRV);
+			std::wstring wStr;
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &diffuseSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load diffuse texture: " + diffuseTexturePath);
@@ -75,7 +77,8 @@ void Mesh::Init(ID3D11Device* device, const std::string& filePath)
 		{
 			// Load texture from file
 			std::string specularTexturePath = mesh.MeshMaterial.map_Ks;
-			HRESULT hr = DirectX::CreateWICTextureFromFile(device, specularTexturePath.c_str(), nullptr, &specularSRV);
+			std::wstring wStr;
+			HRESULT hr = DirectX::CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &specularSRV);
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load specular texture: " + specularTexturePath);
