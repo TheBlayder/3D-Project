@@ -190,11 +190,11 @@ Renderer::~Renderer() {}
 
 bool Renderer::Init(const Window& window)
 {
-	// Set up viewport
-	CreateViewport(window);
-
 	// Set up device and swapchain
 	if(!CreateDeviceAndSwapChain(window)) return false;
+	
+	// Set up viewport
+	CreateViewport(window);
 
 	// Set up shaders
 	std::string vShaderByteCode;

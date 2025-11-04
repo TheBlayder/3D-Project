@@ -20,7 +20,7 @@ private:
 
 	ID3D11RasterizerState* m_defaultRasterizerState = nullptr;
 
-	ID3D11SamplerState* m_samplerState;
+	ID3D11SamplerState* m_samplerState = nullptr;
 
 	ID3D11VertexShader* m_vertexShader = nullptr;
 	ID3D11PixelShader* m_pixelShader = nullptr;

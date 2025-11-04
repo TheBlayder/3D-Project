@@ -13,7 +13,7 @@ Window::Window(HINSTANCE instance, int nCmdShow, UINT width, UINT height) : m_hI
 	wc.hInstance = m_hInstance;
 	wc.lpszClassName = CLASS_NAME;
 
-	if(!RegisterClassEx(&wc));
+	if(!RegisterClassEx(&wc))
 		throw std::runtime_error("Failed to register window class: " + std::to_string(GetLastError()));
 
 	// If width and height are not specified, use the primary monitor's dimensions

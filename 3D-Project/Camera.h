@@ -23,7 +23,6 @@ private:
 	DX::XMFLOAT3 m_up = { 0.f, 1.f, 0.f };
 
 	ProjectionData m_projData;
-
 	ConstantBuffer* m_cameraBuffer;
 	
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
@@ -39,7 +38,6 @@ public:
 	// Movement
 	void MoveForward(float amount); // Forward & Backward
 	void MoveRight(float amount); // Right & Left
-
 	void RotateRight(float amount); // Side to side
 
 	// Constant buffer
