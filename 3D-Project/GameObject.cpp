@@ -4,21 +4,31 @@
 using namespace DirectX;
 namespace MH = MatrixHelper;
 
-GameObject::GameObject(ID3D11Device*& device, const Transform& transform, Mesh* mesh)
+GameObject::GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
 	Init(device, transform, mesh);
 }
 
-void GameObject::Init(ID3D11Device*& device, const Transform& transform, Mesh* mesh)
+void GameObject::Init(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
 	m_transform = transform;
 
-	m_mesh = mesh;
+	m_mesh.Init(device, folderPath, objectName);
 	
 	XMFLOAT4X4 worldMatrix;
 	MH::CreateWorldMatrix(worldMatrix, m_transform);
 	m_worldBuffer = new ConstantBuffer(device, sizeof(XMFLOAT4X4), &worldMatrix);
+}
 
+void GameObject::Draw(ID3D11DeviceContext* context)
+{
+	m_mesh->BindMeshBuffers(context);
+
+	for (size_t i = 0; i < m_mesh->GetNrOfSubMeshes(); ++i)
+	{
+		// Draw sub-meshes
+		m_mesh->PerformSubMeshDrawCall(context, i);
+	}
 }
 
 void GameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
@@ -31,6 +41,11 @@ void GameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
 Transform& GameObject::GetTransform()
 {
 	return m_transform;
+}
+
+Mesh* GameObject::GetMesh()
+{
+	return m_mesh;
 }
 
 // === GETTERS ===

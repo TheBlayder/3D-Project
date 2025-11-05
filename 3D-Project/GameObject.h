@@ -24,13 +24,16 @@ private:
 
 public:
 	GameObject() = default;
-	GameObject(ID3D11Device*& device, const Transform& transform, Mesh* mesh);
+	GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName);
 	~GameObject() = default;
 
-	void Init(ID3D11Device*& device, const Transform& transform, Mesh* mesh);
+	void Init(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName);
+
+	void Draw(ID3D11DeviceContext* context);
 
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
 	Transform& GetTransform();
+	Mesh* GetMesh();
 	ID3D11Buffer* GetConstantBuffer() const;
 };
