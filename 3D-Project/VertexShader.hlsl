@@ -12,15 +12,15 @@ struct VSInput
 {
     float3 position : POSITION;
     float3 normal : NORMAL;
-    float2 uv : TEXCOORD0;
+    float2 uv : UV;
 };
 
 struct VSOutput
 {
     float4 position : SV_POSITION;
-    float4 WORLD_POSITION : TEXCOORD2;
-    float4 NORMAL : TEXCOORD1;
-    float2 UV : TEXCOORD0;
+    float4 WORLD_POSITION : WORLD_POSITION;
+    float4 NORMAL : NORMAL;
+    float2 UV : UV;
 };
 
 VSOutput main(VSInput input)

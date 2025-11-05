@@ -19,7 +19,7 @@ int APIENTRY wWinMain(
 	const UINT WIN_HEIGHT = 600;
 	const UINT WIN_WIDTH = 800;
 	
-	Window window(hInstance, nCmdShow, WIN_HEIGHT, WIN_WIDTH);
+	Window window(hInstance, nCmdShow, WIN_WIDTH, WIN_HEIGHT);
 
 	Renderer renderer;
 	if (!renderer.Init(window))

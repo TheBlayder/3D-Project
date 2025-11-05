@@ -5,7 +5,19 @@ Renderer::Renderer() {}
 
 Renderer::~Renderer() 
 {
+	// Release resources
+	m_vertexShader->Release();
+	m_pixelShader->Release();
+	m_computeShader->Release();
+
+	m_samplerState->Release();
+	m_defaultRasterizerState->Release();
+	m_inputLayout->Release();
+	m_uav->Release();
 	
+	m_swapChain->Release();
+	m_immediateContext->Release();
+	m_device->Release();
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -68,11 +80,6 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 	vShaderByteCodeOUT.clear();
 	
 	// Vertex shader
-
-	// ERROR SOMEWHERE HERE
-	// D3D11 ERROR: ID3D11Device::CreateVertexShader: Encoded Vertex Shader size doesn't match specified size. [ STATE_CREATION ERROR #166: CREATEVERTEXSHADER_INVALIDSHADERBYTECODE]
-	// ??????????
-
 	if(!CSOReader::ReadCSO("VertexShader.cso", vShaderByteCodeOUT))
 	{
 		std::cerr << "Error reading vertex shader bytecode!" << std::endl;
@@ -115,6 +122,9 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
+	m_immediateContext->VSSetShader(m_vertexShader, nullptr, 0);
+	m_immediateContext->PSSetShader(m_pixelShader, nullptr, 0);
+
 	return true;
 }
 
@@ -147,8 +157,22 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 }
 
 bool Renderer::CreateUAV()
-{
-	return false;
+{	
+	ID3D11Texture2D* backBuffer;
+	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
+	if(FAILED(hr))
+	{
+		std::cerr << "Error getting back buffer!" << std::endl;
+		return false;
+	}
+
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+	uavDesc.Texture2D.MipSlice = 0;
+
+	hr = m_device->CreateUnorderedAccessView(backBuffer, &uavDesc, &m_uav);	
+	return true;
 }
 
 bool Renderer::CreateSamplerState()
@@ -218,6 +242,11 @@ bool Renderer::Init(const Window& window)
 
     return true;
 }
+
+//void Renderer::Render(BaseScene* scene)
+//{
+//
+//}
 
 ID3D11Device* Renderer::GetDevice()
 {

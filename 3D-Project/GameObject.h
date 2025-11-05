@@ -7,40 +7,30 @@
 
 #include "ConstantBuffer.h"
 #include "Transform.h"
+#include "Mesh.h"
 
 namespace DX = DirectX;
 
-// BASE CLASS - Abstract class
 class GameObject
 {
-protected:
-	// Object data
-	std::vector<DX::XMFLOAT3> m_vertices;
-	std::vector<DX::XMFLOAT3> m_normals;
-	std::vector<DX::XMFLOAT2> m_UVs;
-
+private:
 	// World data
 	Transform m_transform;
 
+	// Texture data
+	Mesh* m_mesh;
+
 	ConstantBuffer* m_worldBuffer;
 
-	// Texture data
-	std::string m_texturePath; // NOT USED YET
-	unsigned char* m_textureData;
-	size_t m_textureWidth;
-	size_t m_textureHeight;
-	size_t m_textureChannels;
-
-	virtual void Init() = 0;
-
 public:
-	GameObject(ID3D11Device*& device, const Transform& transform, const std::string& texturePath = "");
-	virtual ~GameObject() = default;
+	GameObject() = default;
+	GameObject(ID3D11Device*& device, const Transform& transform, Mesh* mesh);
+	~GameObject() = default;
+
+	void Init(ID3D11Device*& device, const Transform& transform, Mesh* mesh);
 
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
+	Transform& GetTransform();
 	ID3D11Buffer* GetConstantBuffer() const;
-	const std::vector<DX::XMFLOAT3>& GetVertices() const;
-	const std::vector<DX::XMFLOAT3>& GetNormals() const;
-	const std::vector<DX::XMFLOAT2>& GetUVs() const;
 };

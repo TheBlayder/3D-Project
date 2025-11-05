@@ -28,9 +28,9 @@ SamplerState samplerState : register(s0);
 struct PSInput
 {
     float4 position : SV_POSITION;
-    float4 WORLD_POSITION : TEXCOORD2;
-    float4 NORMAL : TEXCOORD1;
-    float2 UV : TEXCOORD0;
+    float4 WORLD_POSITION : WORLD_POSITION;
+    float4 NORMAL : NORMAL;
+    float2 UV : UV;
 };
 
 float4 main(PSInput input) : SV_TARGET
