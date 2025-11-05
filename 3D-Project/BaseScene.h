@@ -12,20 +12,22 @@
 
 namespace DX = DirectX;
 
+// Abstract base class for scenes
 class BaseScene
 {
-private:
+protected:
 	Camera* m_camera;
 	std::vector<GameObject*> m_gameObjects;
 
 public:
 	BaseScene();
-	~BaseScene();
-	bool Init();
+	virtual ~BaseScene() {};
+	bool Init(ID3D11Device* device, ID3D11DeviceContext* context);
 	virtual void UpdateScene() = 0;
 
 	Camera* GetCamera() const;
 
 	void AddGameObject(GameObject* gameObject);
-	std::vector<GameObject*> GetGameObjects() const;
+	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName);
+	std::vector<GameObject*>& GetGameObjects();
 };

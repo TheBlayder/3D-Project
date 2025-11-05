@@ -5,7 +5,6 @@
 #include "Window.h"
 #include "BaseScene.h"
 #include "ConstantBuffer.h"
-#include "BaseScene.h"
 
 class Renderer
 {
@@ -45,8 +44,8 @@ public:
 	bool Init(const Window& window);
 	//void Render(BaseScene* scene); // Argument okända för tillfället
 
+	void RenderFrame(); // Temporary function for testing
+
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();
-
-
 };

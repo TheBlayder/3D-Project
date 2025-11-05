@@ -6,14 +6,14 @@ namespace MH = MatrixHelper;
 
 GameObject::GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
-	Init(device, transform, mesh);
+	Init(device, transform, folderPath, objectName);
 }
 
 void GameObject::Init(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
 	m_transform = transform;
 
-	m_mesh.Init(device, folderPath, objectName);
+	m_mesh->Init(device, folderPath, objectName);
 	
 	XMFLOAT4X4 worldMatrix;
 	MH::CreateWorldMatrix(worldMatrix, m_transform);

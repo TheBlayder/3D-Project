@@ -6,6 +6,14 @@ IndexBuffer::IndexBuffer(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint3
 	Init(device, nrOfIndicesInBuffer, indexData);
 }
 
+IndexBuffer::~IndexBuffer()
+{
+	if (m_buffer)
+	{
+		m_buffer->Release();
+	}
+}
+
 void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_t* indexData)
 {
 	m_nrOfIndices = nrOfIndicesInBuffer;

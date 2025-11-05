@@ -161,6 +161,7 @@
     <ClInclude Include="BaseScene.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="SubMesh.h" />
+    <ClInclude Include="TestObject.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />

@@ -248,6 +248,13 @@ bool Renderer::Init(const Window& window)
 //
 //}
 
+
+// For testing purposes
+void Renderer::RenderFrame()
+{
+	
+}
+
 ID3D11Device* Renderer::GetDevice()
 {
 	return m_device;

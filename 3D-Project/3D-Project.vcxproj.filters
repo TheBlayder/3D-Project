@@ -131,6 +131,9 @@
     <ClInclude Include="InputManager.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
+    <ClInclude Include="TestObject.h">
+      <Filter>Header Files\Scene\Objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
