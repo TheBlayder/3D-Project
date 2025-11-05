@@ -185,7 +185,10 @@
     <FxCompile Include="VertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ComputeShader.cso" />
+    <None Include="PixelShader.cso" />
     <None Include="README.md" />
+    <None Include="VertexShader.cso" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DirectXTK\DirectXTK_Desktop_2022.vcxproj">

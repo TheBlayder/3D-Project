@@ -79,15 +79,14 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 	
-	HRESULT hr = m_device->CreateVertexShader(static_cast<const void*>(vShaderByteCodeOUT.data()), static_cast<SIZE_T>(vShaderByteCodeOUT.size()), nullptr, &m_vertexShader);
-	
+	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.data(), vShaderByteCodeOUT.size(), nullptr, &m_vertexShader);
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating vertex shader!" << std::endl;
 		return false;
 	}
 	
-	std::string byteCode; // Temporary storage for shader bytecode
+	std::string byteCode; // Temporary storage for shader bytecode, gets cleared with each use in CSOReader
 	// Pixel shader
 	if(!CSOReader::ReadCSO("PixelShader.cso", byteCode))
 	{
@@ -96,14 +95,11 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 	}
 
 	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, &m_pixelShader);
-
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating pixel shader!" << std::endl;
 		return false;
 	}
-	byteCode.clear(); // Clear bytecode for reuse
-
 
 	// Compute shader
 	if(!CSOReader::ReadCSO("ComputeShader.cso", byteCode))
@@ -113,13 +109,11 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 	}
 
 	hr = m_device->CreateComputeShader(byteCode.data(), byteCode.size(), nullptr, &m_computeShader);
-
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating compute shader!" << std::endl;
 		return false;
 	}
-	byteCode.clear();
 
 	return true;
 }

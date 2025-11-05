@@ -145,5 +145,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="ComputeShader.cso">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="PixelShader.cso">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="VertexShader.cso">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

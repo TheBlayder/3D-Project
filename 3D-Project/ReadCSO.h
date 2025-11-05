@@ -16,6 +16,7 @@ namespace CSOReader
 {
 	inline static bool ReadCSO(const std::string& filePath, std::string& output) 
 	{
+		output.clear();
 		std::ifstream reader;
 		reader.open(filePath, std::ios::binary | std::ios::ate);
 		if (!reader.is_open()) 
