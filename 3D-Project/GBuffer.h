@@ -1,14 +1,14 @@
 #pragma once
 #include "d3d11.h"
+#include <wrl/client.h>
 #include <stdexcept>
-
 
 class GBuffer
 {
 private:
-	ID3D11Texture2D* m_texture = nullptr;
-	ID3D11ShaderResourceView* m_srv = nullptr;
-	ID3D11RenderTargetView* m_rtv = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
 
 public:
 	GBuffer() = default;
@@ -43,19 +43,19 @@ inline void GBuffer::Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const U
 	textureDesc.CPUAccessFlags = 0;
 	textureDesc.MiscFlags = 0;
 
-	HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, &m_texture);
+	HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, m_texture.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create GBuffer texture.");
 	}
 
-	hr = device->CreateShaderResourceView(m_texture, nullptr, &m_srv);
+	hr = device->CreateShaderResourceView(m_texture.Get(), nullptr, m_srv.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create GBuffer SRV.");
 	}
 
-	hr = device->CreateRenderTargetView(m_texture, nullptr, &m_rtv);
+	hr = device->CreateRenderTargetView(m_texture.Get(), nullptr, m_rtv.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create GBuffer RTV.");
@@ -64,15 +64,15 @@ inline void GBuffer::Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const U
 
 inline ID3D11Texture2D* GBuffer::GetTexture()
 {
-	return nullptr;
+	return m_texture.Get();
 }
 
 inline ID3D11ShaderResourceView* GBuffer::GetSRV()
 {
-	return m_srv;
+	return m_srv.Get();
 }
 
 inline ID3D11RenderTargetView* GBuffer::GetRTV()
 {
-	return m_rtv;
+	return m_rtv.Get();
 }

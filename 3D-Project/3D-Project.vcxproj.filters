@@ -16,9 +16,6 @@
     <Filter Include="Header Files\Engine">
       <UniqueIdentifier>{1dc3a229-d501-4abd-a97a-48b49f518428}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Engine">
-      <UniqueIdentifier>{91d7d9e3-5cf1-40ef-9920-2b66d58d64e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Buffers">
       <UniqueIdentifier>{da8efebb-4b72-45e0-95b7-54437469a896}</UniqueIdentifier>
     </Filter>
@@ -43,6 +40,9 @@
     <Filter Include="Header Files\External-Libs">
       <UniqueIdentifier>{d9731435-3fb0-4fe3-819a-58b4a2789fd2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{91d7d9e3-5cf1-40ef-9920-2b66d58d64e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -66,9 +66,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
@@ -77,6 +74,12 @@
     </ClCompile>
     <ClCompile Include="IndexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="TestObject.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +119,6 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\External-Libs</Filter>
     </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SubMesh.h">
       <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
@@ -133,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="TestObject.h">
       <Filter>Header Files\Scene\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleVertex.h">
+      <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -35,5 +35,5 @@ public:
 
 	Transform& GetTransform();
 	Mesh* GetMesh();
-	ID3D11Buffer* GetConstantBuffer() const;
+	const ID3D11Buffer* GetConstantBuffer();
 };

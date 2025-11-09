@@ -49,7 +49,7 @@ Mesh* GameObject::GetMesh()
 }
 
 // === GETTERS ===
-ID3D11Buffer* GameObject::GetConstantBuffer() const
+const ID3D11Buffer* GameObject::GetConstantBuffer()
 {
 	return m_worldBuffer->GetBuffer();
 }

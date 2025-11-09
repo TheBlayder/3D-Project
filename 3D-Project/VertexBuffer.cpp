@@ -7,12 +7,6 @@ VertexBuffer::VertexBuffer(ID3D11Device*& device, const void* vertices, const UI
 	Init(device, vertices, vertexSize, nrOfVertices);
 }
 
-VertexBuffer::~VertexBuffer()
-{
-	if (m_vertexBuffer)
-		m_vertexBuffer->Release();
-}
-
 void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT& vertexSize, const UINT& nrOfVertices)
 {
 	m_vertexSize = vertexSize;
@@ -30,7 +24,7 @@ void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT&
 	vBufferData.SysMemPitch = 0;
 	vBufferData.SysMemSlicePitch = 0;
 	
-	HRESULT hr = device->CreateBuffer(&vBufferDesc, &vBufferData, &m_vertexBuffer);
+	HRESULT hr = device->CreateBuffer(&vBufferDesc, &vBufferData, m_vertexBuffer.GetAddressOf());
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create vertex buffer!" << std::endl;
@@ -39,20 +33,20 @@ void VertexBuffer::Init(ID3D11Device*& device, const void* vertices, const UINT&
 
 ID3D11Buffer* VertexBuffer::GetBuffer() const
 {
-	return m_vertexBuffer;
+	return m_vertexBuffer.Get();
 }
 
-ID3D11Buffer** VertexBuffer::GetBufferPtr() const
+ID3D11Buffer** VertexBuffer::GetBufferPtr()
 {
-	return m_vertexBufferPtr;
+	return m_vertexBuffer.GetAddressOf();
 }
 
-UINT VertexBuffer::GetVertexSize() const
+const UINT VertexBuffer::GetVertexSize() const
 {
 	return m_vertexSize;
 }
 
-UINT VertexBuffer::GetNrOfVertices() const
+const UINT VertexBuffer::GetNrOfVertices() const
 {
 	return m_nrOfVertices;
 }

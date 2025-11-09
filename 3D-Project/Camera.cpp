@@ -38,11 +38,6 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT
     m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
 }
 
-Camera::~Camera()
-{
-    delete m_cameraBuffer;
-}
-
 // === MOVEMENT ===
 void Camera::MoveForward(float amount)
 {

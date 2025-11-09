@@ -1,5 +1,6 @@
 #pragma once
 #include <d3d11.h>
+#include <wrl/client.h>
 #include <DirectXMath.h>
 
 #include "Window.h"
@@ -9,22 +10,22 @@
 class Renderer
 {
 private:
-	ID3D11Device* m_device = nullptr;
-	ID3D11DeviceContext* m_immediateContext = nullptr;
-	IDXGISwapChain* m_swapChain = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 
-	ID3D11UnorderedAccessView* m_uav = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav;
 
-	ID3D11InputLayout* m_inputLayout = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	ID3D11RasterizerState* m_defaultRasterizerState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
 
-	ID3D11SamplerState* m_samplerState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 
-	ID3D11VertexShader* m_vertexShader = nullptr;
-	ID3D11PixelShader* m_pixelShader = nullptr;
-	ID3D11ComputeShader* m_computeShader = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
+	Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
 
 	ConstantBuffer worldBuffer;
 	ConstantBuffer viewProjectionBuffer;
@@ -39,7 +40,7 @@ private:
 
 public:
 	Renderer();
-	~Renderer();
+	~Renderer() = default;
 
 	bool Init(const Window& window);
 	//void Render(BaseScene* scene); // Argument okända för tillfället

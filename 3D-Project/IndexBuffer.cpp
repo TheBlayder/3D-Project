@@ -6,14 +6,6 @@ IndexBuffer::IndexBuffer(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint3
 	Init(device, nrOfIndicesInBuffer, indexData);
 }
 
-IndexBuffer::~IndexBuffer()
-{
-	if (m_buffer)
-	{
-		m_buffer->Release();
-	}
-}
-
 void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_t* indexData)
 {
 	m_nrOfIndices = nrOfIndicesInBuffer;
@@ -39,12 +31,12 @@ void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_
 	}
 }
 
-size_t IndexBuffer::GetNrOfIndices() const
+const size_t IndexBuffer::GetNrOfIndices() const
 {
 	return m_nrOfIndices;
 }
 
 ID3D11Buffer* IndexBuffer::GetBuffer() const
 {
-	return m_buffer;
+	return m_buffer.Get();
 }

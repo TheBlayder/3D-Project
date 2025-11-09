@@ -105,7 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\DirectXTK\Inc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\DirectXTK\Inc;$(SolutionDir)..\DirectXTK\Bin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,6 +143,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="SubMesh.cpp" />
+    <ClCompile Include="TestObject.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -159,6 +160,7 @@
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="BaseScene.h" />
+    <ClInclude Include="SimpleVertex.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="SubMesh.h" />
     <ClInclude Include="TestObject.h" />

@@ -32,7 +32,7 @@ private:
 public:
 	Camera() = default;
 	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
-	~Camera();
+	~Camera() = default;
 
 	// Movement
 	void MoveForward(float amount); // Forward & Backward

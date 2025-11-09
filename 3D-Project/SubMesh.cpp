@@ -31,8 +31,6 @@ void SubMesh::Init(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndi
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
-	context->PSSetConstantBuffers(0, 1, m_materialBuffer.GetBufferPtr());
-
 	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture, m_diffuseTexture, m_specularTexture };
 	context->PSSetShaderResources(0, 3, SRVs);
 

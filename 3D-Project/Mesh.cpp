@@ -4,9 +4,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include "WICTextureLoader.h"
-
+#include <WICTextureLoader.h>
 #include "OBJ_Loader.h"
+#include "SimpleVertex.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -29,6 +29,8 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 
 	size_t startIndex = 0;
 	std::vector<unsigned int> tempIndices;
+	std::vector<SimpleVertex> tempVertices;
+	
 
 	for(auto& mesh : loader.LoadedMeshes)
 	{
@@ -108,10 +110,17 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 
 		startIndex += mesh.Indices.size(); // Update start index for next sub-mesh
+
+		// Converting objl::Vertex to SimpleVertex and appending to tempVertices
+		for(auto& vertex : mesh.Vertices)
+		{
+			SimpleVertex tempVertex = SimpleVertex(vertex);
+			tempVertices.push_back(tempVertex);
+		}
 	}
 
 	// Initialize vertex buffer
-	m_vertexBuffer.Init(device, loader.LoadedVertices.data(), sizeof(objl::Vertex), loader.LoadedVertices.size());
+	m_vertexBuffer.Init(device, &tempVertices, sizeof(SimpleVertex), tempVertices.size());
 
 	// Initialize index buffer
 	m_indexBuffer.Init(device, static_cast<UINT>(tempIndices.size()), tempIndices.data());
@@ -121,7 +130,8 @@ void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const
 {
 	UINT stride = m_vertexBuffer.GetVertexSize();
 	UINT offset = 0;
-	context->IASetVertexBuffers(0, 1, m_vertexBuffer.GetBufferPtr(), &stride, &offset);
+	ID3D11Buffer* vBuffer = m_vertexBuffer.GetBuffer();
+	context->IASetVertexBuffers(0, 1, &vBuffer, &stride, &offset);
 
 	context->IASetIndexBuffer(m_indexBuffer.GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 }

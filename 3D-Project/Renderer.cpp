@@ -3,23 +3,6 @@
 
 Renderer::Renderer() {}
 
-Renderer::~Renderer() 
-{
-	// Release resources
-	m_vertexShader->Release();
-	m_pixelShader->Release();
-	m_computeShader->Release();
-
-	m_samplerState->Release();
-	m_defaultRasterizerState->Release();
-	m_inputLayout->Release();
-	m_uav->Release();
-	
-	m_swapChain->Release();
-	m_immediateContext->Release();
-	m_device->Release();
-}
-
 void Renderer::CreateViewport(const Window& window)
 {
 	D3D11_VIEWPORT viewport;
@@ -122,8 +105,8 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
-	m_immediateContext->VSSetShader(m_vertexShader, nullptr, 0);
-	m_immediateContext->PSSetShader(m_pixelShader, nullptr, 0);
+	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
 	return true;
 }
@@ -150,7 +133,7 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 		return false;
 	}
 
-	m_immediateContext->IASetInputLayout(m_inputLayout);
+	m_immediateContext->IASetInputLayout(m_inputLayout.Get());
 	m_immediateContext->IASetPrimitiveTopology(m_primitiveTopology);
 
 	return true;
@@ -212,7 +195,7 @@ bool Renderer::CreateRasterizerState()
 		return false;
 	}
 
-	m_immediateContext->RSSetState(m_defaultRasterizerState);
+	m_immediateContext->RSSetState(m_defaultRasterizerState.Get());
 	return true;
 }
 
@@ -257,11 +240,11 @@ void Renderer::RenderFrame()
 
 ID3D11Device* Renderer::GetDevice()
 {
-	return m_device;
+	return m_device.Get();
 }
 
 ID3D11DeviceContext* Renderer::GetImmediateContext()
 {
-	return m_immediateContext;
+	return m_immediateContext.Get();
 }
 
