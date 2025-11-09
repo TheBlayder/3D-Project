@@ -9,8 +9,14 @@ struct SimpleVertex
 	std::array<float, 3> normal;
 	std::array<float, 2> uv;
 
-	SimpleVertex(objl::Vertex& vertex) : position{ vertex.Position.X, vertex.Position.Y, vertex.Position.Z },
-		normal{ vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z },
-		uv{ vertex.TextureCoordinate.X, vertex.TextureCoordinate.Y }
+	SimpleVertex() = default;
+
+	SimpleVertex(const std::array<float, 3>& pos, const std::array<float, 3>& norm, const std::array<float, 2>& tex)
+		: position(pos), normal(norm), uv(tex) {}
+
+	SimpleVertex(objl::Vertex& vertex)
+		: position{ vertex.Position.X, vertex.Position.Y, vertex.Position.Z },
+		  normal{ vertex.Normal.X, vertex.Normal.Y, vertex.Normal.Z },
+		  uv{ vertex.TextureCoordinate.X, vertex.TextureCoordinate.Y }
 	{}
 };

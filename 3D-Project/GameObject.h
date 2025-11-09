@@ -1,6 +1,5 @@
 #pragma once
 #include <d3d11.h>
-#include <DirectXMath.h>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -20,8 +19,6 @@ private:
 	// Texture data
 	Mesh* m_mesh;
 
-	ConstantBuffer* m_worldBuffer;
-
 public:
 	GameObject() = default;
 	GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName);
@@ -31,9 +28,7 @@ public:
 
 	void Draw(ID3D11DeviceContext* context);
 
-	void UpdateConstantBuffer(ID3D11DeviceContext* context);
-
 	Transform& GetTransform();
 	Mesh* GetMesh();
-	const ID3D11Buffer* GetConstantBuffer();
+	const DirectX::XMFLOAT4X4 GetWorldBuffer();
 };

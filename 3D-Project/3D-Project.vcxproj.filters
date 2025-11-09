@@ -79,7 +79,7 @@
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="TestObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

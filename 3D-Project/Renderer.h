@@ -10,10 +10,12 @@
 class Renderer
 {
 private:
+	// Direct3D components
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
@@ -27,8 +29,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
 
-	ConstantBuffer worldBuffer;
-	ConstantBuffer viewProjectionBuffer;
+	// Constant buffers
+	ConstantBuffer m_worldBuffer;
+	ConstantBuffer m_viewProjectionBuffer;
 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
@@ -43,7 +46,7 @@ public:
 	~Renderer() = default;
 
 	bool Init(const Window& window);
-	//void Render(BaseScene* scene); // Argument okända för tillfället
+	//void Render(BaseScene* scene, float deltaTime);
 
 	void RenderFrame(); // Temporary function for testing
 

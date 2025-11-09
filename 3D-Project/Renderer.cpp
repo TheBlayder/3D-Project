@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include "ReadCSO.h"
 
+#include "TestObject.h"
+
 Renderer::Renderer() {}
 
 bool Renderer::Init(const Window& window)
@@ -30,7 +32,7 @@ bool Renderer::Init(const Window& window)
     return true;
 }
 
-//void Renderer::Render(BaseScene* scene)
+//void Renderer::Render(BaseScene* scene, float deltaTime)
 //{
 //
 //}
@@ -38,7 +40,18 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
-	
+	//Fixa camera här
+
+
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+
+	// Rita objekt
+	TestObject test1 = TestObject(m_device.Get());
+	DirectX::XMFLOAT4X4 worldMatrix = test1.GetWorldMatrix();
+	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+
+	test1.Draw(m_immediateContext.Get());
+	m_swapChain->Present(1, 0);
 }
 
 void Renderer::CreateViewport(const Window& window)

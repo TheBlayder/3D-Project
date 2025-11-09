@@ -1,3 +1,5 @@
+#include <DirectXMath.h>
+
 #include "GameObject.h"
 #include "HelperFuncs.h"
 
@@ -14,10 +16,6 @@ void GameObject::Init(ID3D11Device*& device, const Transform& transform, std::st
 	m_transform = transform;
 
 	m_mesh->Init(device, folderPath, objectName);
-	
-	XMFLOAT4X4 worldMatrix;
-	MH::CreateWorldMatrix(worldMatrix, m_transform);
-	m_worldBuffer = new ConstantBuffer(device, sizeof(XMFLOAT4X4), &worldMatrix);
 }
 
 void GameObject::Draw(ID3D11DeviceContext* context)
@@ -31,13 +29,6 @@ void GameObject::Draw(ID3D11DeviceContext* context)
 	}
 }
 
-void GameObject::UpdateConstantBuffer(ID3D11DeviceContext* context)
-{
-	XMFLOAT4X4 worldMatrix;
-	MH::CreateWorldMatrix(worldMatrix, m_transform);
-	m_worldBuffer->Update(context, &worldMatrix);
-}
-
 Transform& GameObject::GetTransform()
 {
 	return m_transform;
@@ -48,8 +39,10 @@ Mesh* GameObject::GetMesh()
 	return m_mesh;
 }
 
-// === GETTERS ===
-const ID3D11Buffer* GameObject::GetConstantBuffer()
+const DirectX::XMFLOAT4X4 GameObject::GetWorldBuffer()
 {
-	return m_worldBuffer->GetBuffer();
+	using namespace DirectX;
+	XMFLOAT4X4 worldMatrix;
+	MH::CreateWorldMatrix(worldMatrix, m_transform);
+	return worldMatrix;
 }

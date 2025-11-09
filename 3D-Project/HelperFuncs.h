@@ -16,7 +16,7 @@ namespace MatrixHelper
 
 		XMMATRIX translation = XMMatrixTranslationFromVector(transform.GetPosition());
 
-        XMMATRIX world = XMMatrixMultiply(XMMatrixMultiply(scaling, rotation), translation);
+        XMMATRIX world = XMMatrixMultiplyTranspose(XMMatrixMultiply(scaling, rotation), translation);
 
         XMStoreFloat4x4(&worldMatrix, world);
     }
