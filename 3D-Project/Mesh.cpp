@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include <stdexcept>
 #include <vector>
+#include <wrl/client.h>
 
 #include <WICTextureLoader.h>
 #include "OBJ_Loader.h"
@@ -34,14 +35,10 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 
 	for(auto& mesh : loader.LoadedMeshes)
 	{
-		SubMesh subMesh;
-		ID3D11ShaderResourceView* ambientSRV = nullptr;
-		ID3D11ShaderResourceView* diffuseSRV = nullptr;
-		ID3D11ShaderResourceView* specularSRV = nullptr;
-
 		using namespace DirectX;
 
 		// Load ambient texture
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ambientSRV = nullptr;
 		XMFLOAT3 ambientComponent = XMFLOAT3(mesh.MeshMaterial.Ka.X, mesh.MeshMaterial.Ka.Y, mesh.MeshMaterial.Ka.Z);
 		if (!mesh.MeshMaterial.map_Ka.empty())
 		{
@@ -60,6 +57,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 
 		// Load diffuse texture
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseSRV = nullptr;
 		XMFLOAT3 diffuseComponent = XMFLOAT3(mesh.MeshMaterial.Kd.X, mesh.MeshMaterial.Kd.Y, mesh.MeshMaterial.Kd.Z);
 		if (!mesh.MeshMaterial.map_Kd.empty())
 		{
@@ -78,6 +76,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 
 		// Load specular texture
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> specularSRV = nullptr;
 		XMFLOAT3 specularComponent = XMFLOAT3(mesh.MeshMaterial.Ks.X, mesh.MeshMaterial.Ks.Y, mesh.MeshMaterial.Ks.Z);
 		float specularExponent = mesh.MeshMaterial.Ns == 0.0f ? 100.f : mesh.MeshMaterial.Ns; // Default exponent att 100 if none specified
 		if (!mesh.MeshMaterial.map_Ks.empty())
@@ -96,9 +95,11 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			CreateDefaultTexture(device, &specularSRV);
 		}
 
+
 		// Initialize sub-mesh
+		SubMesh subMesh;
 		subMesh.Init(device, startIndex, mesh.Indices.size(),
-			ambientSRV, diffuseSRV,  specularSRV,
+			ambientSRV.Get(), diffuseSRV.Get(), specularSRV.Get(),
 			ambientComponent, diffuseComponent, specularComponent, specularExponent);
 
 		m_subMeshes.push_back(std::move(subMesh));

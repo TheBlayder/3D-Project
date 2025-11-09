@@ -11,7 +11,7 @@ void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_
 	m_nrOfIndices = nrOfIndicesInBuffer;
 	
 	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.ByteWidth = static_cast<UINT>(sizeof(indexData) * nrOfIndicesInBuffer);
+	bufferDesc.ByteWidth = static_cast<UINT>(sizeof(uint32_t) * nrOfIndicesInBuffer);
 	bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	bufferDesc.CPUAccessFlags = 0;
@@ -24,7 +24,7 @@ void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_
 	bufferData.SysMemSlicePitch = 0;
 
 	
-	HRESULT hr = device->CreateBuffer(&bufferDesc, &bufferData, &m_buffer);
+	HRESULT hr = device->CreateBuffer(&bufferDesc, &bufferData, m_buffer.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create index buffer");

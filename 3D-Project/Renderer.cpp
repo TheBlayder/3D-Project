@@ -3,6 +3,44 @@
 
 Renderer::Renderer() {}
 
+bool Renderer::Init(const Window& window)
+{
+	// Set up device and swapchain
+	if(!CreateDeviceAndSwapChain(window)) return false;
+	
+	// Set up viewport
+	CreateViewport(window);
+
+	// Set up shaders
+	std::string vShaderByteCode;
+	if(!CreateShaders(vShaderByteCode)) return false;
+
+	// Set up input layout
+	if (!CreateInputLayout(vShaderByteCode)) return false;
+
+	// Set up UAV
+	if (!CreateUAV()) return false;
+
+	// Set up sampler state
+	if (!CreateSamplerState()) return false;
+
+	// Set up rasterizer state
+	if (!CreateRasterizerState()) return false;
+
+    return true;
+}
+
+//void Renderer::Render(BaseScene* scene)
+//{
+//
+//}
+
+// For testing purposes
+void Renderer::RenderFrame()
+{
+	
+}
+
 void Renderer::CreateViewport(const Window& window)
 {
 	D3D11_VIEWPORT viewport;
@@ -50,10 +88,10 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 		0,
 		D3D11_SDK_VERSION,
 		&swapChainDesc,
-		&m_swapChain,
-		&m_device,
+		m_swapChain.GetAddressOf(),
+		m_device.GetAddressOf(),
 		nullptr,
-		&m_immediateContext
+		m_immediateContext.GetAddressOf()
 	);
 	return SUCCEEDED(hr);
 }
@@ -69,7 +107,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 	
-	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.data(), vShaderByteCodeOUT.size(), nullptr, &m_vertexShader);
+	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.data(), vShaderByteCodeOUT.size(), nullptr, m_vertexShader.GetAddressOf());
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating vertex shader!" << std::endl;
@@ -84,7 +122,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
-	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, &m_pixelShader);
+	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, m_pixelShader.GetAddressOf());
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating pixel shader!" << std::endl;
@@ -98,7 +136,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		return false;
 	}
 
-	hr = m_device->CreateComputeShader(byteCode.data(), byteCode.size(), nullptr, &m_computeShader);
+	hr = m_device->CreateComputeShader(byteCode.data(), byteCode.size(), nullptr, m_computeShader.GetAddressOf());
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating compute shader!" << std::endl;
@@ -124,7 +162,7 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 		ARRAYSIZE(layoutDesc),
 		vShaderByteCode.c_str(),
 		vShaderByteCode.length(),
-		&m_inputLayout
+		m_inputLayout.GetAddressOf()
 	);
 
 	if(FAILED(hr))
@@ -141,8 +179,8 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 
 bool Renderer::CreateUAV()
 {	
-	ID3D11Texture2D* backBuffer;
-	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBuffer);
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)backBuffer.GetAddressOf());
 	if(FAILED(hr))
 	{
 		std::cerr << "Error getting back buffer!" << std::endl;
@@ -154,7 +192,7 @@ bool Renderer::CreateUAV()
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 	uavDesc.Texture2D.MipSlice = 0;
 
-	hr = m_device->CreateUnorderedAccessView(backBuffer, &uavDesc, &m_uav);	
+	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_uav.GetAddressOf());
 	return true;
 }
 
@@ -174,7 +212,7 @@ bool Renderer::CreateSamplerState()
 	samplerDesc.MinLOD = 0;
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	HRESULT hr = m_device->CreateSamplerState(&samplerDesc, &m_samplerState);
+	HRESULT hr = m_device->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
 	return !FAILED(hr);
 }
 
@@ -187,7 +225,7 @@ bool Renderer::CreateRasterizerState()
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;
 
-	HRESULT hr = m_device->CreateRasterizerState(&rasterizerDesc, &m_defaultRasterizerState);
+	HRESULT hr = m_device->CreateRasterizerState(&rasterizerDesc, m_defaultRasterizerState.GetAddressOf());
 
 	if(FAILED(hr))
 	{
@@ -197,45 +235,6 @@ bool Renderer::CreateRasterizerState()
 
 	m_immediateContext->RSSetState(m_defaultRasterizerState.Get());
 	return true;
-}
-
-bool Renderer::Init(const Window& window)
-{
-	// Set up device and swapchain
-	if(!CreateDeviceAndSwapChain(window)) return false;
-	
-	// Set up viewport
-	CreateViewport(window);
-
-	// Set up shaders
-	std::string vShaderByteCode;
-	if(!CreateShaders(vShaderByteCode)) return false;
-
-	// Set up input layout
-	if (!CreateInputLayout(vShaderByteCode)) return false;
-
-	// Set up UAV
-	if (!CreateUAV()) return false;
-
-	// Set up sampler state
-	if (!CreateSamplerState()) return false;
-
-	// Set up rasterizer state
-	if (!CreateRasterizerState()) return false;
-
-    return true;
-}
-
-//void Renderer::Render(BaseScene* scene)
-//{
-//
-//}
-
-
-// For testing purposes
-void Renderer::RenderFrame()
-{
-	
 }
 
 ID3D11Device* Renderer::GetDevice()

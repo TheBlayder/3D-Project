@@ -24,7 +24,7 @@ bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 	cBufferData.SysMemPitch = 0;
 	cBufferData.SysMemSlicePitch = 0;
 
-	HRESULT hr = device->CreateBuffer(&cBufferDesc, &cBufferData, &m_buffer);
+	HRESULT hr = device->CreateBuffer(&cBufferDesc, &cBufferData, m_buffer.GetAddressOf());
 	if (FAILED(hr))
 	{
 		std::cerr << "Failed to create constant buffer!" << std::endl;
