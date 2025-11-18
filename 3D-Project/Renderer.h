@@ -6,6 +6,8 @@
 #include "Window.h"
 #include "BaseScene.h"
 #include "ConstantBuffer.h"
+#include "TestObject.h"
+#include "Camera.h"
 
 class Renderer
 {
@@ -15,7 +17,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
@@ -33,17 +35,22 @@ private:
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
 
+	Camera* m_camera;
+
+	TestObject* m_test1;
+
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
 	bool CreateShaders(std::string& vShaderByteCodeOUT);
 	bool CreateInputLayout(const std::string& vShaderByteCode);
 	bool CreateUAV();
+	bool CreateRenderTargetView();
 	bool CreateSamplerState();
 	bool CreateRasterizerState();
 
 public:
-	Renderer();
-	~Renderer() = default;
+	Renderer() = default;
+	~Renderer();
 
 	bool Init(const Window& window);
 	//void Render(BaseScene* scene, float deltaTime);

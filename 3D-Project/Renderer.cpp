@@ -5,6 +5,12 @@
 
 Renderer::Renderer() {}
 
+Renderer::~Renderer()
+{
+	free(m_test1);
+	free(m_camera);
+}
+
 bool Renderer::Init(const Window& window)
 {
 	// Set up device and swapchain
@@ -29,6 +35,8 @@ bool Renderer::Init(const Window& window)
 	// Set up rasterizer state
 	if (!CreateRasterizerState()) return false;
 
+	m_test1 = new TestObject(m_device.Get());
+
     return true;
 }
 
@@ -41,17 +49,17 @@ bool Renderer::Init(const Window& window)
 void Renderer::RenderFrame()
 {
 	//Fixa camera här
-
+	float clearColor[4] = { 0,0,0,0 };
 
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
 
-	// Rita objekt
-	TestObject test1 = TestObject(m_device.Get());
-	DirectX::XMFLOAT4X4 worldMatrix = test1.GetWorldMatrix();
+	// Rita objekt 
+	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
-	test1.Draw(m_immediateContext.Get());
-	m_swapChain->Present(1, 0);
+	m_test1->Draw(m_immediateContext.Get()); // Set vertex buffer
+	
+	m_immediateContext->Draw(3, 0); // Draw call for triangle
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -209,6 +217,23 @@ bool Renderer::CreateUAV()
 	return true;
 }
 
+bool Renderer::CreateRenderTargetView()
+{
+	// get the address of the back buffer
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+	if (FAILED(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.Get()))))
+	{
+		std::cerr << "Failed to get back buffer!" << std::endl;
+		return false;
+	}
+
+	// use the back buffer address to create the render target
+	// null as description to base it on the backbuffers values
+	HRESULT hr = m_device->CreateRenderTargetView(backBuffer.Get(), NULL, m_rtv.GetAddressOf());
+	backBuffer->Release();
+	return !(FAILED(hr));
+}
+
 bool Renderer::CreateSamplerState()
 {
 	D3D11_SAMPLER_DESC samplerDesc;
@@ -226,6 +251,7 @@ bool Renderer::CreateSamplerState()
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	HRESULT hr = m_device->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
+	m_immediateContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 	return !FAILED(hr);
 }
 
