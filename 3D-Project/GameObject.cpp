@@ -6,12 +6,12 @@
 using namespace DirectX;
 namespace MH = MatrixHelper;
 
-GameObject::GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
+GameObject::GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
 	Init(device, transform, folderPath, objectName);
 }
 
-void GameObject::Init(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName)
+void GameObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName)
 {
 	m_transform = transform;
 
@@ -39,7 +39,7 @@ Mesh* GameObject::GetMesh()
 	return m_mesh;
 }
 
-const DirectX::XMFLOAT4X4 GameObject::GetWorldBuffer()
+const DirectX::XMFLOAT4X4 GameObject::GetWorldMatrix()
 {
 	using namespace DirectX;
 	XMFLOAT4X4 worldMatrix;

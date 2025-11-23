@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <string>
+#include <wrl/client.h>
 
 #include "ConstantBuffer.h"
 
@@ -20,9 +21,8 @@ struct MaterialProperties
 	DX::XMFLOAT3 SpecularComponent;
 
 	float SpecularExponent;
-	float padding[3] = {0.f,0.f,0.f}; // Padding to make size multiple of 16 bytes
+	float padding[3] = { 0.f,0.f,0.f }; // Padding to make size multiple of 16 bytes
 };
-
 
 
 class SubMesh
@@ -31,9 +31,9 @@ private:
 	size_t m_startIndex = 0;
 	size_t m_nrOfIndices = 0;
 
-	ID3D11ShaderResourceView* m_ambientTexture = nullptr;
-	ID3D11ShaderResourceView* m_diffuseTexture = nullptr;
-	ID3D11ShaderResourceView* m_specularTexture = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_ambientTexture = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_diffuseTexture = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularTexture = nullptr;
 
 	ConstantBuffer m_materialBuffer;
 

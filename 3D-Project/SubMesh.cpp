@@ -31,23 +31,25 @@ void SubMesh::Init(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndi
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
-	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture, m_diffuseTexture, m_specularTexture };
+	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture.Get(), m_diffuseTexture.Get(), m_specularTexture.Get() };
 	context->PSSetShaderResources(0, 3, SRVs);
+
+	context->PSSetConstantBuffers(0, 1, const_cast<ConstantBuffer&>(m_materialBuffer).GetBufferPtr());
 
 	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
 }
 
 ID3D11ShaderResourceView* SubMesh::GetAmbientSRV() const
 {
-	return m_ambientTexture;
+	return m_ambientTexture.Get();
 }
 
 ID3D11ShaderResourceView* SubMesh::GetDiffuseSRV() const
 {
-	return m_diffuseTexture;
+	return m_diffuseTexture.Get();
 }
 
 ID3D11ShaderResourceView* SubMesh::GetSpecularSRV() const
 {
-	return m_specularTexture;
+	return m_specularTexture.Get();
 }

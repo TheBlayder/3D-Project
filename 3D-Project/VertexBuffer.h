@@ -6,7 +6,7 @@
 class VertexBuffer
 {
 private:
-	Microsoft::WRL::ComPtr <ID3D11Buffer> m_vertexBuffer;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
 	UINT m_nrOfVertices = 0;
 	UINT m_vertexSize = 0;
 

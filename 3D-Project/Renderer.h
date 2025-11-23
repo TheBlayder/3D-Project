@@ -7,6 +7,7 @@
 #include "BaseScene.h"
 #include "ConstantBuffer.h"
 #include "TestObject.h"
+#include "GameObject.h"
 #include "Camera.h"
 
 class Renderer
@@ -37,7 +38,7 @@ private:
 
 	Camera* m_camera;
 
-	TestObject* m_test1;
+	GameObject* m_test1;
 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);

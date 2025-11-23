@@ -59,9 +59,12 @@ void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 }
 
 // === GETTERS ===
-ID3D11Buffer* Camera::GetConstantBuffer() const
+const DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
 {
-    return m_cameraBuffer->GetBuffer();
+	using namespace DirectX;
+	XMFLOAT4X4 viewProjMatrix;
+	GenerateViewProjMatrix(viewProjMatrix);
+	return viewProjMatrix;
 }
 
 const DX::XMFLOAT3& Camera::GetForward() const

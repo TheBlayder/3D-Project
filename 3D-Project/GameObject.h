@@ -21,14 +21,14 @@ private:
 
 public:
 	GameObject() = default;
-	GameObject(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName);
+	GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName);
 	~GameObject() = default;
 
-	void Init(ID3D11Device*& device, const Transform& transform, std::string& folderPath, std::string& objectName);
+	void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName);
 
 	void Draw(ID3D11DeviceContext* context);
 
 	Transform& GetTransform();
 	Mesh* GetMesh();
-	const DirectX::XMFLOAT4X4 GetWorldBuffer();
+	const DirectX::XMFLOAT4X4 GetWorldMatrix();
 };

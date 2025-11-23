@@ -45,7 +45,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			// Load texture from file
 			std::string ambientTexturePath = folderPath + mesh.MeshMaterial.map_Ka;
 			std::wstring wStr(ambientTexturePath.begin(), ambientTexturePath.end());
-			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &ambientSRV);
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, ambientSRV.GetAddressOf());
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load ambient texture: " + ambientTexturePath);
@@ -53,7 +53,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 		else
 		{
-			CreateDefaultTexture(device, &ambientSRV);
+			CreateDefaultTexture(device, ambientSRV.GetAddressOf());
 		}
 
 		// Load diffuse texture
@@ -64,7 +64,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			// Load texture from file
 			std::string diffuseTexturePath = folderPath + mesh.MeshMaterial.map_Kd;
 			std::wstring wStr(diffuseTexturePath.begin(), diffuseTexturePath.end());
-			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &diffuseSRV);
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, diffuseSRV.GetAddressOf());
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load diffuse texture: " + diffuseTexturePath);
@@ -72,7 +72,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 		else
 		{
-			CreateDefaultTexture(device, &diffuseSRV);
+			CreateDefaultTexture(device, diffuseSRV.GetAddressOf());
 		}
 
 		// Load specular texture
@@ -84,7 +84,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			// Load texture from file
 			std::string specularTexturePath = folderPath + mesh.MeshMaterial.map_Ks;
 			std::wstring wStr(specularTexturePath.begin(), specularTexturePath.end());
-			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, &specularSRV);
+			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, specularSRV.GetAddressOf());
 			if (FAILED(hr))
 			{
 				throw std::runtime_error("Failed to load specular texture: " + specularTexturePath);
@@ -92,7 +92,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		}
 		else
 		{
-			CreateDefaultTexture(device, &specularSRV);
+			CreateDefaultTexture(device, specularSRV.GetAddressOf());
 		}
 
 
@@ -102,12 +102,12 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			ambientSRV.Get(), diffuseSRV.Get(), specularSRV.Get(),
 			ambientComponent, diffuseComponent, specularComponent, specularExponent);
 
-		m_subMeshes.push_back(std::move(subMesh));
+		m_subMeshes.emplace_back(std::move(subMesh));
 
 		// Append indices to tempIndices
 		for(auto& index : mesh.Indices)
 		{
-			tempIndices.push_back(index + startIndex);
+			tempIndices.emplace_back(index + startIndex);
 		}
 
 		startIndex += mesh.Indices.size(); // Update start index for next sub-mesh
@@ -116,7 +116,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		for(auto& vertex : mesh.Vertices)
 		{
 			SimpleVertex tempVertex = SimpleVertex(vertex);
-			tempVertices.push_back(tempVertex);
+			tempVertices.emplace_back(tempVertex);
 		}
 	}
 
@@ -142,6 +142,11 @@ void Mesh::PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIn
 	m_subMeshes[subMeshIndex].PerformDrawCall(context);
 }
 
+UINT Mesh::GetNrOfVerticiesInMesh() const
+{
+	return m_vertexBuffer.GetNrOfVertices();
+}
+
 size_t Mesh::GetNrOfSubMeshes() const
 {
 	return m_subMeshes.size();
@@ -164,41 +169,34 @@ ID3D11ShaderResourceView* Mesh::GetSpecularSRV(size_t subMeshIndex) const
 
 void Mesh::CreateDefaultTexture(ID3D11Device* device, ID3D11ShaderResourceView** textureSRV)
 {
-	unsigned char defaultTextureData[4] = { 255, 255, 255, 255 }; // White pixel
-	
-	D3D11_TEXTURE2D_DESC textureDesc;
-	textureDesc.Width = 1;
-	textureDesc.Height = 1;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	
-	D3D11_SUBRESOURCE_DATA textureData = {};
-	textureData.pSysMem = defaultTextureData;
-	textureData.SysMemPitch = sizeof(defaultTextureData);
-	
-	ID3D11Texture2D* texture = nullptr;
-	HRESULT hr = device->CreateTexture2D(&textureDesc, &textureData, &texture);
-	if (FAILED(hr))
-	{
-		throw std::runtime_error("Failed to create default texture.");
-	
-	}
-	
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	srvDesc.Texture2D.MostDetailedMip = 0;
-	srvDesc.Texture2D.MipLevels = 1;
-	
-	hr = device->CreateShaderResourceView(texture, &srvDesc, textureSRV);
-	texture->Release();
-	
-	if (FAILED(hr))
-	{
-		throw std::runtime_error("Failed to create shader resource view for default texture.");
-	}
+    UINT32 defaultPixel = 0xFFFFFFFFu; // single pixel
+    D3D11_TEXTURE2D_DESC textureDesc = {};
+    textureDesc.Width = 1;
+    textureDesc.Height = 1;
+    textureDesc.MipLevels = 1;
+    textureDesc.ArraySize = 1;
+    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    textureDesc.SampleDesc.Count = 1;
+    textureDesc.SampleDesc.Quality = 0;
+    textureDesc.Usage = D3D11_USAGE_DEFAULT;
+    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    textureDesc.CPUAccessFlags = 0;
+    textureDesc.MiscFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA textureData = {};
+    textureData.pSysMem = &defaultPixel;
+    textureData.SysMemPitch = 4; // 1 pixel * 4 bytes (RGBA8)
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+    HRESULT hr = device->CreateTexture2D(&textureDesc, &textureData, texture.GetAddressOf());
+    if (FAILED(hr)) { throw std::runtime_error("Failed to create default texture."); }
+
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+    srvDesc.Format = textureDesc.Format;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    srvDesc.Texture2D.MipLevels = 1;
+
+    hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, textureSRV);
+    if (FAILED(hr)) { throw std::runtime_error("Failed to create shader resource view for default texture."); }
 }

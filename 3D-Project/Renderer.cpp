@@ -1,9 +1,9 @@
 #include "Renderer.h"
 #include "ReadCSO.h"
 
-#include "TestObject.h"
+#include "Transform.h"
 
-Renderer::Renderer() {}
+#include "TestObject.h"
 
 Renderer::~Renderer()
 {
@@ -35,7 +35,24 @@ bool Renderer::Init(const Window& window)
 	// Set up rasterizer state
 	if (!CreateRasterizerState()) return false;
 
-	m_test1 = new TestObject(m_device.Get());
+	// Cube test object
+	Transform testTransform;
+	std::string folderPath = "Objects/Cube";
+	std::string objectName = "cube.obj";
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
+	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
+
+	// Camera
+	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -10.0f };
+	ProjectionData projData;
+	projData.fovInDeg = 70.0f;
+	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
+	projData.nearPlane = 0.1f;
+	projData.m_farPlane = 1000.0f;
+
+	m_camera = new Camera(m_device.Get(), projData, camInitialPos);
 
     return true;
 }
@@ -48,18 +65,25 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
-	//Fixa camera här
 	float clearColor[4] = { 0,0,0,0 };
+	m_immediateContext->ClearRenderTargetView(m_rtv.Get(), clearColor);
 
+	//Fixa camera här
+
+	// VS constant buffers
+	m_immediateContext->VSSetConstantBuffers(0, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
 
 	// Rita objekt 
+	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
+	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
 	m_test1->Draw(m_immediateContext.Get()); // Set vertex buffer
 	
-	m_immediateContext->Draw(3, 0); // Draw call for triangle
+	m_immediateContext->Draw(m_test1->GetMesh()->GetNrOfVerticiesInMesh(), 0);
 }
 
 void Renderer::CreateViewport(const Window& window)

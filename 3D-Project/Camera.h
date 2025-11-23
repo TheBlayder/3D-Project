@@ -42,7 +42,8 @@ public:
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
 	// Getters
-	ID3D11Buffer* GetConstantBuffer() const;
+	const DirectX::XMFLOAT4X4 GetViewProjMatrix();
+
 	const DX::XMFLOAT3& GetForward() const;
 	const DX::XMFLOAT3& GetPosition() const;
 	const DX::XMFLOAT3& GetRight() const;

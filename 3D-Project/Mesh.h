@@ -33,6 +33,7 @@ public:
 	void BindMeshBuffers(ID3D11DeviceContext* context) const;
 	void PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const;
 
+	UINT GetNrOfVerticiesInMesh() const;
 	size_t GetNrOfSubMeshes() const;
 	ID3D11ShaderResourceView* GetAmbientSRV(size_t subMeshIndex) const;
 	ID3D11ShaderResourceView* GetDiffuseSRV(size_t subMeshIndex) const;
