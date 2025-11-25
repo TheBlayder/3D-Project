@@ -1,9 +1,11 @@
+SamplerState samplerState : register(s0);
+
 // Textures coming from the submesh draw call
 Texture2D ambientTexture : register(t0);
 Texture2D diffuseTexture : register(t1);
 Texture2D specularTexture : register(t2);
 
-cbuffer materialProperties : register(b0)
+cbuffer materialBuffer : register(b0)
 {
     int hasAmbientTexture;
     float3 ambientColor;
@@ -17,14 +19,6 @@ cbuffer materialProperties : register(b0)
     float shininess;
 };
 
-cbuffer CameraProperties : register(b1)
-{
-    //idk
-};
-
-
-SamplerState samplerState : register(s0);
-
 struct PSInput
 {
     float4 position : SV_POSITION;
@@ -35,5 +29,5 @@ struct PSInput
 
 float4 main(PSInput input) : SV_TARGET
 {
-    return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    return float4(1.0f, 0.0f, 0.0f, 1.0f);
 }

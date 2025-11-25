@@ -1,4 +1,4 @@
-cbuffer ViewProjectionBuffer : register(b0)
+cbuffer ViewProjectionMatrix : register(b0)
 {
     float4x4 viewProjMatrix;
 };
@@ -26,9 +26,12 @@ struct VSOutput
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    output.WORLD_POSITION = mul(float4(input.position, 1.0f), worldMatrix);
+    
+    float4 modelPos = float4(input.position, 1.0f);
+    output.WORLD_POSITION = mul(modelPos, worldMatrix);
     output.position = mul(output.WORLD_POSITION, viewProjMatrix);
-    output.NORMAL = normalize(float4(mul(float4(input.normal, 0), worldMatrix).xyz, 0));
+    
+    output.NORMAL = normalize(float4(mul(float4(input.normal, 1.0f), worldMatrix).xyz, 0.0f));
     output.UV = input.uv;
     return output;
 }

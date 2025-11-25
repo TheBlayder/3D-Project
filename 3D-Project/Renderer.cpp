@@ -7,8 +7,8 @@
 
 Renderer::~Renderer()
 {
-	free(m_test1);
-	free(m_camera);
+    delete m_test1;
+    delete m_camera;
 }
 
 bool Renderer::Init(const Window& window)
@@ -19,6 +19,10 @@ bool Renderer::Init(const Window& window)
 	// Set up viewport
 	CreateViewport(window);
 
+	if (!CreateRenderTargetView()) return false;
+
+	if (!CreateDepthStencilView(window)) return false;
+
 	// Set up shaders
 	std::string vShaderByteCode;
 	if(!CreateShaders(vShaderByteCode)) return false;
@@ -27,7 +31,7 @@ bool Renderer::Init(const Window& window)
 	if (!CreateInputLayout(vShaderByteCode)) return false;
 
 	// Set up UAV
-	if (!CreateUAV()) return false;
+	//if (!CreateUAV()) return false;
 
 	// Set up sampler state
 	if (!CreateSamplerState()) return false;
@@ -35,11 +39,14 @@ bool Renderer::Init(const Window& window)
 	// Set up rasterizer state
 	if (!CreateRasterizerState()) return false;
 
+	// Set up constant buffers
+	if (!CreateConstantBuffers()) return false;
+
 	// Cube test object
 	Transform testTransform;
 	std::string folderPath = "Objects/Cube";
 	std::string objectName = "cube.obj";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 20.0f, 0.0f));
 	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
@@ -65,14 +72,9 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
-	float clearColor[4] = { 0,0,0,0 };
+	float clearColor[4] = { 0, 0, 0, 0 };
 	m_immediateContext->ClearRenderTargetView(m_rtv.Get(), clearColor);
-
-	//Fixa camera här
-
-	// VS constant buffers
-	m_immediateContext->VSSetConstantBuffers(0, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
-	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+	m_immediateContext->ClearDepthStencilView(m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Rita objekt 
 	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
@@ -81,7 +83,14 @@ void Renderer::RenderFrame()
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
+	// VS constant buffers
+	m_immediateContext->VSSetConstantBuffers(0, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+
 	m_test1->Draw(m_immediateContext.Get());
+
+	// Present the rendered frame to the screen
+	m_swapChain->Present(0, 0);
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -102,12 +111,14 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	if (_DEBUG)
 		flags = D3D11_CREATE_DEVICE_DEBUG;
 
+	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
+
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	swapChainDesc.BufferDesc.Width = window.GetWidth();
 	swapChainDesc.BufferDesc.Height = window.GetHeight();
-	swapChainDesc.BufferDesc.RefreshRate.Numerator = 1;
-	swapChainDesc.BufferDesc.RefreshRate.Denominator = 165;
+	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
@@ -115,8 +126,8 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
 
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_UNORDERED_ACCESS;
-	swapChainDesc.BufferCount = 2;
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; //  | DXGI_USAGE_UNORDERED_ACCESS
+	swapChainDesc.BufferCount = 1; // 2
 	swapChainDesc.OutputWindow = window.GetWindowHandle();
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -127,8 +138,8 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
 		flags,
-		nullptr,
-		0,
+		featureLevels,
+		1,
 		D3D11_SDK_VERSION,
 		&swapChainDesc,
 		m_swapChain.GetAddressOf(),
@@ -136,13 +147,18 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 		nullptr,
 		m_immediateContext.GetAddressOf()
 	);
-	return SUCCEEDED(hr);
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating device and swap chain!" << std::endl;
+		return false;
+	}
+
+	return true;
 }
 
 bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
-{
-	vShaderByteCodeOUT.clear();
-	
+{	
 	// Vertex shader
 	if(!CSOReader::ReadCSO("VertexShader.cso", vShaderByteCodeOUT))
 	{
@@ -241,19 +257,56 @@ bool Renderer::CreateUAV()
 
 bool Renderer::CreateRenderTargetView()
 {
-	// get the address of the back buffer
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-	if (FAILED(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.Get()))))
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
+    if (FAILED(hr))
+    {
+        std::cerr << "Failed to get back buffer! hr=" << std::hex << hr << std::endl;
+        return false;
+    }
+
+    hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_rtv.GetAddressOf());
+    if (FAILED(hr))
+    {
+        std::cerr << "Failed to create RTV! hr=" << std::hex << hr << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool Renderer::CreateDepthStencilView(const Window& window)
+{
+	D3D11_TEXTURE2D_DESC depthStencilDesc;
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+	depthStencilDesc.Width = window.GetWidth();
+	depthStencilDesc.Height = window.GetHeight();
+	depthStencilDesc.MipLevels = 1;
+	depthStencilDesc.ArraySize = 1;
+	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilDesc.SampleDesc.Count = 1;
+	depthStencilDesc.SampleDesc.Quality = 0;
+	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthStencilDesc.CPUAccessFlags = 0;
+	depthStencilDesc.MiscFlags = 0;
+
+	HRESULT hr = m_device->CreateTexture2D(&depthStencilDesc, nullptr, m_depthStencilBuffer.GetAddressOf());
+	if(FAILED(hr))
 	{
-		std::cerr << "Failed to get back buffer!" << std::endl;
+		std::cerr << "Error creating depth stencil buffer!" << std::endl;
 		return false;
 	}
 
-	// use the back buffer address to create the render target
-	// null as description to base it on the backbuffers values
-	HRESULT hr = m_device->CreateRenderTargetView(backBuffer.Get(), NULL, m_rtv.GetAddressOf());
-	backBuffer->Release();
-	return !(FAILED(hr));
+	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, m_dsv.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating depth stencil view!" << std::endl;
+		return false;
+	}
+
+	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
+	return true;
 }
 
 bool Renderer::CreateSamplerState()
@@ -273,6 +326,12 @@ bool Renderer::CreateSamplerState()
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	HRESULT hr = m_device->CreateSamplerState(&samplerDesc, m_samplerState.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating sampler state!" << std::endl;
+		return false;
+	}
+	
 	m_immediateContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 	return !FAILED(hr);
 }
@@ -298,6 +357,26 @@ bool Renderer::CreateRasterizerState()
 	return true;
 }
 
+bool Renderer::CreateConstantBuffers()
+{
+	DirectX::XMFLOAT4X4 identityMatrix;
+	DirectX::XMStoreFloat4x4(&identityMatrix, DirectX::XMMatrixIdentity());
+	// World matrix buffer
+	if (!m_worldBuffer.Init(m_device.Get(), sizeof(DirectX::XMFLOAT4X4), &identityMatrix))
+	{
+		std::cerr << "Error creating world constant buffer!" << std::endl;
+		return false;
+	}
+
+	// ViewProjection matrix buffer
+	if (!m_viewProjectionBuffer.Init(m_device.Get(), sizeof(DirectX::XMFLOAT4X4), &identityMatrix))
+	{
+		std::cerr << "Error creating viewProjection constant buffer!" << std::endl;
+		return false;
+	}
+	return true;
+}
+
 ID3D11Device* Renderer::GetDevice()
 {
 	return m_device.Get();
@@ -307,4 +386,3 @@ ID3D11DeviceContext* Renderer::GetImmediateContext()
 {
 	return m_immediateContext.Get();
 }
-

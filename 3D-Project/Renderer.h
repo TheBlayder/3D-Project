@@ -18,6 +18,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_dsv;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
+
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav;
 
@@ -46,8 +49,10 @@ private:
 	bool CreateInputLayout(const std::string& vShaderByteCode);
 	bool CreateUAV();
 	bool CreateRenderTargetView();
+	bool CreateDepthStencilView(const Window& window);
 	bool CreateSamplerState();
 	bool CreateRasterizerState();
+	bool CreateConstantBuffers();
 
 public:
 	Renderer() = default;
