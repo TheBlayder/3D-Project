@@ -32,19 +32,19 @@ int APIENTRY wWinMain(
 
 	MSG msg = { };
 	using namespace std::chrono;
-	/*while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
+	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{
 		time_point<high_resolution_clock> start = high_resolution_clock::now();
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 
-
+		renderer.RenderFrame();
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		duration<float> time = start - end;
 		float deltaTime = time.count();
-	}*/
+	}
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();

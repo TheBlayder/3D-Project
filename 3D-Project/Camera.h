@@ -19,7 +19,7 @@ class Camera
 {
 private:
 	Transform m_transform;
-	DX::XMFLOAT3 m_up = { 0.f, 1.f, 0.f };
+	DX::XMVECTOR m_up = { 0.f, 1.f, 0.f, 0.f };
 
 	ProjectionData m_projData;
 	ConstantBuffer* m_cameraBuffer;

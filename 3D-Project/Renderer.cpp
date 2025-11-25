@@ -40,7 +40,7 @@ bool Renderer::Init(const Window& window)
 	std::string folderPath = "Objects/Cube";
 	std::string objectName = "cube.obj";
 	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
 
@@ -81,9 +81,7 @@ void Renderer::RenderFrame()
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
-	m_test1->Draw(m_immediateContext.Get()); // Set vertex buffer
-	
-	m_immediateContext->Draw(m_test1->GetMesh()->GetNrOfVerticiesInMesh(), 0);
+	m_test1->Draw(m_immediateContext.Get());
 }
 
 void Renderer::CreateViewport(const Window& window)

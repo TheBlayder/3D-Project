@@ -15,17 +15,17 @@ void GameObject::Init(ID3D11Device* device, const Transform& transform, std::str
 {
 	m_transform = transform;
 
-	m_mesh->Init(device, folderPath, objectName);
+	m_mesh.Init(device, folderPath, objectName);
 }
 
 void GameObject::Draw(ID3D11DeviceContext* context)
 {
-	m_mesh->BindMeshBuffers(context);
+	m_mesh.BindMeshBuffers(context);
 
-	for (size_t i = 0; i < m_mesh->GetNrOfSubMeshes(); ++i)
+	for (size_t i = 0; i < m_mesh.GetNrOfSubMeshes(); ++i)
 	{
 		// Draw sub-meshes
-		m_mesh->PerformSubMeshDrawCall(context, i);
+		m_mesh.PerformSubMeshDrawCall(context, i);
 	}
 }
 
@@ -34,7 +34,7 @@ Transform& GameObject::GetTransform()
 	return m_transform;
 }
 
-Mesh* GameObject::GetMesh()
+Mesh& GameObject::GetMesh()
 {
 	return m_mesh;
 }

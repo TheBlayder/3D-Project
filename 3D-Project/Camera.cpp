@@ -12,8 +12,7 @@ void Camera::RotateAroundAxis(float amount) // Will only rotate around the up ax
 {
 	using namespace DirectX;
 	XMVECTOR currentRotation = m_transform.GetRotation();
-	XMVECTOR upVector = XMLoadFloat3(&m_up);
-	XMVECTOR rotationAmount = XMVectorScale(upVector, amount);
+	XMVECTOR rotationAmount = XMVectorScale(m_up, amount);
 	m_transform.SetRotation(XMVectorAdd(currentRotation, rotationAmount));
 }
 
@@ -22,7 +21,7 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 	using namespace DirectX;
 	XMFLOAT4X4 viewMatrix, projMatrix;
 
-	MH::CreateViewMatrix(viewMatrix, m_transform.GetPositionF3(), m_transform.GetRotationF3(), m_up);
+	MH::CreateViewMatrix(viewMatrix, m_transform.GetPosition(), m_transform.GetRotation(), m_up);
 	MH::CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
 	MH::CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
 }
@@ -31,7 +30,8 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT
     : m_projData(projData)
 {
 	using namespace DirectX;
-	m_transform.SetPosition(DirectX::XMLoadFloat3(&initialPosition));
+	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
+	m_transform.SetRotation(XMVectorSet(0.f, 0.f, 0.f, 1.f));
 
 	XMFLOAT4X4 viewProjMatrix;
 	GenerateViewProjMatrix(viewProjMatrix);
@@ -80,11 +80,14 @@ const DX::XMFLOAT3& Camera::GetPosition() const
 const DX::XMFLOAT3& Camera::GetRight() const
 {
 	DX::XMFLOAT3 right;
-	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetPosition(), DirectX::XMLoadFloat3(&m_up)));
+	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetPosition(), m_up));
 	return right;
 }
 
 const DX::XMFLOAT3& Camera::GetUp() const
 {
-    return m_up;
+	DX::XMFLOAT3 up;
+	DirectX::XMStoreFloat3(&up, m_up);
+	
+	return up;
 }

@@ -17,7 +17,7 @@ private:
 	Transform m_transform;
 
 	// Texture data
-	Mesh* m_mesh;
+	Mesh m_mesh;
 
 public:
 	GameObject() = default;
@@ -29,6 +29,6 @@ public:
 	void Draw(ID3D11DeviceContext* context);
 
 	Transform& GetTransform();
-	Mesh* GetMesh();
+	Mesh& GetMesh();
 	const DirectX::XMFLOAT4X4 GetWorldMatrix();
 };

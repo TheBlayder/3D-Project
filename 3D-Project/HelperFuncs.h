@@ -9,44 +9,34 @@ namespace MatrixHelper
 {
     inline void CreateWorldMatrix(DX::XMFLOAT4X4& worldMatrix, const Transform& transform)  
     {  
-        using namespace DirectX;
-        XMMATRIX scaling = XMMatrixScalingFromVector(transform.GetScale());
+        DX::XMMATRIX scaling = DX::XMMatrixScalingFromVector(transform.GetScale());
+   		DX::XMMATRIX rotation = DX::XMMatrixRotationRollPitchYawFromVector(transform.GetRotation());
+		DX::XMMATRIX translation = DX::XMMatrixTranslationFromVector(transform.GetPosition());
+        
+        DX::XMMATRIX world = DX::XMMatrixMultiplyTranspose(DX::XMMatrixMultiply(scaling, rotation), translation);
 
-		XMMATRIX rotation = XMMatrixRotationRollPitchYawFromVector(transform.GetRotation());
-
-		XMMATRIX translation = XMMatrixTranslationFromVector(transform.GetPosition());
-
-        XMMATRIX world = XMMatrixMultiplyTranspose(XMMatrixMultiply(scaling, rotation), translation);
-
-        XMStoreFloat4x4(&worldMatrix, world);
+        DX::XMStoreFloat4x4(&worldMatrix, world);
     }
 
-    inline void CreateViewMatrix(DX::XMFLOAT4X4& viewMatrix, const DX::XMFLOAT3& position, const DX::XMFLOAT3& forward, const DX::XMFLOAT3& up)
+    inline void CreateViewMatrix(DX::XMFLOAT4X4& viewMatrix, const DX::XMVECTOR& position, const DX::XMVECTOR& forward, const DX::XMVECTOR& up)
     {
-        using namespace DirectX;
-        XMVECTOR eyePos = XMLoadFloat3(&position);
-        XMVECTOR directionVec = XMVectorAdd(eyePos, XMLoadFloat3(&forward));
-        XMVECTOR upVec = XMLoadFloat3(&up);
-        XMMATRIX view = XMMatrixLookAtLH(eyePos, directionVec, upVec);
-
-        XMStoreFloat4x4(&viewMatrix, view);
+        DX::XMMATRIX view = DX::XMMatrixLookAtLH(position, forward, up);
+        DX::XMStoreFloat4x4(&viewMatrix, view);
     }
 
     inline void CreateProjectionMatrix(DX::XMFLOAT4X4& projMatrix, const float fovInDeg, const float aspectRatio, const float nearPlane, const float farPlane)
     {
-        using namespace DirectX;
-        XMMATRIX proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(fovInDeg), aspectRatio, nearPlane, farPlane);
+        DX::XMMATRIX proj = DX::XMMatrixPerspectiveFovLH(DX::XMConvertToRadians(fovInDeg), aspectRatio, nearPlane, farPlane);
 
-        XMStoreFloat4x4(&projMatrix, proj);
+        DX::XMStoreFloat4x4(&projMatrix, proj);
     }
 
     inline void CreateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix, const DX::XMFLOAT4X4& viewMatrix, const DX::XMFLOAT4X4& projMatrix)
     {
-        using namespace DirectX;
-        XMMATRIX view = XMLoadFloat4x4(&viewMatrix);
-        XMMATRIX proj = XMLoadFloat4x4(&projMatrix);
-        XMMATRIX viewProj = XMMatrixMultiplyTranspose(view, proj);
+        DX::XMMATRIX view = DX::XMLoadFloat4x4(&viewMatrix);
+        DX::XMMATRIX proj = DX::XMLoadFloat4x4(&projMatrix);
+        DX::XMMATRIX viewProj = DX::XMMatrixMultiplyTranspose(view, proj);
 
-        XMStoreFloat4x4(&viewProjMatrix, viewProj);
+        DX::XMStoreFloat4x4(&viewProjMatrix, viewProj);
     }
 }
