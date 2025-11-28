@@ -1,5 +1,7 @@
 #include "SubMesh.h"
 
+#include <iostream>
+
 SubMesh::SubMesh(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndicesInSubMesh,
 	ID3D11ShaderResourceView* ambientTextureSRV, ID3D11ShaderResourceView* diffuseTextureSRV, ID3D11ShaderResourceView* specularTextureSRV,
 	DX::XMFLOAT3 ambientComponent, DX::XMFLOAT3 diffuseComponent, DX::XMFLOAT3 specularComponent, float specularExponent)
@@ -31,7 +33,11 @@ void SubMesh::Init(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndi
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
-	ID3D11ShaderResourceView* SRVs[3] = { m_ambientTexture.Get(), m_diffuseTexture.Get(), m_specularTexture.Get() };
+	ID3D11ShaderResourceView* SRVs[3] = {
+		m_ambientTexture.Get(),
+		m_diffuseTexture.Get(),
+		m_specularTexture.Get()
+	};
 	context->PSSetShaderResources(0, 3, SRVs);
 
 	ID3D11Buffer* cb = m_materialBuffer.GetBuffer();

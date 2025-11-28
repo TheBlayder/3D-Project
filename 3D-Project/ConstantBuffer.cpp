@@ -1,6 +1,7 @@
 #include "ConstantBuffer.h"
 
 #include <iostream>
+#include <stdexcept>
 
 ConstantBuffer::ConstantBuffer(ID3D11Device* device, size_t byteSize, void* initData)
 {
@@ -54,7 +55,9 @@ void ConstantBuffer::Update(ID3D11DeviceContext* context, void* data)
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-	context->Map(m_buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(context->Map(m_buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		throw std::runtime_error("Failed to update buffer");
+
 	memcpy(mappedResource.pData, data, m_size);
 	context->Unmap(m_buffer.Get(), 0);
 }

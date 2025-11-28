@@ -44,12 +44,16 @@ bool Renderer::Init(const Window& window)
 
 	// Cube test object
 	Transform testTransform;
-	std::string folderPath = "Objects/Cube";
+	std::string folderPath = "./Objects/Cube";
 	std::string objectName = "cube.obj";
 	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 20.0f, 0.0f));
 	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
+
+	// after m_test1 created (or inside RenderFrame before Draw)
+	auto& mesh = m_test1->GetMesh();
+	std::cout << "Verts: " << mesh.GetNrOfVerticiesInMesh() << " SubMeshs: " << mesh.GetNrOfSubMeshes() << std::endl;
 
 	// Camera
 	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -10.0f };
@@ -72,20 +76,22 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
-	float clearColor[4] = { 0, 0, 0, 0 };
+	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
 	m_immediateContext->ClearRenderTargetView(m_rtv.Get(), clearColor);
 	m_immediateContext->ClearDepthStencilView(m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Rita objekt 
-	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
-	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
-
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
+	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
+	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+
 	// VS constant buffers
-	m_immediateContext->VSSetConstantBuffers(0, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
-	m_immediateContext->VSSetConstantBuffers(1, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
+
+	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
 
 	m_test1->Draw(m_immediateContext.Get());
 
@@ -305,7 +311,6 @@ bool Renderer::CreateDepthStencilView(const Window& window)
 		return false;
 	}
 
-	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
 	return true;
 }
 
@@ -341,7 +346,7 @@ bool Renderer::CreateRasterizerState()
 	// Default rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;
 

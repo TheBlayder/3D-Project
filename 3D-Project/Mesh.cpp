@@ -28,7 +28,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		return;
 	}
 
-	size_t startIndex = 0;
+	UINT startIndex = 0;
 	std::vector<unsigned int> tempIndices;
 	std::vector<SimpleVertex> tempVertices;
 	
@@ -125,6 +125,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 
 	// Initialize index buffer
 	m_indexBuffer.Init(device, static_cast<UINT>(tempIndices.size()), tempIndices.data());
+
 }
 
 void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const

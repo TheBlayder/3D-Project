@@ -1,11 +1,11 @@
-cbuffer ViewProjectionMatrix : register(b0)
-{
-    float4x4 viewProjMatrix;
-};
-
-cbuffer WorldMatrix : register(b1)
+cbuffer WorldMatrix : register(b0)
 {
     float4x4 worldMatrix;
+};
+
+cbuffer ViewProjectionMatrix : register(b1)
+{
+    float4x4 viewProjMatrix;
 };
 
 struct VSInput

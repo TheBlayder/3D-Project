@@ -29,5 +29,15 @@ struct PSInput
 
 float4 main(PSInput input) : SV_TARGET
 {
-    return float4(1.0f, 0.0f, 0.0f, 1.0f);
+    // Sample each texture using the provided sampler and UV coordinates
+    float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV) : float4(ambientColor, 1.0f);
+    float4 diffuseSample = (hasDiffuseTexture != 0) ? diffuseTexture.Sample(samplerState, input.UV) : float4(diffuseColor, 1.0f);
+    float4 specularSample = (hasSpecularTexture != 0) ? specularTexture.Sample(samplerState, input.UV) : float4(specularColor, 1.0f);
+
+    float4 combined = (ambientSample + diffuseSample + specularSample);
+
+    // Ensure alpha is valid (use sampled alpha if present, otherwise 1.0)
+    combined.a = combined.a > 0.0f ? combined.a : 1.0f;
+
+    return combined;
 }

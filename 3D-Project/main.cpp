@@ -36,8 +36,11 @@ int APIENTRY wWinMain(
 	{
 		time_point<high_resolution_clock> start = high_resolution_clock::now();
 
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 
 		renderer.RenderFrame();
 
