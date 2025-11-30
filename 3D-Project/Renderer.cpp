@@ -46,14 +46,13 @@ bool Renderer::Init(const Window& window)
 	Transform testTransform;
 	std::string folderPath = "./Objects/Cube";
 	std::string objectName = "cube.obj";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 20.0f, 0.0f));
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 1.0f));
 	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
-	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
 
-	// after m_test1 created (or inside RenderFrame before Draw)
-	auto& mesh = m_test1->GetMesh();
-	std::cout << "Verts: " << mesh.GetNrOfVerticiesInMesh() << " SubMeshs: " << mesh.GetNrOfSubMeshes() << std::endl;
+	//// Create a simple triangle test object
+	//m_test1 = new TestObject(m_device.Get());
 
 	// Camera
 	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -10.0f };
@@ -225,8 +224,8 @@ bool Renderer::CreateInputLayout(const std::string& vShaderByteCode)
 	HRESULT hr = m_device->CreateInputLayout(
 		layoutDesc,
 		ARRAYSIZE(layoutDesc),
-		vShaderByteCode.c_str(),
-		vShaderByteCode.length(),
+		vShaderByteCode.data(),
+		vShaderByteCode.size(),
 		m_inputLayout.GetAddressOf()
 	);
 
@@ -336,7 +335,7 @@ bool Renderer::CreateSamplerState()
 		std::cerr << "Error creating sampler state!" << std::endl;
 		return false;
 	}
-	
+
 	m_immediateContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
 	return !FAILED(hr);
 }

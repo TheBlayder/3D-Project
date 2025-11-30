@@ -39,5 +39,7 @@ float4 main(PSInput input) : SV_TARGET
     // Ensure alpha is valid (use sampled alpha if present, otherwise 1.0)
     combined.a = combined.a > 0.0f ? combined.a : 1.0f;
 
-    return combined;
+    //return combined;
+    
+    return float4(1.0f, 0.0f, 1.0f, 1.0f); // Magenta for testing)
 }

@@ -49,4 +49,3 @@ public:
 	const DX::XMFLOAT3& GetRight() const;
 	const DX::XMFLOAT3& GetUp() const;
 };
-
