@@ -47,7 +47,7 @@ bool Renderer::Init(const Window& window)
 	std::string folderPath = "./Objects/Cube";
 	std::string objectName = "cube.obj";
 	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.5f, 0.5f, 0.0f, 0.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
 
@@ -354,7 +354,7 @@ bool Renderer::CreateRasterizerState()
 	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
 
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_NONE;
+	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;
 

@@ -42,7 +42,7 @@ int APIENTRY wWinMain(
 			DispatchMessage(&msg);
 		}
 
-		renderer.RenderFrame();
+		renderer.RenderFrame(); // Temporary function for testing
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		duration<float> time = start - end;

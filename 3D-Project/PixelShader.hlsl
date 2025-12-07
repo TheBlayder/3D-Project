@@ -41,5 +41,7 @@ float4 main(PSInput input) : SV_TARGET
 
     ////return combined;
     
-    return float4(1.0f, 0.0f, 1.0f, 1.0f); // Magenta for testing)
+    float3 n = normalize(input.NORMAL.xyz);
+    float3 color = n * 0.5f + 0.5f; // map [-1,1] -> [0,1]
+    return float4(color, 1.0f);
 }

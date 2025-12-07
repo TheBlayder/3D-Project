@@ -31,7 +31,7 @@ VSOutput main(VSInput input)
     output.WORLD_POSITION = mul(modelPos, worldMatrix);
     output.position = mul(output.WORLD_POSITION, viewProjMatrix);
     
-    output.NORMAL = normalize(float4(mul(float4(input.normal, 1.0f), worldMatrix).xyz, 0.0f));
+    output.NORMAL = normalize(float4(mul(float4(input.normal, 0.0f), worldMatrix).xyz, 0.0f));
     output.UV = input.uv;
     return output;
 }
