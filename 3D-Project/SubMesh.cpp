@@ -41,7 +41,7 @@ void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 	context->PSSetShaderResources(0, 3, SRVs);
 
 	ID3D11Buffer* cb = m_materialBuffer.GetBuffer();
-	context->PSSetConstantBuffers(0, 1,&cb);
+	context->PSSetConstantBuffers(0, 1, &cb);
 
 	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
 }

@@ -46,16 +46,16 @@ bool Renderer::Init(const Window& window)
 	Transform testTransform;
 	std::string folderPath = "./Objects/Cube";
 	std::string objectName = "cube.obj";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 1.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f));
-	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
 
 	//// Create a simple triangle test object
 	//m_test1 = new TestObject(m_device.Get());
 
 	// Camera
-	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -10.0f };
+	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
 	ProjectionData projData;
 	projData.fovInDeg = 70.0f;
 	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
@@ -75,24 +75,29 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
+	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
+
 	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
 	m_immediateContext->ClearRenderTargetView(m_rtv.Get(), clearColor);
 	m_immediateContext->ClearDepthStencilView(m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-	// Rita objekt 
+	// Update constant buffers
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
 	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 
 	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
 	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
 
-	// VS constant buffers
+	// Bind VS constant buffers
 	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
 
-	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
-
+	// Draw test object
 	m_test1->Draw(m_immediateContext.Get());
+
+	// Unbind shader resource views (safety — avoids "resource still bound as SRV" on next writes)
+	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+	m_immediateContext->PSSetShaderResources(0, 3, nullSRVs);
 
 	// Present the rendered frame to the screen
 	m_swapChain->Present(0, 0);
@@ -100,14 +105,13 @@ void Renderer::RenderFrame()
 
 void Renderer::CreateViewport(const Window& window)
 {
-	D3D11_VIEWPORT viewport;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-	viewport.Width = static_cast<FLOAT>(window.GetWidth());
-	viewport.Height = static_cast<FLOAT>(window.GetHeight());
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	m_immediateContext->RSSetViewports(1, &viewport);
+	m_viewport.TopLeftX = 0.0f;
+	m_viewport.TopLeftY = 0.0f;
+	m_viewport.Width = static_cast<FLOAT>(window.GetWidth());
+	m_viewport.Height = static_cast<FLOAT>(window.GetHeight());
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+	m_immediateContext->RSSetViewports(1, &m_viewport);
 }
 
 bool Renderer::CreateDeviceAndSwapChain(const Window& window)
@@ -284,6 +288,7 @@ bool Renderer::CreateDepthStencilView(const Window& window)
 {
 	D3D11_TEXTURE2D_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
 	depthStencilDesc.Width = window.GetWidth();
 	depthStencilDesc.Height = window.GetHeight();
 	depthStencilDesc.MipLevels = 1;
@@ -316,6 +321,8 @@ bool Renderer::CreateDepthStencilView(const Window& window)
 bool Renderer::CreateSamplerState()
 {
 	D3D11_SAMPLER_DESC samplerDesc;
+	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -344,6 +351,8 @@ bool Renderer::CreateRasterizerState()
 {
 	// Default rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc;
+	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
+
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_NONE;
 	rasterizerDesc.FrontCounterClockwise = FALSE;

@@ -17,6 +17,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
+	D3D11_VIEWPORT m_viewport;
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_dsv;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
@@ -62,6 +63,7 @@ public:
 	//void Render(BaseScene* scene, float deltaTime);
 
 	void RenderFrame(); // Temporary function for testing
+	void RenderFrame2(); // Temporary function for testing
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();
