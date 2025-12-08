@@ -1,9 +1,13 @@
 #pragma once
 
+#include <vector>
+
 #include "d3d11.h"
 #include "DirectXMath.h"
 #include "ConstantBuffer.h"
 #include "Transform.h"
+#include "GBuffer.h"
+
 
 namespace DX = DirectX;
 
@@ -23,6 +27,9 @@ private:
 
 	ProjectionData m_projData;
 	ConstantBuffer* m_cameraBuffer;
+
+	const size_t m_nrOfGbuffs = 2;
+	GBuffer** m_gbuffers = new GBuffer*[m_nrOfGbuffs];
 	
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
 	void RotateAroundAxis(float amount);

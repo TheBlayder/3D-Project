@@ -30,7 +30,9 @@ inline GBuffer::GBuffer(ID3D11Device* device, const UINT WINDOW_WIDTH, const UIN
 
 inline void GBuffer::Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT)
 {
-	D3D11_TEXTURE2D_DESC textureDesc = {};
+	D3D11_TEXTURE2D_DESC textureDesc;
+	ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));	
+	
 	textureDesc.Width = WINDOW_WIDTH;
 	textureDesc.Height = WINDOW_HEIGHT;
 	textureDesc.MipLevels = 1;

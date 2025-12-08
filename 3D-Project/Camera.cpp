@@ -29,6 +29,8 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
     : m_projData(projData)
 {
+	
+
 	using namespace DirectX;
 	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
 	m_transform.SetRotation(XMVectorSet(0.f, 0.f, 0.001f, 0.f));

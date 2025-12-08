@@ -63,7 +63,6 @@ public:
 	//void Render(BaseScene* scene, float deltaTime);
 
 	void RenderFrame(); // Temporary function for testing
-	void RenderFrame2(); // Temporary function for testing
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();

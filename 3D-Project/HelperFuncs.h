@@ -13,9 +13,9 @@ namespace MatrixHelper
         DX::XMMATRIX scaling = DX::XMMatrixScaling(transform.GetScaleF3().x, transform.GetScaleF3().y, transform.GetScaleF3().z);
         DX::XMMATRIX translation = DX::XMMatrixTranslation(transform.GetPositionF3().x, transform.GetPositionF3().y, transform.GetPositionF3().z);
 
-        DX::XMMATRIX rotationX = DX::XMMatrixRotationX(transform.GetRotationF3().x);
-        DX::XMMATRIX rotationY = DX::XMMatrixRotationY(transform.GetRotationF3().y);
-        DX::XMMATRIX rotationZ = DX::XMMatrixRotationZ(transform.GetRotationF3().z);
+        DX::XMMATRIX rotationX = DX::XMMatrixRotationX((DX::XMConvertToRadians(transform.GetRotationF3().x)));
+        DX::XMMATRIX rotationY = DX::XMMatrixRotationY((DX::XMConvertToRadians(transform.GetRotationF3().y)));
+        DX::XMMATRIX rotationZ = DX::XMMatrixRotationZ((DX::XMConvertToRadians(transform.GetRotationF3().z)));
         DX::XMMATRIX rotation = DX::XMMatrixMultiply(DX::XMMatrixMultiply(rotationZ, rotationY), rotationX);
 
         DX::XMMATRIX world = DX::XMMatrixMultiplyTranspose(DX::XMMatrixMultiply(scaling, rotation), translation);
