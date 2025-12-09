@@ -19,11 +19,11 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 	D3D11_VIEWPORT m_viewport;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_dsv;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
 
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
-	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uav;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RTV;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

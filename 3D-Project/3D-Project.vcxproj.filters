@@ -140,6 +140,9 @@
     <ClInclude Include="SimpleVertex.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
+    <ClInclude Include="DeferredHandler.h">
+      <Filter>Header Files\Internal-Libs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">

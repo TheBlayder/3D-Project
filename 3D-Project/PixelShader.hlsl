@@ -27,6 +27,12 @@ struct PSInput
     float2 UV : UV;
 };
 
+struct PSOutput
+{
+    float4 position : SV_Target0;
+    float4 normal : SV_Target1;
+};
+
 float4 main(PSInput input) : SV_TARGET
 {
     //// Sample each texture using the provided sampler and UV coordinates
@@ -41,7 +47,9 @@ float4 main(PSInput input) : SV_TARGET
 
     ////return combined;
     
-    float3 n = normalize(input.NORMAL.xyz);
-    float3 color = n * 0.5f + 0.5f; // map [-1,1] -> [0,1]
-    return float4(color, 1.0f);
+    PSOutput output;
+    output.position = input.WORLD_POSITION;
+    output.normal = input.NORMAL;
+    
+    return output;
 }

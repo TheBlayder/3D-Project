@@ -75,11 +75,11 @@ bool Renderer::Init(const Window& window)
 // For testing purposes
 void Renderer::RenderFrame()
 {
-	m_immediateContext->OMSetRenderTargets(1, m_rtv.GetAddressOf(), m_dsv.Get());
+	m_immediateContext->OMSetRenderTargets(1, m_RTV.GetAddressOf(), m_DSV.Get());
 
 	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
-	m_immediateContext->ClearRenderTargetView(m_rtv.Get(), clearColor);
-	m_immediateContext->ClearDepthStencilView(m_dsv.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_immediateContext->ClearRenderTargetView(m_RTV.Get(), clearColor);
+	m_immediateContext->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	// Update constant buffers
 	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
@@ -260,7 +260,7 @@ bool Renderer::CreateUAV()
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 	uavDesc.Texture2D.MipSlice = 0;
 
-	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_uav.GetAddressOf());
+	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_UAV.GetAddressOf());
 	return true;
 }
 
@@ -274,7 +274,7 @@ bool Renderer::CreateRenderTargetView()
         return false;
     }
 
-    hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_rtv.GetAddressOf());
+    hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RTV.GetAddressOf());
     if (FAILED(hr))
     {
         std::cerr << "Failed to create RTV! hr=" << std::hex << hr << std::endl;
@@ -308,7 +308,7 @@ bool Renderer::CreateDepthStencilView(const Window& window)
 		return false;
 	}
 
-	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, m_dsv.GetAddressOf());
+	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, m_DSV.GetAddressOf());
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating depth stencil view!" << std::endl;
