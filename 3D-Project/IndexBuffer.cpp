@@ -18,7 +18,7 @@ void IndexBuffer::Init(ID3D11Device* device, size_t nrOfIndicesInBuffer, uint32_
 	bufferDesc.MiscFlags = 0;
 	bufferDesc.StructureByteStride = 0;
 	
-	D3D11_SUBRESOURCE_DATA bufferData;
+	D3D11_SUBRESOURCE_DATA bufferData = {};
 	bufferData.pSysMem = indexData;
 	bufferData.SysMemPitch = 0;
 	bufferData.SysMemSlicePitch = 0;

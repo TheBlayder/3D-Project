@@ -122,8 +122,7 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 	swapChainDesc.BufferDesc.Width = window.GetWidth();
 	swapChainDesc.BufferDesc.Height = window.GetHeight();
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
@@ -255,7 +254,7 @@ bool Renderer::CreateUAV()
 		return false;
 	}
 
-	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 	uavDesc.Texture2D.MipSlice = 0;
@@ -286,9 +285,7 @@ bool Renderer::CreateRenderTargetView()
 
 bool Renderer::CreateDepthStencilView(const Window& window)
 {
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-
+	D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 	depthStencilDesc.Width = window.GetWidth();
 	depthStencilDesc.Height = window.GetHeight();
 	depthStencilDesc.MipLevels = 1;
@@ -320,9 +317,7 @@ bool Renderer::CreateDepthStencilView(const Window& window)
 
 bool Renderer::CreateSamplerState()
 {
-	D3D11_SAMPLER_DESC samplerDesc;
-	ZeroMemory(&samplerDesc, sizeof(samplerDesc));
-
+	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -350,9 +345,7 @@ bool Renderer::CreateSamplerState()
 bool Renderer::CreateRasterizerState()
 {
 	// Default rasterizer state
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
-
+	D3D11_RASTERIZER_DESC rasterizerDesc = {};
 	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = FALSE;

@@ -12,7 +12,7 @@ bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 {
 	m_size = static_cast<UINT>(byteSize);
 
-	D3D11_BUFFER_DESC cBufferDesc;
+	D3D11_BUFFER_DESC cBufferDesc = {};
 	cBufferDesc.ByteWidth = m_size;
 	cBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	cBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -20,7 +20,7 @@ bool ConstantBuffer::Init(ID3D11Device* device, size_t byteSize, void* initData)
 	cBufferDesc.MiscFlags = 0;
 	cBufferDesc.StructureByteStride = 0;
 
-	D3D11_SUBRESOURCE_DATA cBufferData;
+	D3D11_SUBRESOURCE_DATA cBufferData = {};
 	cBufferData.pSysMem = initData;
 	cBufferData.SysMemPitch = 0;
 	cBufferData.SysMemSlicePitch = 0;
@@ -52,9 +52,7 @@ const UINT ConstantBuffer::GetSize()
 
 void ConstantBuffer::Update(ID3D11DeviceContext* context, void* data)
 {
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
+	D3D11_MAPPED_SUBRESOURCE mappedResource = {};
 	if (FAILED(context->Map(m_buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		throw std::runtime_error("Failed to update buffer");
 

@@ -44,9 +44,7 @@ inline bool DeferredHandler::Init(ID3D11Device* device, const UINT WINDOW_WIDTH,
 	m_specularGBuffer.Init(device, WINDOW_WIDTH, WINDOW_HEIGHT);
 	
 	// Depth stencil buffer and view
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	
+	D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 	depthStencilDesc.Width = WINDOW_WIDTH;
 	depthStencilDesc.Height = WINDOW_HEIGHT;
 	depthStencilDesc.MipLevels = 1;
