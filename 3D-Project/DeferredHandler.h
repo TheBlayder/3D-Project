@@ -80,7 +80,7 @@ inline void DeferredHandler::BindGeometryPass(ID3D11DeviceContext* context)
 	ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 	context->CSSetShaderResources(0, 5, nullSRVs);
 
-	// Bind G-Buffers and depth stencil for geometry pass write
+	// Bind G-Buffers for geometry pass write
 	ID3D11RenderTargetView* RTVs[] = {
 		m_positionGBuffer.GetRTV(),
 		m_normalGBuffer.GetRTV(),

@@ -27,21 +27,43 @@ struct PSInput
     float2 UV : UV;
 };
 
-float4 main(PSInput input) : SV_TARGET
+struct PSOutput
 {
-    //// Sample each texture using the provided sampler and UV coordinates
-    //float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV) : float4(ambientColor, 1.0f);
-    //float4 diffuseSample = (hasDiffuseTexture != 0) ? diffuseTexture.Sample(samplerState, input.UV) : float4(diffuseColor, 1.0f);
-    //float4 specularSample = (hasSpecularTexture != 0) ? specularTexture.Sample(samplerState, input.UV) : float4(specularColor, 1.0f);
+    float4 position : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 ambient : SV_Target2;
+    float4 diffuse : SV_Target3;
+    float4 specular : SV_Target4;
+};
 
-    //float4 combined = (ambientSample + diffuseSample + specularSample);
+PSOutput main(PSInput input)
+{
+    PSOutput output;
 
-    //// Ensure alpha is valid (use sampled alpha if present, otherwise 1.0)
-    //combined.a = combined.a > 0.0f ? combined.a : 1.0f;
+    // Position: store world-space position (w = 1)
+    output.position = float4(input.WORLD_POSITION.xyz, 1.0f);
 
-    ////return combined;
-    
+    // Normal: normalize and pack from [-1,1] -> [0,1] so it can be stored in an UNORM render target.
+    // Unpack in lighting pass with: normal = normalize(normal_rgb * 2.0 - 1.0);
     float3 n = normalize(input.NORMAL.xyz);
-    float3 color = n * 0.5f + 0.5f; // map [-1,1] -> [0,1]
-    return float4(color, 1.0f);
+    output.normal = float4(n * 0.5f + 0.5f, 1.0f);
+
+    // Sample material textures or fallback to constant colors
+    float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV) : float4(ambientColor, 1.0f);
+    float4 diffuseSample = (hasDiffuseTexture != 0) ? diffuseTexture.Sample(samplerState, input.UV) : float4(diffuseColor, 1.0f);
+    float4 specularSample = (hasSpecularTexture != 0) ? specularTexture.Sample(samplerState, input.UV) : float4(specularColor, 1.0f);
+
+    // Ensure alpha is valid (use sampled alpha if present, otherwise 1.0)
+    ambientSample.a = (ambientSample.a > 0.0f) ? ambientSample.a : 1.0f;
+    diffuseSample.a = (diffuseSample.a > 0.0f) ? diffuseSample.a : 1.0f;
+    specularSample.a = (specularSample.a > 0.0f) ? specularSample.a : 1.0f;
+
+    output.ambient = ambientSample;
+    output.diffuse = diffuseSample;
+
+    // Store specular color in rgb. Put 'shininess' (specular power) into alpha so the lighting pass has access to it.
+    // If your specular texture's alpha already encodes shininess, adapt here.
+    output.specular = float4(specularSample.rgb, shininess);
+
+    return output;
 }

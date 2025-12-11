@@ -31,6 +31,9 @@ struct PSOutput
 {
     float4 position : SV_Target0;
     float4 normal : SV_Target1;
+    float4 ambient : SV_Target2;
+    float4 diffuse : SV_Target3;
+    float4 specular : SV_Target4;
 };
 
 float4 main(PSInput input) : SV_TARGET
