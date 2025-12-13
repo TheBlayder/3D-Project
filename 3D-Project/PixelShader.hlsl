@@ -41,10 +41,12 @@ float4 main(PSInput input) : SV_TARGET
     PSOutput output;
 
     // Position: store world-space position (w = 1)
-    output.position = float4(input.WORLD_POSITION.xyz, 1.0f);
+    // Using input.UV.x to pass some extra data if needed
+    output.position = float4(input.WORLD_POSITION.xyz, input.UV.x);
 
     // Normal: store normalized world-space normal (w = 0)
-    output.normal = float4(normalize(input.NORMAL.xyz), 0.0f);
+    // Using input.UV.y to pass some extra data if needed
+    output.normal = float4(normalize(input.NORMAL.xyz), input.UV.y);
 
     // Sample material textures or fallback to constant colors
     float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV) : float4(ambientColor, 1.0f);

@@ -7,8 +7,8 @@ class GBuffer
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_SRV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RTV;
 
 public:
 	GBuffer() = default;
@@ -49,13 +49,13 @@ inline void GBuffer::Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const U
 		throw std::runtime_error("Failed to create GBuffer texture.");
 	}
 
-	hr = device->CreateShaderResourceView(m_texture.Get(), nullptr, m_srv.GetAddressOf());
+	hr = device->CreateShaderResourceView(m_texture.Get(), nullptr, m_SRV.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create GBuffer SRV.");
 	}
 
-	hr = device->CreateRenderTargetView(m_texture.Get(), nullptr, m_rtv.GetAddressOf());
+	hr = device->CreateRenderTargetView(m_texture.Get(), nullptr, m_RTV.GetAddressOf());
 	if (FAILED(hr))
 	{
 		throw std::runtime_error("Failed to create GBuffer RTV.");
@@ -69,10 +69,10 @@ inline ID3D11Texture2D* GBuffer::GetTexture()
 
 inline ID3D11ShaderResourceView* GBuffer::GetSRV()
 {
-	return m_srv.Get();
+	return m_SRV.Get();
 }
 
 inline ID3D11RenderTargetView* GBuffer::GetRTV()
 {
-	return m_rtv.Get();
+	return m_RTV.Get();
 }

@@ -12,7 +12,7 @@
 /// </summary>
 class DeferredHandler
 {
-private:	
+private: 	
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
 
@@ -76,9 +76,9 @@ inline bool DeferredHandler::Init(ID3D11Device* device, const UINT WINDOW_WIDTH,
 
 inline void DeferredHandler::BindGeometryPass(ID3D11DeviceContext* context)
 {
-	//Unbind from compute shader
+	// Unbind from compute shader
 	ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-	context->CSSetShaderResources(0, 5, nullSRVs);
+	context->CSSetShaderResources(0,5, nullSRVs);
 
 	// Bind G-Buffers for geometry pass write
 	ID3D11RenderTargetView* RTVs[] = {

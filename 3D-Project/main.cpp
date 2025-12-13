@@ -16,8 +16,8 @@ int APIENTRY wWinMain(
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); // Check for memory leaks
 
-	const UINT WIN_HEIGHT = 600;
-	const UINT WIN_WIDTH = 800;
+	const UINT WIN_WIDTH = 1280;
+	const UINT WIN_HEIGHT = 720;
 	
 	Window window(hInstance, nCmdShow, WIN_WIDTH, WIN_HEIGHT);
 

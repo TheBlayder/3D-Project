@@ -33,6 +33,11 @@ void SubMesh::Init(ID3D11Device* device, size_t startIndexValue, size_t nrOfIndi
 
 void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 {
+	// Unbind any existing SRVs from the pixel shader
+	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+	context->PSSetShaderResources(0, 3, nullSRVs);
+	
+	// Bind new SRVs
 	ID3D11ShaderResourceView* SRVs[3] = {
 		m_ambientTexture.Get(),
 		m_diffuseTexture.Get(),
