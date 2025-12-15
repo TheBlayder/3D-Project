@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GBuffer.h"
 #include "DeferredHandler.h"
+#include "Window.h"
 
 namespace DX = DirectX;
 
@@ -38,10 +39,10 @@ private:
 public:
 	Camera() = default;
 	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
-	~Camera() = default;
+	~Camera();
 
 	// Movement (needs redo)
-	void MoveForward(float amount); // Forward & Backward
+	void MoveForward(float amount);
 	void RotateRight(float amount);
 
 	// Constant buffer
@@ -49,7 +50,7 @@ public:
 
 	// Getters
 	const DirectX::XMFLOAT4X4 GetViewProjMatrix();
-
+	DeferredHandler* GetDeferredHandler();
 	const DX::XMFLOAT3& GetForward() const;
 	const DX::XMFLOAT3& GetPosition() const;
 	const DX::XMFLOAT3& GetRight() const;

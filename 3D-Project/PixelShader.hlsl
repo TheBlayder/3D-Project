@@ -36,7 +36,7 @@ struct PSOutput
     float4 specular : SV_Target4;
 };
 
-float4 main(PSInput input) : SV_TARGET
+PSOutput main(PSInput input) : SV_TARGET
 {
     PSOutput output;
 
@@ -61,8 +61,7 @@ float4 main(PSInput input) : SV_TARGET
     output.ambient = ambientSample;
     output.diffuse = diffuseSample;
 
-    // Store specular color in rgb. Put 'shininess' (specular power) into alpha so the lighting pass has access to it.
-    // If your specular texture's alpha already encodes shininess, adapt here.
+    // Store specular color in rgb. Put 'shininess' into alpha channel
     output.specular = float4(specularSample.rgb, shininess);
 
     return output;

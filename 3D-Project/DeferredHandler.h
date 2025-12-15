@@ -24,6 +24,7 @@ private:
 
 public:
 	DeferredHandler() = default;
+	DeferredHandler(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT);
 	~DeferredHandler() = default;
 
 	inline bool Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT);
@@ -33,6 +34,11 @@ public:
 
 	ID3D11DepthStencilView* GetDSV() { return m_DSV.Get(); }
 };
+
+inline DeferredHandler::DeferredHandler(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT)
+{
+	Init(device, WINDOW_WIDTH, WINDOW_HEIGHT);
+}
 
 inline bool DeferredHandler::Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT)
 {

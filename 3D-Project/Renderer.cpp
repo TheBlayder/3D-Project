@@ -9,6 +9,7 @@ Renderer::~Renderer()
 {
     delete m_test1;
     delete m_camera;
+	delete m_deferredHandler;
 }
 
 bool Renderer::Init(const Window& window)
@@ -31,7 +32,7 @@ bool Renderer::Init(const Window& window)
 	if (!CreateInputLayout(vShaderByteCode)) return false;
 
 	// Set up UAV
-	//if (!CreateUAV()) return false;
+	if (!CreateUAV()) return false;
 
 	// Set up sampler state
 	if (!CreateSamplerState()) return false;
@@ -64,16 +65,18 @@ bool Renderer::Init(const Window& window)
 
 	m_camera = new Camera(m_device.Get(), projData, camInitialPos);
 
+	m_deferredHandler = new DeferredHandler(m_device.Get(), window.GetWidth(), window.GetHeight());
+
     return true;
 }
 
-//void Renderer::Render(BaseScene* scene, float deltaTime)
+//void Renderer::RenderFrame(BaseScene* scene, float deltaTime)
 //{
 //
 //}
 
 // For testing purposes
-void Renderer::RenderFrame()
+void Renderer::RenderForward()
 {
 	m_immediateContext->OMSetRenderTargets(1, m_RTV.GetAddressOf(), m_DSV.Get());
 
@@ -101,6 +104,64 @@ void Renderer::RenderFrame()
 
 	// Present the rendered frame to the screen
 	m_swapChain->Present(0, 0);
+}
+
+// For testing purposes
+void Renderer::RenderDeferred()
+{
+	m_deferredHandler->ClearBuffers(m_immediateContext.Get(), { 0.f, 0.f, 0.f, 0.f });
+
+	GeometryPass();
+	LightPass();
+
+	// Present the rendered frame to the screen
+	m_swapChain->Present(0, 0);
+}
+
+void Renderer::GeometryPass()
+{
+	// Bind G-buffer render targets and depth
+	m_deferredHandler->BindGeometryPass(m_immediateContext.Get());
+
+	// Update constant buffers
+	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
+	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
+	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+
+	// Bind VS constant buffers
+	m_immediateContext->VSSetConstantBuffers(0,1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+	m_immediateContext->VSSetConstantBuffers(1,1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
+
+	// Draw test object(s)
+	m_test1->Draw(m_immediateContext.Get());
+}
+
+void Renderer::LightPass()
+{
+	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
+	m_deferredHandler->BindLightPass(m_immediateContext.Get());
+
+	// Bind compute shader
+	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr,0);
+
+	// Bind UAV (backbuffer) for compute shader output
+	if (m_UAV)
+		m_immediateContext->CSSetUnorderedAccessViews(0,1, m_UAV.GetAddressOf(), nullptr);
+
+	// Dispatch compute shader to shade pixels (assuming thread group size matches shader)
+	// Compute dispatch dimensions based on viewport
+	UINT dispatchX = static_cast<UINT>(ceilf(m_viewport.Width / 8.0f));
+	UINT dispatchY = static_cast<UINT>(ceilf(m_viewport.Height / 8.0f));
+	m_immediateContext->Dispatch(dispatchX, dispatchY, 1);
+
+	// Unbind compute shader and UAVs
+	m_immediateContext->CSSetShader(nullptr, nullptr,0);
+	if (m_UAV)
+	{
+		ID3D11UnorderedAccessView* nullUAVs[1] = { nullptr };
+		m_immediateContext->CSSetUnorderedAccessViews(0,1, nullUAVs, nullptr);
+	}
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -134,8 +195,8 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	swapChainDesc.SampleDesc.Count = 1;
 	swapChainDesc.SampleDesc.Quality = 0;
 
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; //  | DXGI_USAGE_UNORDERED_ACCESS
-	swapChainDesc.BufferCount = 1; // 2
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_UNORDERED_ACCESS;
+	swapChainDesc.BufferCount = 2;
 	swapChainDesc.OutputWindow = window.GetWindowHandle();
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -212,6 +273,7 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
 
 	return true;
 }

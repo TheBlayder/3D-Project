@@ -29,8 +29,6 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
     : m_projData(projData)
 {
-	
-
 	using namespace DirectX;
 	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
 	m_transform.SetRotation(XMVectorSet(0.f, 0.f, 0.001f, 0.f));
@@ -38,6 +36,13 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT
 	XMFLOAT4X4 viewProjMatrix;
 	GenerateViewProjMatrix(viewProjMatrix);
     m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
+
+}
+
+Camera::~Camera()
+{
+	delete m_cameraBuffer;
+	delete m_DH;
 }
 
 // === MOVEMENT ===
@@ -67,6 +72,11 @@ const DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
 	XMFLOAT4X4 viewProjMatrix;
 	GenerateViewProjMatrix(viewProjMatrix);
 	return viewProjMatrix;
+}
+
+DeferredHandler* Camera::GetDeferredHandler()
+{
+	return m_DH;
 }
 
 const DX::XMFLOAT3& Camera::GetForward() const

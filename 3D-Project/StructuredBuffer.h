@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include <d3d11.h>
 #include <wrl/client.h>
@@ -10,7 +9,7 @@ class StructuredBuffer
 {
 private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer = nullptr;
-	Microsoft::WRL::ComPtr <ID3D11ShaderResourceView> m_SRV = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_SRV = nullptr;
 	UINT m_elementSize = 0;
 	size_t m_nrOfElements = 0;
 
