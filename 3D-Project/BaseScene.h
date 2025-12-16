@@ -28,6 +28,6 @@ public:
 	Camera* GetCamera() const;
 
 	void AddGameObject(GameObject* gameObject);
-	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName);
+	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder);
 	std::vector<GameObject*>& GetGameObjects();
 };

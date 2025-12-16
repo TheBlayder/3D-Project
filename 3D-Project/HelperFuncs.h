@@ -9,9 +9,8 @@ namespace MatrixHelper
 {
     inline void CreateWorldMatrix(DX::XMFLOAT4X4& worldMatrix, const Transform& transform)
     {
-        // Build S, R, T correctly
-        DX::XMMATRIX scaling = DX::XMMatrixScaling(transform.GetScaleF3().x, transform.GetScaleF3().y, transform.GetScaleF3().z);
-        DX::XMMATRIX translation = DX::XMMatrixTranslation(transform.GetPositionF3().x, transform.GetPositionF3().y, transform.GetPositionF3().z);
+        DX::XMMATRIX scaling = DX::XMMatrixScalingFromVector(transform.GetScale());
+        DX::XMMATRIX translation = DX::XMMatrixTranslationFromVector(transform.GetPosition());
 
         DX::XMMATRIX rotationX = DX::XMMatrixRotationX((DX::XMConvertToRadians(transform.GetRotationF3().x)));
         DX::XMMATRIX rotationY = DX::XMMatrixRotationY((DX::XMConvertToRadians(transform.GetRotationF3().y)));

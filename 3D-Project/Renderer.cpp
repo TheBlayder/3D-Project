@@ -45,20 +45,21 @@ bool Renderer::Init(const Window& window)
 
 	// Cube test object
 	Transform testTransform;
-	std::string folderPath = "./Objects/Cube";
-	std::string objectName = "cube.obj";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.5f, 0.5f, 0.0f, 0.0f));
-	testTransform.SetScale(DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f));
-	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
+	std::string folderPath = "./Objects/Strawberry";
+	std::string objectName = "Strawberry_obj.obj";
+	std::string textureFolder = "/Texture";
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 8.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.001f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder);
 
 	//// Create a simple triangle test object
 	//m_test1 = new TestObject(m_device.Get());
 
 	// Camera
-	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
+	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 6.0f, -10.0f };
 	ProjectionData projData;
-	projData.fovInDeg = 70.0f;
+	projData.fovInDeg = 90.0f;
 	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 1000.0f;

@@ -6,16 +6,16 @@
 using namespace DirectX;
 namespace MH = MatrixHelper;
 
-GameObject::GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName)
+GameObject::GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "")
 {
-	Init(device, transform, folderPath, objectName);
+	Init(device, transform, folderPath, objectName, textureFolder);
 }
 
-void GameObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName)
+void GameObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "")
 {
 	m_transform = transform;
 
-	m_mesh.Init(device, folderPath, objectName);
+	m_mesh.Init(device, folderPath, objectName, textureFolder);
 }
 
 void GameObject::Draw(ID3D11DeviceContext* context)

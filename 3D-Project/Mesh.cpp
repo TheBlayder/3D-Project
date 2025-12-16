@@ -13,12 +13,12 @@
 #include "stb_image.h"
 
 
-Mesh::Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName)
+Mesh::Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder = "")
 {
-	Init(device, folderPath, objectName);
+	Init(device, folderPath, objectName, textureFolder);
 }
 
-void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName)
+void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder = "")
 {
 	const std::string filePath = folderPath + "/" + objectName;
 	objl::Loader loader;
@@ -42,7 +42,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		if (!mesh.MeshMaterial.map_Ka.empty())
 		{
 			// Load texture from file
-			std::string ambientTexturePath = folderPath + mesh.MeshMaterial.map_Ka;
+			std::string ambientTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Ka;
 			std::wstring wStr(ambientTexturePath.begin(), ambientTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, ambientSRV.GetAddressOf());
 			if (FAILED(hr))
@@ -61,7 +61,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		if (!mesh.MeshMaterial.map_Kd.empty())
 		{
 			// Load texture from file
-			std::string diffuseTexturePath = folderPath + mesh.MeshMaterial.map_Kd;
+			std::string diffuseTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Kd;
 			std::wstring wStr(diffuseTexturePath.begin(), diffuseTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, diffuseSRV.GetAddressOf());
 			if (FAILED(hr))
@@ -81,7 +81,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		if (!mesh.MeshMaterial.map_Ks.empty())
 		{
 			// Load texture from file
-			std::string specularTexturePath = folderPath + mesh.MeshMaterial.map_Ks;
+			std::string specularTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Ks;
 			std::wstring wStr(specularTexturePath.begin(), specularTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, specularSRV.GetAddressOf());
 			if (FAILED(hr))
