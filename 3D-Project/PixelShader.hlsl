@@ -17,6 +17,7 @@ cbuffer materialBuffer : register(b0)
     float3 specularColor;
     
     float shininess;
+    float3 padding;
 };
 
 struct PSInput
