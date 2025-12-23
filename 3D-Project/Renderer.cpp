@@ -43,7 +43,7 @@ bool Renderer::Init(const Window& window)
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
 
-	// Cube test object
+	// Strawberry test object
 	Transform testTransform;
 	std::string folderPath = "./Objects/Strawberry";
 	std::string objectName = "Strawberry_obj.obj";
@@ -52,6 +52,15 @@ bool Renderer::Init(const Window& window)
 	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.001f, 0.0f, 0.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder);
+
+	//// Cube test object
+	//Transform testTransform;
+	//std::string folderPath = "./Objects/Cube";
+	//std::string objectName = "Cube.obj";
+	//testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	//testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.001f, 0.0f, 0.0f));
+	//testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	//m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
 
 	//// Create a simple triangle test object
 	//m_test1 = new TestObject(m_device.Get());
@@ -409,7 +418,7 @@ bool Renderer::CreateRasterizerState()
 {
 	// Default rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
-	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;

@@ -27,7 +27,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
 

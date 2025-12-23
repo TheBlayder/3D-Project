@@ -21,10 +21,10 @@ private:
 
 public:
 	GameObject() = default;
-	GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder);
+	GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "");
 	~GameObject() = default;
 
-	void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder);
+	void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "");
 
 	void Draw(ID3D11DeviceContext* context);
 
