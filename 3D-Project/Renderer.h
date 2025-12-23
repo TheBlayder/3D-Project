@@ -27,7 +27,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
-	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
 
@@ -41,9 +41,9 @@ private:
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
 
-	DeferredHandler* m_deferredHandler;
-	Camera* m_camera;
-	GameObject* m_test1;
+	DeferredHandler* m_deferredHandler = nullptr;
+	Camera* m_camera = nullptr;
+	GameObject* m_test1 = nullptr;
 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);

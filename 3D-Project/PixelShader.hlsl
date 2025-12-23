@@ -42,16 +42,21 @@ PSOutput main(PSInput input) : SV_TARGET
     PSOutput output;
 
     // Position: store world-space position (w = 1)
-    // Using input.UV.x to pass some extra data if needed
-    output.position = float4(input.WORLD_POSITION.xyz, input.UV.x);
+    output.position = float4(input.WORLD_POSITION.xyz, 1.0f);
 
     // Normal: store normalized world-space normal (w = 0)
-    // Using input.UV.y to pass some extra data if needed
-    output.normal = float4(normalize(input.NORMAL.xyz), input.UV.y);
-
+    output.normal = float4(normalize(input.NORMAL.xyz), 0.0f);
+    
+    // DEBUG: Uncomment to visualize UV coordinates as colors (R=U, G=V, B=0)
+    // This helps diagnose UV mapping issues - UVs should range from 0-1
+    // output.ambient = float4(input.UV.x, input.UV.y, 0.0f, 1.0f);
+    // output.diffuse = float4(input.UV.x, input.UV.y, 0.0f, 1.0f);
+    // output.specular = float4(0, 0, 0, 1.0f);
+    // return output;
+    
     // Sample material textures or fallback to constant colors
-    float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV) : float4(ambientColor, 1.0f);
-    float4 diffuseSample = (hasDiffuseTexture != 0) ? diffuseTexture.Sample(samplerState, input.UV) : float4(diffuseColor, 1.0f);
+    float4 ambientSample = (hasAmbientTexture != 0) ? ambientTexture.Sample(samplerState, input.UV)  : float4(ambientColor, 1.0f);
+    float4 diffuseSample = (hasDiffuseTexture != 0) ? diffuseTexture.Sample(samplerState, input.UV)  : float4(diffuseColor, 1.0f);
     float4 specularSample = (hasSpecularTexture != 0) ? specularTexture.Sample(samplerState, input.UV) : float4(specularColor, 1.0f);
 
     // Ensure alpha is valid (use sampled alpha if present, otherwise 1.0)

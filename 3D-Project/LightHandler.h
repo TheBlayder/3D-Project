@@ -11,10 +11,10 @@ namespace DX = DirectX;
 
 struct LightData
 {
-	float position[3];
+	DX::XMFLOAT3 position;
 	float intensity;
-	float color[4];
-	float direction[3];
+	DX::XMFLOAT4 color;
+	DX::XMFLOAT3 direction;
 	float padding;
 };
 

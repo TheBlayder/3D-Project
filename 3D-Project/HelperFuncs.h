@@ -17,16 +17,14 @@ namespace MatrixHelper
         DX::XMMATRIX rotationZ = DX::XMMatrixRotationZ((DX::XMConvertToRadians(transform.GetRotationF3().z)));
         DX::XMMATRIX rotation = DX::XMMatrixMultiply(DX::XMMatrixMultiply(rotationZ, rotationY), rotationX);
 
-        DX::XMMATRIX world = DX::XMMatrixMultiplyTranspose(DX::XMMatrixMultiply(scaling, rotation), translation);
+        DX::XMMATRIX world = DX::XMMatrixMultiply(DX::XMMatrixMultiply(scaling, rotation), translation);
 
-        DX::XMStoreFloat4x4(&worldMatrix, world);
+        DX::XMStoreFloat4x4(&worldMatrix, DX::XMMatrixTranspose(world));
     }
 
     inline void CreateViewMatrix(DX::XMFLOAT4X4& viewMatrix, const DX::XMVECTOR& position, const DX::XMVECTOR& forward, const DX::XMVECTOR& up)
     {
-        // If 'forward' is a direction vector, the "at" point is eye + forward
-        DX::XMVECTOR at = DX::XMVectorAdd(position, forward);
-        DX::XMMATRIX view = DX::XMMatrixLookAtLH(position, at, up);
+        DX::XMMATRIX view = DX::XMMatrixLookAtLH(position, forward, up);
         DX::XMStoreFloat4x4(&viewMatrix, view);
     }
 
@@ -41,6 +39,6 @@ namespace MatrixHelper
         DX::XMMATRIX view = DX::XMLoadFloat4x4(&viewMatrix);
         DX::XMMATRIX proj = DX::XMLoadFloat4x4(&projMatrix);
         DX::XMMATRIX viewProj = DX::XMMatrixMultiply(view, proj);
-        DX::XMStoreFloat4x4(&viewProjMatrix, viewProj);
+        DX::XMStoreFloat4x4(&viewProjMatrix, DX::XMMatrixTranspose(viewProj));
     }
 }

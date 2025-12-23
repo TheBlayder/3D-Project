@@ -13,12 +13,12 @@
 #include "stb_image.h"
 
 
-Mesh::Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder = "")
+Mesh::Mesh(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder, const bool flipUVy)
 {
-	Init(device, folderPath, objectName, textureFolder);
+	Init(device, folderPath, objectName, textureFolder, flipUVy);
 }
 
-void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder = "")
+void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::string& objectName, const std::string& textureFolder, const bool flipUVy)
 {
 	const std::string filePath = folderPath + "/" + objectName;
 	objl::Loader loader;
@@ -94,7 +94,6 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 			CreateDefaultTexture(device, specularSRV.GetAddressOf());
 		}
 
-
 		// Initialize sub-mesh
 		SubMesh subMesh;
 		subMesh.Init(device, startIndex, mesh.Indices.size(),
@@ -112,9 +111,10 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		startIndex += mesh.Indices.size(); // Update start index for next sub-mesh
 
 		// Converting objl::Vertex to SimpleVertex and appending to tempVertices
+		// Note: flipV=true if your textures appear upside-down
 		for(auto& vertex : mesh.Vertices)
 		{
-			SimpleVertex tempVertex = SimpleVertex(vertex);
+			SimpleVertex tempVertex = SimpleVertex(vertex, flipUVy); // Try with true if textures are flipped
 			tempVertices.emplace_back(tempVertex);
 		}
 	}

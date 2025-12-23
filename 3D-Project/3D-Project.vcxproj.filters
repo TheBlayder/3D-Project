@@ -146,7 +146,7 @@
     <ClInclude Include="IndexBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="InputManager.h">
+    <ClInclude Include="InputHandler.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
     <ClInclude Include="TestObject.h">
@@ -172,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\Scene\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\AppData\Local\Temp\COPILOTBASELINE\5372df9a\~BASESCENE.H">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -7,9 +7,23 @@
 
 Renderer::~Renderer()
 {
-    delete m_test1;
-    delete m_camera;
-	delete m_deferredHandler;
+    if (m_test1 != nullptr)
+    {
+        delete m_test1;
+        m_test1 = nullptr;
+    }
+    
+    if (m_camera != nullptr)
+    {
+        delete m_camera;
+        m_camera = nullptr;
+    }
+    
+	if (m_deferredHandler != nullptr)
+	{
+		delete m_deferredHandler;
+		m_deferredHandler = nullptr;
+	}
 }
 
 bool Renderer::Init(const Window& window)
@@ -43,15 +57,25 @@ bool Renderer::Init(const Window& window)
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
 
-	// Strawberry test object
+	// Boat test object
 	Transform testTransform;
-	std::string folderPath = "./Objects/Strawberry";
-	std::string objectName = "Strawberry_obj.obj";
-	std::string textureFolder = "/Texture";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.001f, 0.0f, 0.0f));
-	testTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
-	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder);
+	std::string folderPath = "./Objects/boat";
+	std::string objectName = "boat.obj";
+	std::string textureFolder = "";
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -3.0f, 5.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
+
+	//// Strawberry test object
+	//Transform testTransform;
+	//std::string folderPath = "./Objects/Strawberry";
+	//std::string objectName = "Strawberry_obj.obj";
+	//std::string textureFolder = "/Texture";
+	//testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -3.0f, 5.0f, 0.0f));
+	//testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
+	//testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	//m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
 
 	//// Cube test object
 	//Transform testTransform;
@@ -86,35 +110,35 @@ bool Renderer::Init(const Window& window)
 //}
 
 // For testing purposes
-void Renderer::RenderForward()
-{
-	m_immediateContext->OMSetRenderTargets(1, m_RTV.GetAddressOf(), m_DSV.Get());
-
-	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
-	m_immediateContext->ClearRenderTargetView(m_RTV.Get(), clearColor);
-	m_immediateContext->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-	// Update constant buffers
-	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
-	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
-
-	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
-	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
-
-	// Bind VS constant buffers
-	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
-	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
-
-	// Draw test object
-	m_test1->Draw(m_immediateContext.Get());
-
-	// Unbind shader resource views (safety — avoids "resource still bound as SRV" on next writes)
-	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
-	m_immediateContext->PSSetShaderResources(0, 3, nullSRVs);
-
-	// Present the rendered frame to the screen
-	m_swapChain->Present(0, 0);
-}
+//void Renderer::RenderForward()
+//{
+//	m_immediateContext->OMSetRenderTargets(1, m_RTV.GetAddressOf(), m_DSV.Get());
+//
+//	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
+//	m_immediateContext->ClearRenderTargetView(m_RTV.Get(), clearColor);
+//	m_immediateContext->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+//
+//	// Update constant buffers
+//	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
+//	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+//
+//	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
+//	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+//
+//	// Bind VS constant buffers
+//	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+//	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
+//
+//	// Draw test object
+//	m_test1->Draw(m_immediateContext.Get());
+//
+//	// Unbind shader resource views (safety — avoids "resource still bound as SRV" on next writes)
+//	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+//	m_immediateContext->PSSetShaderResources(0, 3, nullSRVs);
+//
+//	// Present the rendered frame to the screen
+//	m_swapChain->Present(0, 0);
+//}
 
 // For testing purposes
 void Renderer::RenderDeferred()
@@ -418,7 +442,7 @@ bool Renderer::CreateRasterizerState()
 {
 	// Default rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
-	rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 	rasterizerDesc.CullMode = D3D11_CULL_BACK;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthClipEnable = TRUE;

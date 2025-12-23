@@ -23,13 +23,13 @@ struct ProjectionData
 class Camera
 {
 private:
-	DeferredHandler* m_DH;
+	DeferredHandler* m_DH = nullptr;
 
 	Transform m_transform;
 	DX::XMVECTOR m_up = { 0.f, 1.f, 0.f, 0.f };
 
 	ProjectionData m_projData;
-	ConstantBuffer* m_cameraBuffer;
+	ConstantBuffer* m_cameraBuffer = nullptr;
 	
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
 	void RotateAroundAxis(float amount);

@@ -41,8 +41,17 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT
 
 Camera::~Camera()
 {
-	delete m_cameraBuffer;
-	delete m_DH;
+	if (m_cameraBuffer != nullptr)
+	{
+		delete m_cameraBuffer;
+		m_cameraBuffer = nullptr;
+	}
+	
+	if (m_DH != nullptr)
+	{
+		delete m_DH;
+		m_DH = nullptr;
+	}
 }
 
 // === MOVEMENT ===

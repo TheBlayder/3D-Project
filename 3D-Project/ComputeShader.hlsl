@@ -8,14 +8,19 @@ Texture2D<float4> specularGBuffer : register(t4);
 
 const float ambientIntensity = 0.1f;
 
+// Sparar detta tills att det behövs
+struct LightData // : register(??)
+{
+    float3 position;
+    float intensity;
+    float4 color;
+    float3 direction;
+    float padding;
+};
+
 [numthreads(8, 8, 1)]
 void main( uint3 DTid : SV_DispatchThreadID )
-{
-    // Bounds check to avoid out-of-range writes
-    uint width, height;
-    positionGBuffer.GetDimensions(width, height);
-    if (DTid.x >= width || DTid.y >= height) return;
-    
+{  
     // Read G-buffer position
     float3 position = positionGBuffer.Load(int3(DTid.xy, 0)).xyz;
     
