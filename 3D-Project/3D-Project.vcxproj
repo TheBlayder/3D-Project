@@ -152,7 +152,6 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\AppData\Local\Temp\COPILOTBASELINE\5372df9a\~BASESCENE.H" />
     <ClInclude Include="DeferredHandler.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameObject.h" />

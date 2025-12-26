@@ -1,3 +1,4 @@
+// World and View-Projection Matricies (Currently from Renderer, will probs be moved to Scene later)
 cbuffer WorldMatrix : register(b0)
 {
     float4x4 worldMatrix;

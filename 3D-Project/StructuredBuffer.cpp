@@ -11,10 +11,10 @@ void StructuredBuffer::Init(ID3D11Device* device, UINT sizeOfElement, size_t nrO
 	m_nrOfElements = nrOfElementsInBuffer;
 
 	D3D11_BUFFER_DESC bufferDesc = {};
-	bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	bufferDesc.ByteWidth = static_cast<UINT>(sizeOfElement * nrOfElementsInBuffer);
-	bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	bufferDesc.StructureByteStride = sizeOfElement;
+	bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	bufferDesc.Usage = dynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
 	bufferDesc.CPUAccessFlags = dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 
@@ -53,19 +53,4 @@ void StructuredBuffer::UpdateBuffer(ID3D11DeviceContext* context, void* data)
 
 	memcpy(mappedResource.pData, data, m_elementSize * m_nrOfElements);
 	context->Unmap(m_buffer.Get(), 0);
-}
-
-UINT StructuredBuffer::GetElementSize() const
-{
-	return m_elementSize;
-}
-
-size_t StructuredBuffer::GetNrOfElements() const
-{
-	return m_nrOfElements;
-}
-
-ID3D11ShaderResourceView* StructuredBuffer::GetSRV() const
-{
-	return m_SRV.Get();
 }

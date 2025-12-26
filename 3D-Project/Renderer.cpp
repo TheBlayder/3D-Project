@@ -1,29 +1,17 @@
 #include "Renderer.h"
+
 #include "ReadCSO.h"
-
 #include "Transform.h"
-
-#include "TestObject.h"
 
 Renderer::~Renderer()
 {
-    if (m_test1 != nullptr)
-    {
-        delete m_test1;
-        m_test1 = nullptr;
-    }
+    if (m_test1) { delete m_test1; }
     
-    if (m_camera != nullptr)
-    {
-        delete m_camera;
-        m_camera = nullptr;
-    }
+    if (m_camera) { delete m_camera; }
     
-	if (m_deferredHandler != nullptr)
-	{
-		delete m_deferredHandler;
-		m_deferredHandler = nullptr;
-	}
+	if (m_deferredHandler) { delete m_deferredHandler; }
+
+	if (m_lightHandler) { delete m_lightHandler; }
 }
 
 bool Renderer::Init(const Window& window)
@@ -77,18 +65,6 @@ bool Renderer::Init(const Window& window)
 	//testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	//m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
 
-	//// Cube test object
-	//Transform testTransform;
-	//std::string folderPath = "./Objects/Cube";
-	//std::string objectName = "Cube.obj";
-	//testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
-	//testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.001f, 0.0f, 0.0f));
-	//testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
-	//m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName);
-
-	//// Create a simple triangle test object
-	//m_test1 = new TestObject(m_device.Get());
-
 	// Camera
 	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 10.0f, -10.0f };
 	ProjectionData projData;
@@ -100,6 +76,8 @@ bool Renderer::Init(const Window& window)
 	m_camera = new Camera(m_device.Get(), projData, camInitialPos);
 
 	m_deferredHandler = new DeferredHandler(m_device.Get(), window.GetWidth(), window.GetHeight());
+
+	m_lightHandler = new LightHandler();
 
     return true;
 }
@@ -177,25 +155,24 @@ void Renderer::LightPass()
 	m_deferredHandler->BindLightPass(m_immediateContext.Get());
 
 	// Bind compute shader
-	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr,0);
+	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
 
 	// Bind UAV (backbuffer) for compute shader output
 	if (m_UAV)
-		m_immediateContext->CSSetUnorderedAccessViews(0,1, m_UAV.GetAddressOf(), nullptr);
+		m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
+	else
+		throw std::runtime_error("UAV not created!");
 
 	// Dispatch compute shader to shade pixels (assuming thread group size matches shader)
 	// Compute dispatch dimensions based on viewport
-	UINT dispatchX = static_cast<UINT>(ceilf(m_viewport.Width / 8.0f));
-	UINT dispatchY = static_cast<UINT>(ceilf(m_viewport.Height / 8.0f));
+	const float threadGroupSizeXY = 8.f; // Must match [numthreads(x,y,z)] in compute shader
+	UINT dispatchX = static_cast<UINT>(ceilf(m_viewport.Width / threadGroupSizeXY));
+	UINT dispatchY = static_cast<UINT>(ceilf(m_viewport.Height / threadGroupSizeXY));
 	m_immediateContext->Dispatch(dispatchX, dispatchY, 1);
 
 	// Unbind compute shader and UAVs
-	m_immediateContext->CSSetShader(nullptr, nullptr,0);
-	if (m_UAV)
-	{
-		ID3D11UnorderedAccessView* nullUAVs[1] = { nullptr };
-		m_immediateContext->CSSetUnorderedAccessViews(0,1, nullUAVs, nullptr);
-	}
+	m_immediateContext->CSSetShader(nullptr, nullptr, 0);
+	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullptr, nullptr);
 }
 
 void Renderer::CreateViewport(const Window& window)

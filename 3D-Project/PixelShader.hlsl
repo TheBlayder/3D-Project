@@ -1,10 +1,12 @@
+// Sampler state for texture sampling (from Renderer)
 SamplerState samplerState : register(s0);
 
-// Textures coming from the submesh draw call
+// Textures coming from the submesh draw call (from SubMesh)
 Texture2D ambientTexture : register(t0);
 Texture2D diffuseTexture : register(t1);
 Texture2D specularTexture : register(t2);
 
+// Material properties (from SubMesh)
 cbuffer materialBuffer : register(b0)
 {
     int hasAmbientTexture;

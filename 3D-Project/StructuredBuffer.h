@@ -28,7 +28,7 @@ public:
 
 	void UpdateBuffer(ID3D11DeviceContext* context, void* data);
 
-	UINT GetElementSize() const;
-	size_t GetNrOfElements() const;
-	ID3D11ShaderResourceView* GetSRV() const;
+	UINT GetElementSize() const { return m_elementSize; }
+	size_t GetNrOfElements() const { return m_nrOfElements; }
+	ID3D11ShaderResourceView* GetSRV() const { return m_SRV.Get(); }
 };

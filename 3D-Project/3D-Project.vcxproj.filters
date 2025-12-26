@@ -87,9 +87,6 @@
     <ClCompile Include="TestObject.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="LightHandler.cpp">
-      <Filter>Source Files\Scene\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="StructuredBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
       <Filter>Source Files\Scene\Lights</Filter>
     </ClCompile>
     <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\Scene\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="LightHandler.cpp">
       <Filter>Source Files\Scene\Lights</Filter>
     </ClCompile>
   </ItemGroup>
@@ -158,12 +158,6 @@
     <ClInclude Include="SimpleVertex.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
-    <ClInclude Include="DeferredHandler.h">
-      <Filter>Header Files\Internal-Libs</Filter>
-    </ClInclude>
-    <ClInclude Include="LightHandler.h">
-      <Filter>Header Files\Scene\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="StructuredBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
@@ -173,8 +167,11 @@
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\Scene\Lights</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\AppData\Local\Temp\COPILOTBASELINE\5372df9a\~BASESCENE.H">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="LightHandler.h">
+      <Filter>Header Files\Scene\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredHandler.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

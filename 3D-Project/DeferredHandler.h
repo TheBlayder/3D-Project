@@ -22,6 +22,8 @@ private:
 	GBuffer m_ambientGBuffer;
 	GBuffer m_specularGBuffer;
 
+	UINT nrOfGBuffers = 5;
+
 public:
 	DeferredHandler() = default;
 	DeferredHandler(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT);
@@ -83,8 +85,8 @@ inline bool DeferredHandler::Init(ID3D11Device* device, const UINT WINDOW_WIDTH,
 inline void DeferredHandler::BindGeometryPass(ID3D11DeviceContext* context)
 {
 	// Unbind from compute shader
-	ID3D11ShaderResourceView* nullSRVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-	context->CSSetShaderResources(0,5, nullSRVs);
+	ID3D11ShaderResourceView* nullSRVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+	context->CSSetShaderResources(0, nrOfGBuffers, nullSRVs);
 
 	// Bind G-Buffers for geometry pass write
 	ID3D11RenderTargetView* RTVs[] = {
@@ -94,14 +96,14 @@ inline void DeferredHandler::BindGeometryPass(ID3D11DeviceContext* context)
 		m_ambientGBuffer.GetRTV(),
 		m_specularGBuffer.GetRTV()
 	};
-	context->OMSetRenderTargets(5, RTVs, m_DSV.Get());
+	context->OMSetRenderTargets(nrOfGBuffers, RTVs, m_DSV.Get());
 }
 
 inline void DeferredHandler::BindLightPass(ID3D11DeviceContext* context)
 {
 	// Unbind render targets from geometry pass write
-	ID3D11RenderTargetView* nullRTVs[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-	context->OMSetRenderTargets(5, nullRTVs, nullptr);
+	ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+	context->OMSetRenderTargets(nrOfGBuffers, nullRTVs, nullptr);
 	
 	// Bind G-Buffers as shader resource views for light pass read in compute shader
 	ID3D11ShaderResourceView* SRVs[] = {
@@ -111,7 +113,7 @@ inline void DeferredHandler::BindLightPass(ID3D11DeviceContext* context)
 		m_ambientGBuffer.GetSRV(),
 		m_specularGBuffer.GetSRV()
 	};
-	context->CSSetShaderResources(0, 5, SRVs);
+	context->CSSetShaderResources(0, nrOfGBuffers, SRVs);
 }
 
 inline void DeferredHandler::ClearBuffers(ID3D11DeviceContext* context, std::array<float, 4> clearColor = {0.f, 0.f, 0.f, 0.f})
