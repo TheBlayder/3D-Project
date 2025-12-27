@@ -11,10 +11,19 @@
 
 namespace DX = DirectX;
 
-struct LightData
+struct SpotLightData
 {
 	DX::XMFLOAT3 position;
 	float intensity;
+	DX::XMFLOAT4 color;
+	DX::XMFLOAT3 direction;
+	float innerConeInDeg;
+	float outerConeinDeg;
+	float padding;
+};
+
+struct DirectionalLightData
+{
 	DX::XMFLOAT4 color;
 	DX::XMFLOAT3 direction;
 	float padding;
@@ -53,12 +62,12 @@ public:
 	void BindLightBuffer(ID3D11DeviceContext* context);
 
 	// SpotLight
-	void AddSpotLight(const SpotLight& spotLight);
+	void AddSpotLight(SpotLightData& spotLight);
 	const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
 	const size_t GetNrOfSpotLights() const { return m_spotLights.size(); }
 
 	// DirectionalLight
-	void AddDirectionalLight(const DirectionalLight& directionalLight);
+	void AddDirectionalLight(DirectionalLightData& dirLight);
 	const std::vector<DirectionalLight>& GetDirectionalLights() const { return m_directionalLights; }
 	const size_t GetNrOfDirectionalLights() const { return m_directionalLights.size(); }
 };

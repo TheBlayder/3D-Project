@@ -14,13 +14,23 @@ void LightHandler::BindLightBuffer(ID3D11DeviceContext* context)
 	context->CSSetShaderResources(5, 2, SRVs); // Shader slots 5 and 6, match with compute shader
 }
 
+void LightHandler::AddSpotLight(SpotLightData& spotLight)
+{
+	m_spotLights.emplace_back(spotLight);
+}
+
+void LightHandler::AddDirectionalLight(DirectionalLightData& dirLight)
+{
+	m_directionalLights.emplace_back(dirLight);
+}
+
 /// <summary>
 /// ONLY TO BE CALLED AFTER ALL LIGHTS HAVE BEEN ADDED
 /// </summary>
 void LightHandler::Init(ID3D11Device* device, ID3D11DeviceContext* context, const DX::XMFLOAT3 cameraPosition)
 {
-	m_spotLightBuffer.Init(device, sizeof(LightData), m_spotLights.size(), m_spotLights.data(), true);
-	m_directionalLightBuffer.Init(device, sizeof(LightData), m_directionalLights.size(), m_directionalLights.data(), true);
+	m_spotLightBuffer.Init(device, sizeof(SpotLightData), m_spotLights.size(), m_spotLights.data(), true);
+	m_directionalLightBuffer.Init(device, sizeof(DirectionalLightData), m_directionalLights.size(), m_directionalLights.data(), true);
 
 	m_lightBufferData = {};
 	m_lightBufferData.nrOfSpotLights = static_cast<int>(m_spotLights.size());
