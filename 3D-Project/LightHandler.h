@@ -26,7 +26,7 @@ struct DirectionalLightData
 {
 	DX::XMFLOAT4 color;
 	DX::XMFLOAT3 direction;
-	float padding;
+	float intensity;
 };
 
 struct LightBufferData
@@ -50,6 +50,8 @@ private:
 	StructuredBuffer m_spotLightBuffer;
 	StructuredBuffer m_directionalLightBuffer;
 
+	void GetSpotLightData(std::vector<SpotLightData>& outData) const;
+	void GetDirectionalLightData(std::vector<DirectionalLightData>& outData) const;
 
 public:
 	LightHandler() = default;

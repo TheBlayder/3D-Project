@@ -39,6 +39,8 @@ struct PSOutput
     float4 specular : SV_Target4;
 };
 
+static const float ambientStrength = 0.2f;
+
 PSOutput main(PSInput input) : SV_TARGET
 {
     PSOutput output;
@@ -66,7 +68,7 @@ PSOutput main(PSInput input) : SV_TARGET
     diffuseSample.a = (diffuseSample.a > 0.0f) ? diffuseSample.a : 1.0f;
     specularSample.a = (specularSample.a > 0.0f) ? specularSample.a : 1.0f;
 
-    output.ambient = ambientSample;
+    output.ambient = ambientSample * ambientStrength;
     output.diffuse = diffuseSample;
 
     // Store specular color in rgb. Put 'shininess' into alpha channel

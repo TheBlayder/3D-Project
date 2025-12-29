@@ -26,21 +26,21 @@ struct SpotLight
     float3 direction;
     float innerConeInDeg;
     float outerConeInDeg;
-    float3 padding;
+    float padding;
 };
 
 struct DirectionalLight
 {
     float4 color;
     float3 direction;
-    float padding;
+    float intensity;
 };
 
 // Structured buffers for lights (from LightHandler)
 StructuredBuffer<SpotLight> spotLights : register(t5);
 StructuredBuffer<DirectionalLight> directionalLights : register(t6);
 
-const int threadGroupSizeXY = 8;
+static const int threadGroupSizeXY = 8;
 [numthreads(threadGroupSizeXY, threadGroupSizeXY, 1)]
 //void main( uint3 DTid : SV_DispatchThreadID )
 //{  
@@ -69,7 +69,9 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         SpotLight light = spotLights[i];
         
-        float4 lightToPixel = normalize(positionSample - float4(light.position, 0.f));
+        float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
+        float distance = length(lightToPixelVec);
+        float4 lightToPixel = lightToPixelVec / distance;
     
         // Check if pixel is facing away from the light
         if (dot(normalSample, -lightToPixel) <= 0.f)
@@ -84,18 +86,18 @@ void main(uint3 DTid : SV_DispatchThreadID)
         float spotAttenuation = clamp((theta - cosOuterCone) / epsilon, 0.f, 1.f);
         
         // Check if outside spotlight cone
-        if(spotAttenuation <= 0.f)
+        if (spotAttenuation <= 0.f)
             continue;
         
         // Diffuse calculation
         float irradience = max(dot(normalSample, -lightToPixel), 0.f); // Lambertian reflectance (amount of light hitting the surface)
-        float falloff = 1.0f / dot(lightToPixel, lightToPixel); // Inverse square falloff
+        float falloff = 1.0f / (distance * distance); // Inverse square falloff
         float combinedIntensity = falloff * light.intensity * light.color * spotAttenuation; // Shared variable to spare on computations
         
         diffuseComponent += combinedIntensity * irradience;
         
         // Specular calculation
-        float4 halfVector = normalize(lightToPixel + viewDirection);
+        float4 halfVector = normalize(-lightToPixel + viewDirection);
         float angleHalfNormal = max(dot(normalSample, halfVector), 0.f);
         float specularIntensity = (irradience > 0.f) ? pow(max(angleHalfNormal, 0.f), specularExponent) : 0.f;
         
@@ -113,5 +115,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 diffuseFinal = diffuseGBuffer[DTid.xy] * diffuseComponent;
     float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
     
-    backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal + specularFinal;
+    backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal;// + specularFinal;
+    //backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseGBuffer[DTid.xy];
 }

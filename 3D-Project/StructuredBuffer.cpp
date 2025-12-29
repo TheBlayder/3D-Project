@@ -24,7 +24,7 @@ void StructuredBuffer::Init(ID3D11Device* device, UINT sizeOfElement, size_t nrO
 	HRESULT hr = device->CreateBuffer(&bufferDesc, bufferData ? &initialData : nullptr, m_buffer.GetAddressOf());
 	if (FAILED(hr))
 	{
-		throw std::runtime_error("Failed to create structured buffer.");
+	throw std::runtime_error("Failed to create structured buffer.");
 	}
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

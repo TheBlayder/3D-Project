@@ -90,12 +90,6 @@
     <ClCompile Include="StructuredBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files\Scene\Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Source Files\Scene\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="LightHandler.cpp">
       <Filter>Source Files\Scene\Lights</Filter>
     </ClCompile>
@@ -161,17 +155,17 @@
     <ClInclude Include="StructuredBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="SpotLight.h">
-      <Filter>Header Files\Scene\Lights</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
-      <Filter>Header Files\Scene\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="LightHandler.h">
       <Filter>Header Files\Scene\Lights</Filter>
     </ClInclude>
     <ClInclude Include="DeferredHandler.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\Scene\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\Scene\Lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

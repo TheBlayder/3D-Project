@@ -31,4 +31,5 @@ public:
 	UINT GetElementSize() const { return m_elementSize; }
 	size_t GetNrOfElements() const { return m_nrOfElements; }
 	ID3D11ShaderResourceView* GetSRV() const { return m_SRV.Get(); }
+	ID3D11ShaderResourceView** GetSRVPtr() { return m_SRV.GetAddressOf(); }
 };

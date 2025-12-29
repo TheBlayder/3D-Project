@@ -3,6 +3,9 @@
 #include "ReadCSO.h"
 #include "Transform.h"
 
+#include "SpotLight.h"
+#include "DirectionalLight.h"
+
 Renderer::~Renderer()
 {
     if (m_test1) { delete m_test1; }
@@ -45,28 +48,37 @@ bool Renderer::Init(const Window& window)
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
 
-	// Boat test object
-	Transform testTransform;
-	std::string folderPath = "./Objects/boat";
-	std::string objectName = "boat.obj";
-	std::string textureFolder = "";
-	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -3.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
-	testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
-	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
-
-	//// Strawberry test object
+	//// Boat test object
 	//Transform testTransform;
-	//std::string folderPath = "./Objects/Strawberry";
-	//std::string objectName = "Strawberry_obj.obj";
-	//std::string textureFolder = "/Texture";
+	//std::string folderPath = "./Objects/boat";
+	//std::string objectName = "boat.obj";
+	//std::string textureFolder = "";
 	//testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -3.0f, 5.0f, 0.0f));
 	//testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
 	//testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	//m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
+	
+	/*Transform testTransform;
+	std::string folderPath = "./Objects/Donut";
+	std::string objectName = "black donut.obj";
+	std::string textureFolder = "/textures";
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(45.0f, 0.f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(3.f, 3.f, 3.f, 0.0f));
+	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);*/
+
+	// Strawberry test object
+	Transform testTransform;
+	std::string folderPath = "./Objects/Strawberry";
+	std::string objectName = "Strawberry_obj.obj";
+	std::string textureFolder = "/Texture";
+	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -5.0f, 5.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
 
 	// Camera
-	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 10.0f, -10.0f };
+	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
 	ProjectionData projData;
 	projData.fovInDeg = 90.0f;
 	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
@@ -78,6 +90,17 @@ bool Renderer::Init(const Window& window)
 	m_deferredHandler = new DeferredHandler(m_device.Get(), window.GetWidth(), window.GetHeight());
 
 	m_lightHandler = new LightHandler();
+
+	SpotLightData spotLightData;
+	spotLightData.position = DirectX::XMFLOAT3(0.f, 100.f, -5.f);
+	spotLightData.intensity = 0.f;
+	spotLightData.color = DirectX::XMFLOAT4(1.f, 0.f, 0.f, 1.f);
+	spotLightData.direction = DirectX::XMFLOAT3(1.f, 0.f, 0.f);
+	spotLightData.innerConeInDeg = 5.f;
+	spotLightData.outerConeinDeg = 30.f;
+	m_lightHandler->AddSpotLight(spotLightData);
+
+	m_lightHandler->Init(m_device.Get(), m_immediateContext.Get(), camInitialPos);
 
     return true;
 }
@@ -163,6 +186,9 @@ void Renderer::LightPass()
 	else
 		throw std::runtime_error("UAV not created!");
 
+	// Bind light sources
+	m_lightHandler->BindLightBuffer(m_immediateContext.Get());
+
 	// Dispatch compute shader to shade pixels (assuming thread group size matches shader)
 	// Compute dispatch dimensions based on viewport
 	const float threadGroupSizeXY = 8.f; // Must match [numthreads(x,y,z)] in compute shader
@@ -172,7 +198,8 @@ void Renderer::LightPass()
 
 	// Unbind compute shader and UAVs
 	m_immediateContext->CSSetShader(nullptr, nullptr, 0);
-	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullptr, nullptr);
+	ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
+	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
 }
 
 void Renderer::CreateViewport(const Window& window)
