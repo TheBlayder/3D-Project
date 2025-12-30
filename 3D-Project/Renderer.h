@@ -58,18 +58,18 @@ private:
 	bool CreateRasterizerState();
 	bool CreateConstantBuffers();
 
-	void GeometryPass();
-	void LightPass();
+	void GeometryPass(BaseScene* scene);
+	void LightPass(BaseScene* scene);
 
 public:
 	Renderer() = default;
 	~Renderer();
 
 	bool Init(const Window& window);
-	//void RenderFrame(BaseScene* scene, float deltaTime);
+	void RenderFrame(BaseScene* scene, const float deltaTime);
 
-	void RenderForward(); // Temporary function for testing
-	void RenderDeferred(); // Temporary function for testing
+	//void RenderForward(); // Temporary function for testing
+	//void RenderDeferred(); // Temporary function for testing
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();

@@ -62,6 +62,7 @@ public:
 	void UpdateLightBuffer(ID3D11DeviceContext* context, const DX::XMFLOAT3 cameraPosition);
 
 	void BindLightBuffer(ID3D11DeviceContext* context);
+	void UnbindLightBuffer(ID3D11DeviceContext* context);
 
 	// SpotLight
 	void AddSpotLight(SpotLightData& spotLight);

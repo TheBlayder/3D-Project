@@ -2,9 +2,13 @@
 #include <d3d11.h>
 #include <iostream>
 #include <chrono>
+#include <stdexcept>
 
 #include "Window.h"
 #include "Renderer.h"
+
+#include "BaseScene.h"
+#include "TestScene.h"
 
 #define _CRTDBG_MAP_ALLOC
 
@@ -28,9 +32,13 @@ int APIENTRY wWinMain(
 		return -1;
 	}
 
-	// === MAIN LOOP ===
+	BaseScene* scene = new TestScene();
+	if(!scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), window))
+		throw std::runtime_error("Failed to initialize testscene!");
 
+	// === MAIN LOOP ===
 	MSG msg = { };
+	float deltaTime = 0.0f;
 	using namespace std::chrono;
 	while (!(GetKeyState(VK_ESCAPE) & 0x8000) && msg.message != WM_QUIT)
 	{
@@ -42,11 +50,11 @@ int APIENTRY wWinMain(
 			DispatchMessage(&msg);
 		}
 
-		renderer.RenderDeferred(); // Temporary function for testing
+		renderer.RenderFrame(scene, deltaTime);
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		duration<float> time = start - end;
-		float deltaTime = time.count();
+		deltaTime = time.count();
 	}
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);

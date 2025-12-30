@@ -49,6 +49,12 @@
     <Filter Include="Header Files\Scene\Lights">
       <UniqueIdentifier>{1e814d83-32d9-474d-bc39-75e95f429f7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene\Scenes">
+      <UniqueIdentifier>{5e3c8437-8c4a-4290-be67-5a4433590eb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Scenes">
+      <UniqueIdentifier>{05393c42-c17e-4758-b72b-26941512855a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -81,9 +87,6 @@
     <ClCompile Include="IndexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="BaseScene.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="TestObject.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
@@ -92,6 +95,12 @@
     </ClCompile>
     <ClCompile Include="LightHandler.cpp">
       <Filter>Source Files\Scene\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseScene.cpp">
+      <Filter>Source Files\Scene\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="TestScene.cpp">
+      <Filter>Source Files\Scene\Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,12 +152,6 @@
     <ClInclude Include="InputHandler.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
-    <ClInclude Include="TestObject.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseScene.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleVertex.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
@@ -166,6 +169,15 @@
     </ClInclude>
     <ClInclude Include="DirectionalLight.h">
       <Filter>Header Files\Scene\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseScene.h">
+      <Filter>Header Files\Scene\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="TestObject.h">
+      <Filter>Header Files\Scene\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="TestScene.h">
+      <Filter>Header Files\Scene\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

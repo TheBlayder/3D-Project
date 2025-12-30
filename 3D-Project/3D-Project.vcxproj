@@ -146,6 +146,7 @@
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="SubMesh.cpp" />
     <ClCompile Include="TestObject.cpp" />
+    <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -171,6 +172,7 @@
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="SubMesh.h" />
     <ClInclude Include="TestObject.h" />
+    <ClInclude Include="TestScene.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="Window.h" />

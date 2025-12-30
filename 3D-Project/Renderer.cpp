@@ -6,6 +6,8 @@
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 
+#include "BaseScene.h"
+
 Renderer::~Renderer()
 {
     if (m_test1) { delete m_test1; }
@@ -105,10 +107,18 @@ bool Renderer::Init(const Window& window)
     return true;
 }
 
-//void Renderer::RenderFrame(BaseScene* scene, float deltaTime)
-//{
-//
-//}
+void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
+{
+	m_deferredHandler->ClearBuffers(m_immediateContext.Get(), { 0.f, 0.f, 0.f, 0.f });
+	
+	// Update scene (camera, objects, lights, etc.)
+	scene->UpdateScene(deltaTime);
+
+	GeometryPass(scene);
+	LightPass(scene);
+	
+	m_swapChain->Present(0, 0);
+}
 
 // For testing purposes
 //void Renderer::RenderForward()
@@ -142,37 +152,41 @@ bool Renderer::Init(const Window& window)
 //}
 
 // For testing purposes
-void Renderer::RenderDeferred()
-{
-	m_deferredHandler->ClearBuffers(m_immediateContext.Get(), { 0.f, 0.f, 0.f, 0.f });
+//void Renderer::RenderDeferred()
+//{
+//	m_deferredHandler->ClearBuffers(m_immediateContext.Get(), { 0.f, 0.f, 0.f, 0.f });
+//
+//	GeometryPass();
+//	LightPass();
+//
+//	// Present the rendered frame to the screen
+//	m_swapChain->Present(0, 0);
+//}
 
-	GeometryPass();
-	LightPass();
-
-	// Present the rendered frame to the screen
-	m_swapChain->Present(0, 0);
-}
-
-void Renderer::GeometryPass()
+void Renderer::GeometryPass(BaseScene* scene)
 {
 	// Bind G-buffer render targets and depth
 	m_deferredHandler->BindGeometryPass(m_immediateContext.Get());
 
-	// Update constant buffers
-	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
-	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
-	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
+	// Draw all game objects in the scene
+	std::vector<GameObject*>& sceneObjects = scene->GetGameObjects();
+	for (auto& obj : sceneObjects)
+	{
+		// Update world matrix constant buffer for each object
+		DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
+		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
+
+		obj->Draw(m_immediateContext.Get());
+	}
+
+	// Update camera constant buffer
+	DirectX::XMFLOAT4X4 viewProjMatrix = scene->GetCamera()->GetViewProjMatrix();
 	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
-
-	// Bind VS constant buffers
-	m_immediateContext->VSSetConstantBuffers(0,1, m_worldBuffer.GetBufferPtr()); // Set world buffer
-	m_immediateContext->VSSetConstantBuffers(1,1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
-
-	// Draw test object(s)
-	m_test1->Draw(m_immediateContext.Get());
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
 }
 
-void Renderer::LightPass()
+void Renderer::LightPass(BaseScene* scene)
 {
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
 	m_deferredHandler->BindLightPass(m_immediateContext.Get());
@@ -187,7 +201,7 @@ void Renderer::LightPass()
 		throw std::runtime_error("UAV not created!");
 
 	// Bind light sources
-	m_lightHandler->BindLightBuffer(m_immediateContext.Get());
+	scene->BindLights(m_immediateContext.Get());
 
 	// Dispatch compute shader to shade pixels (assuming thread group size matches shader)
 	// Compute dispatch dimensions based on viewport

@@ -26,6 +26,15 @@ void LightHandler::BindLightBuffer(ID3D11DeviceContext* context)
 	}
 }
 
+void LightHandler::UnbindLightBuffer(ID3D11DeviceContext* context)
+{
+	ID3D11Buffer* nullBuffer = nullptr;
+	context->CSSetConstantBuffers(0, 1, &nullBuffer);
+
+	ID3D11ShaderResourceView* nullSRVs[2] = { nullptr, nullptr };
+	context->CSSetShaderResources(5, 2, nullSRVs);
+}
+
 void LightHandler::AddSpotLight(SpotLightData& spotLight)
 {
 	m_spotLights.emplace_back(spotLight.position, spotLight.color, spotLight.direction, 
