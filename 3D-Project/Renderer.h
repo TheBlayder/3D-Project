@@ -10,7 +10,6 @@
 #include "DeferredHandler.h"
 
 #include "GameObject.h"
-#include "LightHandler.h"
 
 class Renderer
 {
@@ -43,9 +42,6 @@ private:
 	ConstantBuffer m_viewProjectionBuffer;
 
 	DeferredHandler* m_deferredHandler = nullptr;
-	Camera* m_camera = nullptr;
-	GameObject* m_test1 = nullptr;
-	LightHandler* m_lightHandler = nullptr;
 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
