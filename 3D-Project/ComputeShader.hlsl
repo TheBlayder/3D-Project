@@ -26,7 +26,8 @@ struct SpotLight
     float3 direction;
     float innerConeInDeg;
     float outerConeInDeg;
-    float padding;
+    float range;
+    float2 padding;
 };
 
 struct DirectionalLight
@@ -70,11 +71,15 @@ void main(uint3 DTid : SV_DispatchThreadID)
         SpotLight light = spotLights[i];
         
         float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
+        
+        // Check if pixel is within range of light.
+        if (length(lightToPixelVec) > light.range)
+            continue;
+        
         float4 lightToPixel_n = normalize(lightToPixelVec);
-        float4 pixelToLight_n = normalize(float4(light.position, 0.f) - positionSample);
     
         // Check if pixel is facing away from the light
-        if (dot(normalSample, pixelToLight_n) <= 0.f)
+        if (dot(normalSample, -lightToPixel_n) <= 0.f)
             continue;
         
         float cosInnerCone = cos(radians(light.innerConeInDeg));
@@ -90,19 +95,19 @@ void main(uint3 DTid : SV_DispatchThreadID)
             continue;
         
         // Diffuse calculation
-        float irradience = max(dot(normalSample, pixelToLight_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
+        float irradience = max(dot(normalSample, -lightToPixel_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
         float distance = length(lightToPixelVec);
         float falloff = 1.0f / (distance * distance); // Inverse square falloff
-        float combinedIntensity = falloff * light.intensity * light.color * spotAttenuation; // Shared variable to spare on computations
+        float combinedIntensity = falloff * light.intensity * spotAttenuation; // Shared variable to spare on computations
         
-        diffuseComponent += combinedIntensity * irradience;
+        diffuseComponent += combinedIntensity * irradience * light.color;
         
         // Specular calculation
-        float4 halfVector_n = normalize(pixelToLight_n + viewDirection_n);
+        float4 halfVector_n = normalize(-lightToPixel_n + viewDirection_n);
         float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
-        float specularIntensity = (irradience > 0.f) ? pow(max(angleHalfNormal, 0.f), specularExponent) : 0.f;
+        float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
         
-        specularComponent += specularIntensity * combinedIntensity;
+        specularComponent += specularIntensity * combinedIntensity * light.color;
     }
     
     // Process directional lights
@@ -110,6 +115,24 @@ void main(uint3 DTid : SV_DispatchThreadID)
     {
         DirectionalLight light = directionalLights[i];
         
+        float4 direction_n = normalize(float4(light.direction, 0.f));
+        float irradience = dot(normalSample, -direction_n);
+        
+        // Check if pixel is facing the light
+        if(irradience <= 0.f)
+            continue;
+        
+        // Diffuse
+        float combinedIntensity = light.intensity * irradience;
+        
+        diffuseComponent += combinedIntensity * light.color;
+        
+        // Specular
+        float4 halfVector_n = normalize(-direction_n + viewDirection_n);
+        float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
+        float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
+        
+        specularComponent += combinedIntensity * specularIntensity * light.color;
     }
     
     float4 ambientFinal = ambientGBuffer[DTid.xy];
@@ -117,5 +140,4 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
     
     backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal + specularFinal;
-    //backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal;
 }

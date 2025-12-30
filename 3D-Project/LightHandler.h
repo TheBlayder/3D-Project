@@ -19,7 +19,8 @@ struct SpotLightData
 	DX::XMFLOAT3 direction;
 	float innerConeInDeg;
 	float outerConeinDeg;
-	float padding;
+	float range;
+	DX::XMFLOAT2 padding = { 0.f, 0.f };
 };
 
 struct DirectionalLightData

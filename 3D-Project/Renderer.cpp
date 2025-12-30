@@ -38,6 +38,8 @@ bool Renderer::Init(const Window& window)
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
 
+	m_deferredHandler = new DeferredHandler(m_device.Get(), window.GetWidth(), window.GetHeight());
+
     return true;
 }
 

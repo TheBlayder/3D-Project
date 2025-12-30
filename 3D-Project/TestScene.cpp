@@ -2,8 +2,10 @@
 
 bool TestScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, Window& window)
 {
+	using namespace DirectX;
+
 	// Initialize camera
-	DirectX::XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
+	XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
 	ProjectionData projData;
 	projData.fovInDeg = 90.0f;
 	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
@@ -16,13 +18,20 @@ bool TestScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, Wi
 	m_lightHandler = new LightHandler();
 
 	SpotLightData spotLightData;
-	spotLightData.position = DirectX::XMFLOAT3(0.f, -2.f, -5.f);
+	spotLightData.position = XMFLOAT3(0.f, -2.f, -5.f);
 	spotLightData.intensity = 200.f;
-	spotLightData.color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f);
-	spotLightData.direction = DirectX::XMFLOAT3(0.f, 0.f, 1.f);
+	spotLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
+	spotLightData.direction = XMFLOAT3(0.f, 0.f, 1.f);
 	spotLightData.innerConeInDeg = 15.f;
 	spotLightData.outerConeinDeg = 40.f;
+	spotLightData.range = 20.f;
 	m_lightHandler->AddSpotLight(spotLightData);
+
+	DirectionalLightData dirLightData;
+	dirLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
+	dirLightData.direction = XMFLOAT3(0.f, -1.f, 0.f);
+	dirLightData.intensity = 100.f;
+	m_lightHandler->AddDirectionalLight(dirLightData);
 	
 	m_lightHandler->Init(device, context, m_camera->GetPosition());
 
@@ -44,8 +53,9 @@ bool TestScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, Wi
 void TestScene::UpdateScene(const float deltaTime)
 {
 	// Rotating strawberry
+	float rotationSpeed = 30.f;
 	DirectX::XMVECTOR rotation = m_gameObjects[0]->GetTransform().GetRotation();
-	rotation = DirectX::XMVectorAdd(rotation, DirectX::XMVectorSet(0.0f, 30.f * deltaTime, 0.0f, 0.0f));
+	rotation = DirectX::XMVectorAdd(rotation, DirectX::XMVectorSet(0.0f, rotationSpeed * deltaTime, 0.0f, 0.0f));
 	m_gameObjects[0]->GetTransform().SetRotation(rotation);
 
 }

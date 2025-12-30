@@ -13,12 +13,13 @@ private:
 	DX::XMFLOAT3 m_direction;
 	float m_innerConeInDeg;
 	float m_outerConeInDeg;
-	DX::XMFLOAT3 padding;
+	float m_range;
+	DX::XMFLOAT2 padding = {0.f, 0.f};
 public:
 	SpotLight(const DX::XMFLOAT3& position, const DX::XMFLOAT4& color, const DX::XMFLOAT3& direction, 
-		float intensity, float innerConeInDeg, float outerConeInDeg)
+		float intensity, float innerConeInDeg, float outerConeInDeg, float range)
 		: m_position(position), m_color(color), m_direction(direction), 
-		m_intensity(intensity), m_innerConeInDeg(innerConeInDeg), m_outerConeInDeg(outerConeInDeg), padding(0.f, 0.f, 0.f)
+		m_intensity(intensity), m_innerConeInDeg(innerConeInDeg), m_outerConeInDeg(outerConeInDeg), m_range(range), padding(0.f, 0.f)
 	{}
 	~SpotLight() = default;
 
@@ -28,4 +29,5 @@ public:
 	DX::XMFLOAT3 GetDirection() const { return m_direction; }
 	float GetInnerConeInDeg() const { return m_innerConeInDeg; }
 	float GetOuterConeInDeg() const { return m_outerConeInDeg; }
+	float GetRange() const { return m_range; }
 };

@@ -38,7 +38,7 @@ void LightHandler::UnbindLightBuffer(ID3D11DeviceContext* context)
 void LightHandler::AddSpotLight(SpotLightData& spotLight)
 {
 	m_spotLights.emplace_back(spotLight.position, spotLight.color, spotLight.direction, 
-		spotLight.intensity, spotLight.innerConeInDeg, spotLight.outerConeinDeg);
+		spotLight.intensity, spotLight.innerConeInDeg, spotLight.outerConeinDeg, spotLight.range);
 }
 
 void LightHandler::AddDirectionalLight(DirectionalLightData& dirLight)
@@ -58,6 +58,7 @@ void LightHandler::GetSpotLightData(std::vector<SpotLightData>& outData) const
 		data.direction = spotLight.GetDirection();
 		data.innerConeInDeg = spotLight.GetInnerConeInDeg();
 		data.outerConeinDeg = spotLight.GetOuterConeInDeg();
+		data.range = spotLight.GetRange();
 
 		outData.emplace_back(data);
 	}
