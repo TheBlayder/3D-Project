@@ -73,7 +73,7 @@ bool Renderer::Init(const Window& window)
 	std::string objectName = "Strawberry_obj.obj";
 	std::string textureFolder = "/Texture";
 	testTransform.SetPosition(DirectX::XMVectorSet(0.0f, -5.0f, 5.0f, 0.0f));
-	testTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	testTransform.SetRotation(DirectX::XMVectorSet(-10.0f, 0.f, 0.0f, 0.0f));
 	testTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	m_test1 = new GameObject(m_device.Get(), testTransform, folderPath, objectName, textureFolder, true);
 
@@ -92,12 +92,12 @@ bool Renderer::Init(const Window& window)
 	m_lightHandler = new LightHandler();
 
 	SpotLightData spotLightData;
-	spotLightData.position = DirectX::XMFLOAT3(0.f, 100.f, -5.f);
-	spotLightData.intensity = 0.f;
-	spotLightData.color = DirectX::XMFLOAT4(1.f, 0.f, 0.f, 1.f);
-	spotLightData.direction = DirectX::XMFLOAT3(1.f, 0.f, 0.f);
-	spotLightData.innerConeInDeg = 5.f;
-	spotLightData.outerConeinDeg = 30.f;
+	spotLightData.position = DirectX::XMFLOAT3(0.f, -2.f, -5.f);
+	spotLightData.intensity = 200.f;
+	spotLightData.color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f);
+	spotLightData.direction = DirectX::XMFLOAT3(0.f, 0.f, 1.f);
+	spotLightData.innerConeInDeg = 15.f;
+	spotLightData.outerConeinDeg = 40.f;
 	m_lightHandler->AddSpotLight(spotLightData);
 
 	m_lightHandler->Init(m_device.Get(), m_immediateContext.Get(), camInitialPos);

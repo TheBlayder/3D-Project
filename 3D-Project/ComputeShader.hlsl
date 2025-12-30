@@ -62,7 +62,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     float4 positionSample = float4(positionGBuffer[DTid.xy].xyz, 0.f);
     float4 normalSample = float4(normalize(normalGBuffer[DTid.xy].xyz), 0.f);
-    float4 viewDirection = normalize(float4(cameraPosition, 0.f) - positionSample);
+    float4 viewDirection_n = normalize(float4(cameraPosition, 0.f) - positionSample);
     
     // Process spot lights
     for (int i = 0; i < nrOfSpotLights; ++i)
@@ -70,18 +70,18 @@ void main(uint3 DTid : SV_DispatchThreadID)
         SpotLight light = spotLights[i];
         
         float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
-        float distance = length(lightToPixelVec);
-        float4 lightToPixel = lightToPixelVec / distance;
+        float4 lightToPixel_n = normalize(lightToPixelVec);
+        float4 pixelToLight_n = normalize(float4(light.position, 0.f) - positionSample);
     
         // Check if pixel is facing away from the light
-        if (dot(normalSample, -lightToPixel) <= 0.f)
+        if (dot(normalSample, pixelToLight_n) <= 0.f)
             continue;
         
         float cosInnerCone = cos(radians(light.innerConeInDeg));
         float cosOuterCone = cos(radians(light.outerConeInDeg));
         
         // Calculate spotlight cone attenuation
-        float theta = dot(normalize(float4(light.direction, 0.f)), lightToPixel);
+        float theta = dot(normalize(float4(light.direction, 0.f)), lightToPixel_n);
         float epsilon = cosInnerCone - cosOuterCone;
         float spotAttenuation = clamp((theta - cosOuterCone) / epsilon, 0.f, 1.f);
         
@@ -90,15 +90,16 @@ void main(uint3 DTid : SV_DispatchThreadID)
             continue;
         
         // Diffuse calculation
-        float irradience = max(dot(normalSample, -lightToPixel), 0.f); // Lambertian reflectance (amount of light hitting the surface)
+        float irradience = max(dot(normalSample, pixelToLight_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
+        float distance = length(lightToPixelVec);
         float falloff = 1.0f / (distance * distance); // Inverse square falloff
         float combinedIntensity = falloff * light.intensity * light.color * spotAttenuation; // Shared variable to spare on computations
         
         diffuseComponent += combinedIntensity * irradience;
         
         // Specular calculation
-        float4 halfVector = normalize(-lightToPixel + viewDirection);
-        float angleHalfNormal = max(dot(normalSample, halfVector), 0.f);
+        float4 halfVector_n = normalize(pixelToLight_n + viewDirection_n);
+        float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
         float specularIntensity = (irradience > 0.f) ? pow(max(angleHalfNormal, 0.f), specularExponent) : 0.f;
         
         specularComponent += specularIntensity * combinedIntensity;
@@ -115,6 +116,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 diffuseFinal = diffuseGBuffer[DTid.xy] * diffuseComponent;
     float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
     
-    backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal;// + specularFinal;
-    //backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseGBuffer[DTid.xy];
+    backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal + specularFinal;
+    //backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal;
 }
