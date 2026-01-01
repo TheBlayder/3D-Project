@@ -139,5 +139,5 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 diffuseFinal = diffuseGBuffer[DTid.xy] * diffuseComponent;
     float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
     
-    backBufferUAV[uint3(DTid.xy, 0)] = ambientFinal + diffuseFinal + specularFinal;
+    backBufferUAV[float3(DTid.xy, 0.f)] = ambientFinal + diffuseFinal + specularFinal;
 }

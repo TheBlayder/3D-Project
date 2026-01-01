@@ -3,7 +3,9 @@
 class TestScene : public BaseScene
 {
 private:
-	bool LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, Window& window) override;
+	void LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, Window& window) override;
+	void LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context) override;
+	void LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context) override;
 public:
 	~TestScene() = default;
 	void UpdateScene(const float deltaTime) override;

@@ -1,28 +1,32 @@
 #include "BaseScene.h"
 
-bool BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window& window)
+#include <algorithm>
+
+void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window& window)
+{	
+	LoadScene(device, context, window);
+}
+
+void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, Window& window)
 {
-	m_camera = new Camera();
-	m_lightHandler = new LightHandler();
-	if (!LoadScene(device, context, window)) { return false; }
+	LoadSceneCameras(device, context, window);
+	LoadSceneGameObjects(device, context);
+	LoadSceneLights(device, context);
 }
 
 void BaseScene::UpdateSceneLights(ID3D11DeviceContext* context)
 {
-	if (m_lightHandler)
-	{
-		m_lightHandler->UpdateLightBuffer(context, m_camera->GetPosition());
-	}
+	m_lightHandler->UpdateLightBuffer(context, m_camera->GetPosition());
 }
 
 Camera* BaseScene::GetCamera() const
 {
-    return m_camera;
+	return m_camera;
 }
 
 void BaseScene::BindLights(ID3D11DeviceContext* context)
 {
-	if (m_lightHandler) { m_lightHandler->BindLightBuffer(context); }
+	m_lightHandler->BindLightBuffer(context);
 }
 
 void BaseScene::AddGameObject(GameObject* gameObject)
@@ -40,4 +44,20 @@ void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, 
 std::vector<GameObject*>& BaseScene::GetGameObjects()
 {
 	return m_gameObjects;
+}
+
+BaseScene::~BaseScene()
+{
+	// Clean up owned pointers
+	if (m_camera)
+		delete m_camera;
+
+	if (m_lightHandler)
+		delete m_lightHandler;
+
+	for (auto obj : m_gameObjects)
+	{
+		delete obj;
+	}
+	m_gameObjects.clear();
 }

@@ -33,8 +33,7 @@ int APIENTRY wWinMain(
 	}
 
 	BaseScene* scene = new TestScene();
-	if(!scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), window))
-		throw std::runtime_error("Failed to initialize testscene!");
+	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), window);
 
 	// === MAIN LOOP ===
 	MSG msg = { };
@@ -56,6 +55,8 @@ int APIENTRY wWinMain(
 		duration<float> time = start - end;
 		deltaTime = time.count();
 	}
+
+	delete scene;
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();
