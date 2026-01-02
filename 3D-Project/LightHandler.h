@@ -21,6 +21,7 @@ struct SpotLightData
 	float outerConeinDeg;
 	float range;
 	DX::XMFLOAT2 padding = { 0.f, 0.f };
+	DX::XMFLOAT4X4 vpMatrix;
 };
 
 struct DirectionalLightData
@@ -28,6 +29,7 @@ struct DirectionalLightData
 	DX::XMFLOAT4 color;
 	DX::XMFLOAT3 direction;
 	float intensity;
+	DX::XMFLOAT4X4 vpMatrix;
 };
 
 struct LightBufferData
@@ -42,20 +44,25 @@ struct LightBufferData
 class LightHandler
 {
 private:
-	std::vector<SpotLight> m_spotLights;
-	std::vector<DirectionalLight> m_directionalLights;
-
 	ConstantBuffer m_lightBuffer;
 	LightBufferData m_lightBufferData;
-
+	
+	std::vector<SpotLight> m_spotLights;
 	StructuredBuffer m_spotLightBuffer;
-	StructuredBuffer m_directionalLightBuffer;
-
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_spotLightBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_spotLightDepthTex;
+	D3D11_VIEWPORT m_spotLightViewport;
 	void GetSpotLightData(std::vector<SpotLightData>& outData) const;
+
+	std::vector<DirectionalLight> m_directionalLights;
+	StructuredBuffer m_directionalLightBuffer;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_directionalLightBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_directionalLightDepthTex;
+	D3D11_VIEWPORT m_directionalLightViewport;
 	void GetDirectionalLightData(std::vector<DirectionalLightData>& outData) const;
 
 public:
-	LightHandler() = default;
+	LightHandler(const UINT spotLightResolution, const UINT dirLightResolution);
 	~LightHandler() = default;
 	
 	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const DX::XMFLOAT3 cameraPosition);
@@ -65,14 +72,21 @@ public:
 	void BindLightBuffer(ID3D11DeviceContext* context);
 	void UnbindLightBuffer(ID3D11DeviceContext* context);
 
+	void BindDepthTextures(ID3D11DeviceContext* context);
+	void UnbindDepthTextures(ID3D11DeviceContext* context);
+
 	// SpotLight
 	void AddSpotLight(SpotLightData& spotLight);
 	const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
 	const size_t GetNrOfSpotLights() const { return m_spotLights.size(); }
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSpotLightBufferSRV() const { return m_spotLightBuffer.GetSRV(); }
+	const D3D11_VIEWPORT& GetSpotLightViewport() const { return m_spotLightViewport; }
 
 	// DirectionalLight
 	void AddDirectionalLight(DirectionalLightData& dirLight);
 	const std::vector<DirectionalLight>& GetDirectionalLights() const { return m_directionalLights; }
 	const size_t GetNrOfDirectionalLights() const { return m_directionalLights.size(); }
+	const D3D11_VIEWPORT& GetDirectionalLightViewport() const { return m_directionalLightViewport; }
+
 };
 

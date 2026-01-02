@@ -102,6 +102,9 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Source Files\Scene\Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">

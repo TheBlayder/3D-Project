@@ -15,7 +15,7 @@ void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* cont
 {
 	using namespace DirectX;
 
-	XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -2.0f };
+	XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
 	ProjectionData projData;
 	projData.fovInDeg = 90.0f;
 	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
@@ -35,11 +35,19 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
-	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, -1.f, 0.0f, 0.0f));
-	strawberryTransform.SetRotation(DirectX::XMVectorSet(-10.0f, 0.f, 0.0f, 0.0f));
+	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
-	bool flipUVy = true;
-	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder, flipUVy);
+	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
+
+	// Floor
+	Transform floorTransform;
+	folderPath = "./Objects/Cube";
+	objectName = "cube.obj";
+	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -1.5f, 0.0f, 0.0f));
+	floorTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	floorTransform.SetScale(DirectX::XMVectorSet(10.f, 0.5f, 10.f, 0.0f));
+	AddGameObject(device, floorTransform, folderPath, objectName);
 }
 
 void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context)
@@ -47,14 +55,17 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	using namespace DirectX;
 	
 	if (m_lightHandler) delete m_lightHandler;
-	m_lightHandler = new LightHandler();
+
+	const UINT spotLightResolution = 1024;
+	const UINT dirLightResolution = 2048;
+	m_lightHandler = new LightHandler(spotLightResolution, dirLightResolution);
 
 	SpotLightData spotLightData = {};
-	spotLightData.position = XMFLOAT3(0.f, -1.f, -5.f);
-	spotLightData.intensity = 10.f;
-	spotLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
-	spotLightData.direction = XMFLOAT3(0.f, 0.f, 1.f);
-	spotLightData.innerConeInDeg = 1.f;
+	spotLightData.position = XMFLOAT3(0.f, 7.f, 0.f);
+	spotLightData.intensity = 50.f;
+	spotLightData.color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
+	spotLightData.direction = XMFLOAT3(0.f, -1.f, 0.f);
+	spotLightData.innerConeInDeg = 10.f;
 	spotLightData.outerConeinDeg = 30.f;
 	spotLightData.range = 20.f;
 	m_lightHandler->AddSpotLight(spotLightData);

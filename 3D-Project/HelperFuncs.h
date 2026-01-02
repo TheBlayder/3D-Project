@@ -34,6 +34,12 @@ namespace MatrixHelper
         DX::XMStoreFloat4x4(&projMatrix, proj);
     }
 
+    inline void CreateOrthographicMatrix(DX::XMFLOAT4X4& projMatrix, const float width, const float height, const float nearPlane, const float farPlane)
+    {
+        DX::XMMATRIX proj = DX::XMMatrixOrthographicLH(width, height, nearPlane, farPlane);
+        DX::XMStoreFloat4x4(&projMatrix, proj);
+    }
+
     inline void CreateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix, const DX::XMFLOAT4X4& viewMatrix, const DX::XMFLOAT4X4& projMatrix)
     {
         DX::XMMATRIX view = DX::XMLoadFloat4x4(&viewMatrix);

@@ -15,10 +15,6 @@ bool Renderer::Init(const Window& window)
 	// Set up viewport
 	CreateViewport(window);
 
-	if (!CreateRenderTargetView()) return false;
-
-	if (!CreateDepthStencilView(window)) return false;
-
 	// Set up shaders
 	std::string vShaderByteCode;
 	if(!CreateShaders(vShaderByteCode)) return false;
@@ -30,10 +26,10 @@ bool Renderer::Init(const Window& window)
 	if (!CreateUAV()) return false;
 
 	// Set up sampler state
-	if (!CreateSamplerState()) return false;
+	if (!CreateSamplerStates()) return false;
 
 	// Set up rasterizer state
-	if (!CreateRasterizerState()) return false;
+	if (!CreateRasterizerStates()) return false;
 
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
@@ -46,61 +42,81 @@ bool Renderer::Init(const Window& window)
 void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
 	m_deferredHandler->ClearBuffers(m_immediateContext.Get());
-	
+
 	// Update scene (camera, objects, lights, etc.)
 	scene->UpdateScene(deltaTime);
 
+	ShadowPass(scene);	
 	GeometryPass(scene);
 	LightPass(scene);
 	
 	m_swapChain->Present(0, 0);
 }
 
-// For testing purposes
-//void Renderer::RenderForward()
-//{
-//	m_immediateContext->OMSetRenderTargets(1, m_RTV.GetAddressOf(), m_DSV.Get());
-//
-//	float clearColor[4] = { 0.f, 0.f, 0.f, 0.f };
-//	m_immediateContext->ClearRenderTargetView(m_RTV.Get(), clearColor);
-//	m_immediateContext->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-//
-//	// Update constant buffers
-//	DirectX::XMFLOAT4X4 worldMatrix = m_test1->GetWorldMatrix();
-//	m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
-//
-//	DirectX::XMFLOAT4X4 viewProjMatrix = m_camera->GetViewProjMatrix();
-//	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
-//
-//	// Bind VS constant buffers
-//	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
-//	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
-//
-//	// Draw test object
-//	m_test1->Draw(m_immediateContext.Get());
-//
-//	// Unbind shader resource views (safety — avoids "resource still bound as SRV" on next writes)
-//	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
-//	m_immediateContext->PSSetShaderResources(0, 3, nullSRVs);
-//
-//	// Present the rendered frame to the screen
-//	m_swapChain->Present(0, 0);
-//}
+void Renderer::ShadowPass(BaseScene* scene)
+{
+	const std::vector<GameObject*>& sceneObjects = scene->GetGameObjects();
+	m_immediateContext->PSSetShader(nullptr, nullptr, 0); // No pixel shader for shadow pass
 
-// For testing purposes
-//void Renderer::RenderDeferred()
-//{
-//	m_deferredHandler->ClearBuffers(m_immediateContext.Get(), { 0.f, 0.f, 0.f, 0.f });
-//
-//	GeometryPass();
-//	LightPass();
-//
-//	// Present the rendered frame to the screen
-//	m_swapChain->Present(0, 0);
-//}
+	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
+
+	// Spot Lights
+	m_immediateContext->RSSetViewports(1, &scene->GetLightHandler()->GetSpotLightViewport());
+	const std::vector<SpotLight>& spotLights = scene->GetLightHandler()->GetSpotLights();
+	for (auto& light : spotLights)
+	{
+		m_immediateContext->ClearDepthStencilView(light.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_immediateContext->OMSetRenderTargets(0, nullptr, light.GetDSV());
+
+		// Set view-projection matrix from light's perspective
+		DirectX::XMFLOAT4X4 lightViewProjMatrix = light.GetViewProjMatrix();
+		m_viewProjectionBuffer.Update(m_immediateContext.Get(), &lightViewProjMatrix);
+
+		// Draw all game objects from the light's perspective
+		for(auto& obj : sceneObjects)
+		{
+			// Update world matrix constant buffer for each object and bind it
+			DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
+			m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix);
+
+			obj->Draw(m_immediateContext.Get());
+		}
+	}
+
+	// Directional Lights
+	m_immediateContext->RSSetViewports(1, &scene->GetLightHandler()->GetDirectionalLightViewport());
+	const std::vector<DirectionalLight>& dirLights = scene->GetLightHandler()->GetDirectionalLights();
+
+	for(auto& light : dirLights)
+	{
+		m_immediateContext->ClearDepthStencilView(light.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_immediateContext->OMSetRenderTargets(0, nullptr, light.GetDSV());
+
+		DirectX::XMFLOAT4X4 lightViewProjMatrix = light.GetViewProjMatrix();
+		m_viewProjectionBuffer.Update(m_immediateContext.Get(), &lightViewProjMatrix);
+
+		for (auto& obj : sceneObjects)
+		{
+			DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
+			m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix);
+			obj->Draw(m_immediateContext.Get());
+		}
+	}
+
+	// Reset states
+	m_immediateContext->OMSetRenderTargets(0, nullptr, nullptr);
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	m_immediateContext->RSSetViewports(1, &m_viewport);
+}
 
 void Renderer::GeometryPass(BaseScene* scene)
 {
+	// Update camera constant buffer BEFORE drawing so vertex shader uses correct view-proj
+	DirectX::XMFLOAT4X4 viewProjMatrix = scene->GetCamera()->GetViewProjMatrix();
+	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+
 	// Bind G-buffer render targets and depth
 	m_deferredHandler->BindGeometryPass(m_immediateContext.Get());
 
@@ -111,15 +127,9 @@ void Renderer::GeometryPass(BaseScene* scene)
 		// Update world matrix constant buffer for each object
 		DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
 		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
-		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr()); // Set world buffer
 
 		obj->Draw(m_immediateContext.Get());
 	}
-
-	// Update camera constant buffer
-	DirectX::XMFLOAT4X4 viewProjMatrix = scene->GetCamera()->GetViewProjMatrix();
-	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
-	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr()); // Set viewProjection buffer
 }
 
 void Renderer::LightPass(BaseScene* scene)
@@ -127,29 +137,26 @@ void Renderer::LightPass(BaseScene* scene)
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
 	m_deferredHandler->BindLightPass(m_immediateContext.Get());
 
-	// Bind compute shader
-	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
-
 	// Bind UAV (backbuffer) for compute shader output
-	if (m_UAV)
-		m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
-	else
-		throw std::runtime_error("UAV not created!");
+	m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
 
 	// Bind light sources
 	scene->BindLights(m_immediateContext.Get());
 
-	// Dispatch compute shader to shade pixels (assuming thread group size matches shader)
-	// Compute dispatch dimensions based on viewport
+	// Bind shadow maps
+	scene->GetLightHandler()->BindDepthTextures(m_immediateContext.Get());
+
+	// Compute dispatch
 	const float threadGroupSizeXY = 8.f; // Must match [numthreads(x,y,z)] in compute shader
 	UINT dispatchX = static_cast<UINT>(ceilf(m_viewport.Width / threadGroupSizeXY));
 	UINT dispatchY = static_cast<UINT>(ceilf(m_viewport.Height / threadGroupSizeXY));
 	m_immediateContext->Dispatch(dispatchX, dispatchY, 1);
 
 	// Unbind compute shader and UAVs
-	m_immediateContext->CSSetShader(nullptr, nullptr, 0);
 	ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
+
+	scene->GetLightHandler()->UnbindDepthTextures(m_immediateContext.Get());
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -306,67 +313,24 @@ bool Renderer::CreateUAV()
 
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-	uavDesc.Texture2D.MipSlice = 0;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+	uavDesc.Texture2DArray.MipSlice = 0;
+	uavDesc.Texture2DArray.FirstArraySlice = 0;
+	uavDesc.Texture2DArray.ArraySize = 1;
 
 	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_UAV.GetAddressOf());
-	return true;
-}
-
-bool Renderer::CreateRenderTargetView()
-{
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-    HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-    if (FAILED(hr))
-    {
-        std::cerr << "Failed to get back buffer! hr=" << std::hex << hr << std::endl;
-        return false;
-    }
-
-    hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RTV.GetAddressOf());
-    if (FAILED(hr))
-    {
-        std::cerr << "Failed to create RTV! hr=" << std::hex << hr << std::endl;
-        return false;
-    }
-
-    return true;
-}
-
-bool Renderer::CreateDepthStencilView(const Window& window)
-{
-	D3D11_TEXTURE2D_DESC depthStencilDesc = {};
-	depthStencilDesc.Width = window.GetWidth();
-	depthStencilDesc.Height = window.GetHeight();
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilDesc.SampleDesc.Count = 1;
-	depthStencilDesc.SampleDesc.Quality = 0;
-	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0;
-	depthStencilDesc.MiscFlags = 0;
-
-	HRESULT hr = m_device->CreateTexture2D(&depthStencilDesc, nullptr, m_depthStencilBuffer.GetAddressOf());
-	if(FAILED(hr))
+	if (FAILED(hr))
 	{
-		std::cerr << "Error creating depth stencil buffer!" << std::endl;
-		return false;
-	}
-
-	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, m_DSV.GetAddressOf());
-	if(FAILED(hr))
-	{
-		std::cerr << "Error creating depth stencil view!" << std::endl;
+		std::cerr << "Error creating UAV!" << std::endl;
 		return false;
 	}
 
 	return true;
 }
 
-bool Renderer::CreateSamplerState()
+bool Renderer::CreateSamplerStates()
 {
+	// General texture sampler state
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -389,10 +353,36 @@ bool Renderer::CreateSamplerState()
 	}
 
 	m_immediateContext->PSSetSamplers(0, 1, m_samplerState.GetAddressOf());
-	return !FAILED(hr);
+
+	// Shadow map sampler state
+	D3D11_SAMPLER_DESC shadowSamplerDesc = {};
+	shadowSamplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+	shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	shadowSamplerDesc.MipLODBias = 0.0f;
+	shadowSamplerDesc.MaxAnisotropy = 16;
+	shadowSamplerDesc.BorderColor[0] = 1.0f;
+	shadowSamplerDesc.BorderColor[1] = 1.0f;
+	shadowSamplerDesc.BorderColor[2] = 1.0f;
+	shadowSamplerDesc.BorderColor[3] = 1.0f;
+	shadowSamplerDesc.MinLOD = 0;
+	shadowSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	hr = m_device->CreateSamplerState(&shadowSamplerDesc, m_shadowSamplerState.GetAddressOf());
+
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating shadow sampler state!" << std::endl;
+		return false;
+	}
+
+	m_immediateContext->CSSetSamplers(0, 1, m_shadowSamplerState.GetAddressOf());
+
+	return true;
 }
 
-bool Renderer::CreateRasterizerState()
+bool Renderer::CreateRasterizerStates()
 {
 	// Default rasterizer state
 	D3D11_RASTERIZER_DESC rasterizerDesc = {};
@@ -430,6 +420,10 @@ bool Renderer::CreateConstantBuffers()
 		std::cerr << "Error creating viewProjection constant buffer!" << std::endl;
 		return false;
 	}
+
+	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
+
 	return true;
 }
 

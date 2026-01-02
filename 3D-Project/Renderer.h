@@ -20,10 +20,6 @@ private:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 	D3D11_VIEWPORT m_viewport;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
-
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RTV;
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
 
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
@@ -32,6 +28,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_shadowSamplerState;
 
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
@@ -48,12 +45,11 @@ private:
 	bool CreateShaders(std::string& vShaderByteCodeOUT);
 	bool CreateInputLayout(const std::string& vShaderByteCode);
 	bool CreateUAV();
-	bool CreateRenderTargetView();
-	bool CreateDepthStencilView(const Window& window);
-	bool CreateSamplerState();
-	bool CreateRasterizerState();
+	bool CreateSamplerStates();
+	bool CreateRasterizerStates();
 	bool CreateConstantBuffers();
 
+	void ShadowPass(BaseScene* scene);
 	void GeometryPass(BaseScene* scene);
 	void LightPass(BaseScene* scene);
 
@@ -63,9 +59,6 @@ public:
 
 	bool Init(const Window& window);
 	void RenderFrame(BaseScene* scene, const float deltaTime);
-
-	//void RenderForward(); // Temporary function for testing
-	//void RenderDeferred(); // Temporary function for testing
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetImmediateContext();

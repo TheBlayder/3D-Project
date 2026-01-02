@@ -82,6 +82,10 @@ LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			}
 			return 0;
 
+		case WM_KEYUP:
+			// Handle key release
+			return 0;
+
 		// Mouse input handling
 		case WM_MOUSEMOVE:
 			// Handle mouse movement

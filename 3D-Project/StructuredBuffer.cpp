@@ -30,7 +30,7 @@ void StructuredBuffer::Init(ID3D11Device* device, UINT sizeOfElement, size_t nrO
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 	srvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-	srvDesc.Buffer.ElementOffset = 0;
+	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.NumElements = static_cast<UINT>(nrOfElementsInBuffer);
 
 	hr = device->CreateShaderResourceView(m_buffer.Get(), &srvDesc, m_SRV.GetAddressOf());

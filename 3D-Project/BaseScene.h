@@ -36,9 +36,10 @@ public:
 	virtual void UpdateScene(const float deltaTime) = 0;
 
 	Camera* GetCamera() const;
+	LightHandler* GetLightHandler() const;
 	void BindLights(ID3D11DeviceContext* context);
 
 	void AddGameObject(GameObject* gameObject);
-	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = false);
+	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
 	std::vector<GameObject*>& GetGameObjects();
 };

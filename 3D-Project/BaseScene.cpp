@@ -24,6 +24,11 @@ Camera* BaseScene::GetCamera() const
 	return m_camera;
 }
 
+LightHandler* BaseScene::GetLightHandler() const
+{
+	return m_lightHandler;
+}
+
 void BaseScene::BindLights(ID3D11DeviceContext* context)
 {
 	m_lightHandler->BindLightBuffer(context);
