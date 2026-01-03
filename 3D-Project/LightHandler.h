@@ -49,14 +49,14 @@ private:
 	
 	std::vector<SpotLight> m_spotLights;
 	StructuredBuffer m_spotLightBuffer;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_spotLightBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_spotLightSRV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_spotLightDepthTex;
 	D3D11_VIEWPORT m_spotLightViewport;
 	void GetSpotLightData(std::vector<SpotLightData>& outData) const;
 
 	std::vector<DirectionalLight> m_directionalLights;
 	StructuredBuffer m_directionalLightBuffer;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_directionalLightBufferSRV;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_directionalLightSRV;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_directionalLightDepthTex;
 	D3D11_VIEWPORT m_directionalLightViewport;
 	void GetDirectionalLightData(std::vector<DirectionalLightData>& outData) const;
@@ -79,7 +79,6 @@ public:
 	void AddSpotLight(SpotLightData& spotLight);
 	const std::vector<SpotLight>& GetSpotLights() const { return m_spotLights; }
 	const size_t GetNrOfSpotLights() const { return m_spotLights.size(); }
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetSpotLightBufferSRV() const { return m_spotLightBuffer.GetSRV(); }
 	const D3D11_VIEWPORT& GetSpotLightViewport() const { return m_spotLightViewport; }
 
 	// DirectionalLight

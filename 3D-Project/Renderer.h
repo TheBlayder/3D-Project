@@ -9,8 +9,6 @@
 #include "Camera.h"
 #include "DeferredHandler.h"
 
-#include "GameObject.h"
-
 class Renderer
 {
 private:

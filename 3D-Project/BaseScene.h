@@ -6,7 +6,7 @@
 #include <DirectXMath.h>
 
 #include "Camera.h"
-#include "GameObject.h"
+#include "BaseObject.h"
 #include "LightHandler.h"
 #include "Window.h"
 
@@ -19,7 +19,7 @@ class BaseScene
 protected:
 	Camera* m_camera = nullptr;
 	LightHandler* m_lightHandler = nullptr;
-	std::vector<GameObject*> m_gameObjects;
+	std::vector<BaseObject*> m_sceneObjects;
 
 	void UpdateSceneLights(ID3D11DeviceContext* context);
 
@@ -39,7 +39,7 @@ public:
 	LightHandler* GetLightHandler() const;
 	void BindLights(ID3D11DeviceContext* context);
 
-	void AddGameObject(GameObject* gameObject);
-	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
-	std::vector<GameObject*>& GetGameObjects();
+	void AddBaseObject(BaseObject* baseObject);
+	void AddBaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
+	std::vector<BaseObject*>& GetBaseObjects();
 };

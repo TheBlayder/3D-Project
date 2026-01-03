@@ -62,7 +62,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     float4 normalSample = float4(normalize(normalGBuffer[DTid.xy].xyz), 0.f);
     float4 viewDirection_n = normalize(float4(cameraPosition, 0.f) - positionSample);
     
-    const float depthBias = 0.005f;
+    const float depthBias = 0.001f;
     
     // Process spot lights
     for (int i = 0; i < nrOfSpotLights; ++i)
@@ -71,6 +71,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
         
         // Shadow calculation
         float4 lightClip = mul(positionSample, light.vpMatrix);
+        if(lightClip.w <= 0.f)
+            continue;
         float3 lightNDC = lightClip.xyz / lightClip.w;
         
         float3 lightUV = float3(lightNDC.x * 0.5f + 0.5f, lightNDC.y * -0.5f + 0.5f, i);
@@ -79,7 +81,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
         if (isInShadow)
             continue;
      
-        
         // Check if pixel is within range of light.
         float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
         if (length(lightToPixelVec) > light.range)

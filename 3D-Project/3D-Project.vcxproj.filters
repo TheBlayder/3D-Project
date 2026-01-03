@@ -87,9 +87,6 @@
     <ClCompile Include="IndexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
-    <ClCompile Include="TestObject.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="StructuredBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
@@ -104,6 +101,12 @@
     </ClCompile>
     <ClCompile Include="SpotLight.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Source Files\Scene\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="DCEM.cpp">
+      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,11 +179,14 @@
     <ClInclude Include="BaseScene.h">
       <Filter>Header Files\Scene\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="TestObject.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="TestScene.h">
       <Filter>Header Files\Scene\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>Header Files\Scene\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="DCEM.h">
+      <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

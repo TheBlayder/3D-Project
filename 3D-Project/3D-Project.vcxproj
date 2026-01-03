@@ -134,6 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BaseObject.cpp" />
+    <ClCompile Include="DCEM.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
@@ -146,12 +148,13 @@
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="SubMesh.cpp" />
-    <ClCompile Include="TestObject.cpp" />
     <ClCompile Include="TestScene.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseObject.h" />
+    <ClInclude Include="DCEM.h" />
     <ClInclude Include="DeferredHandler.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="GameObject.h" />
@@ -172,7 +175,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="SubMesh.h" />
-    <ClInclude Include="TestObject.h" />
     <ClInclude Include="TestScene.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexBuffer.h" />

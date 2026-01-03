@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "BaseObject.h"
 #include "ReadCSO.h"
 
 Renderer::~Renderer()
@@ -55,7 +56,7 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 
 void Renderer::ShadowPass(BaseScene* scene)
 {
-	const std::vector<GameObject*>& sceneObjects = scene->GetGameObjects();
+	const std::vector<BaseObject*>& sceneObjects = scene->GetBaseObjects();
 	m_immediateContext->PSSetShader(nullptr, nullptr, 0); // No pixel shader for shadow pass
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
@@ -65,13 +66,13 @@ void Renderer::ShadowPass(BaseScene* scene)
 	// Spot Lights
 	m_immediateContext->RSSetViewports(1, &scene->GetLightHandler()->GetSpotLightViewport());
 	const std::vector<SpotLight>& spotLights = scene->GetLightHandler()->GetSpotLights();
-	for (auto& light : spotLights)
+	for (auto& spotLight : spotLights)
 	{
-		m_immediateContext->ClearDepthStencilView(light.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_immediateContext->OMSetRenderTargets(0, nullptr, light.GetDSV());
+		m_immediateContext->ClearDepthStencilView(spotLight.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_immediateContext->OMSetRenderTargets(0, nullptr, spotLight.GetDSV());
 
 		// Set view-projection matrix from light's perspective
-		DirectX::XMFLOAT4X4 lightViewProjMatrix = light.GetViewProjMatrix();
+		DirectX::XMFLOAT4X4 lightViewProjMatrix = spotLight.GetViewProjMatrix();
 		m_viewProjectionBuffer.Update(m_immediateContext.Get(), &lightViewProjMatrix);
 
 		// Draw all game objects from the light's perspective
@@ -89,12 +90,12 @@ void Renderer::ShadowPass(BaseScene* scene)
 	m_immediateContext->RSSetViewports(1, &scene->GetLightHandler()->GetDirectionalLightViewport());
 	const std::vector<DirectionalLight>& dirLights = scene->GetLightHandler()->GetDirectionalLights();
 
-	for(auto& light : dirLights)
+	for(auto& dirLight : dirLights)
 	{
-		m_immediateContext->ClearDepthStencilView(light.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-		m_immediateContext->OMSetRenderTargets(0, nullptr, light.GetDSV());
+		m_immediateContext->ClearDepthStencilView(dirLight.GetDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_immediateContext->OMSetRenderTargets(0, nullptr, dirLight.GetDSV());
 
-		DirectX::XMFLOAT4X4 lightViewProjMatrix = light.GetViewProjMatrix();
+		DirectX::XMFLOAT4X4 lightViewProjMatrix = dirLight.GetViewProjMatrix();
 		m_viewProjectionBuffer.Update(m_immediateContext.Get(), &lightViewProjMatrix);
 
 		for (auto& obj : sceneObjects)
@@ -121,7 +122,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 	m_deferredHandler->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
-	std::vector<GameObject*>& sceneObjects = scene->GetGameObjects();
+	std::vector<BaseObject*>& sceneObjects = scene->GetBaseObjects();
 	for (auto& obj : sceneObjects)
 	{
 		// Update world matrix constant buffer for each object

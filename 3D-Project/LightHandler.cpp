@@ -45,8 +45,8 @@ void LightHandler::UnbindLightBuffer(ID3D11DeviceContext* context)
 void LightHandler::BindDepthTextures(ID3D11DeviceContext* context)
 {
     ID3D11ShaderResourceView* SRVs[2] = {
-        m_spotLightBufferSRV.Get(),
-        m_directionalLightBufferSRV.Get()
+        m_spotLightSRV.Get(),
+        m_directionalLightSRV.Get()
     };
     context->CSSetShaderResources(7, 2, SRVs);
 }
@@ -117,7 +117,7 @@ void LightHandler::Init(ID3D11Device* device, ID3D11DeviceContext* context, cons
     // Directional lights buffer
     std::vector<DirectionalLightData> dirLightData;
     GetDirectionalLightData(dirLightData);
-    if (!dirLightData.empty())  // Add this check
+    if (!dirLightData.empty())
         m_directionalLightBuffer.Init(device, sizeof(DirectionalLightData), dirLightData.size(), dirLightData.data());
     
     // Initialize light buffer metadata
@@ -128,12 +128,14 @@ void LightHandler::Init(ID3D11Device* device, ID3D11DeviceContext* context, cons
 	
 	m_lightBuffer.Init(device, sizeof(LightBufferData), &m_lightBufferData);
 
+	BindLightBuffer(context);
+
 	// Set up Shadow Map
 	if(!m_spotLights.empty())
 	{
 		D3D11_TEXTURE2D_DESC spotLightDesc = {};
-		spotLightDesc.Width = m_spotLightViewport.Width;
-		spotLightDesc.Height = m_spotLightViewport.Height;
+		spotLightDesc.Width = static_cast<UINT>(m_spotLightViewport.Width);
+		spotLightDesc.Height = static_cast<UINT>(m_spotLightViewport.Height);
 		spotLightDesc.MipLevels = 1;
 		spotLightDesc.ArraySize = static_cast<UINT>(m_spotLights.size());
 		spotLightDesc.Format = DXGI_FORMAT_R32_TYPELESS;
@@ -174,7 +176,7 @@ void LightHandler::Init(ID3D11Device* device, ID3D11DeviceContext* context, cons
 		srvDesc.Texture2DArray.FirstArraySlice = 0;
 		srvDesc.Texture2DArray.ArraySize = static_cast<UINT>(m_spotLights.size());
 
-		hr = device->CreateShaderResourceView(m_spotLightDepthTex.Get(), &srvDesc, m_spotLightBufferSRV.GetAddressOf());
+		hr = device->CreateShaderResourceView(m_spotLightDepthTex.Get(), &srvDesc, m_spotLightSRV.GetAddressOf());
 		if (FAILED(hr))
 		{
 			throw std::runtime_error("Could not create depth buffer srv");
@@ -226,12 +228,10 @@ void LightHandler::Init(ID3D11Device* device, ID3D11DeviceContext* context, cons
 		srvDesc.Texture2DArray.FirstArraySlice = 0;
 		srvDesc.Texture2DArray.ArraySize = static_cast<UINT>(m_directionalLights.size());
 
-		hr = device->CreateShaderResourceView(m_directionalLightDepthTex.Get(), &srvDesc, m_directionalLightBufferSRV.GetAddressOf());
+		hr = device->CreateShaderResourceView(m_directionalLightDepthTex.Get(), &srvDesc, m_directionalLightSRV.GetAddressOf());
 		if (FAILED(hr))
 		{
 			throw std::runtime_error("Could not create depth buffer srv");
 		}
 	}
-
-	BindLightBuffer(context);
 }

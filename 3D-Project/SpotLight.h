@@ -49,7 +49,6 @@ public:
 
 		XMVECTOR pos = XMLoadFloat3(&m_position);
 		XMVECTOR dir_n = XMVector3Normalize(XMLoadFloat3(&m_direction));
-		XMVECTOR forward = XMVectorAdd(pos, dir_n);
 
 		// Choose an up vector that isn't colinear with the light direction
 		XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
@@ -68,7 +67,7 @@ public:
 		float nearZ = 0.1f;
 		float farZ = m_range;
 
-		MatrixHelper::CreateViewMatrix(view, pos, forward, up);
+		MatrixHelper::CreateViewMatrix(view, pos, dir_n, up);
 		MatrixHelper::CreateProjectionMatrix(proj, fovInDeg, aspectRatio, nearZ, farZ);
 		MatrixHelper::CreateViewProjMatrix(viewProj, view, proj);
 

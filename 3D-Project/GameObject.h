@@ -4,31 +4,16 @@
 #include <string>
 #include <iostream>
 
-#include "ConstantBuffer.h"
-#include "Transform.h"
-#include "Mesh.h"
+#include "BaseObject.h"
 
 namespace DX = DirectX;
 
-class GameObject
+class GameObject : public BaseObject
 {
-private:
-	// World data
-	Transform m_transform;
-
-	// Texture data
-	Mesh m_mesh;
-
 public:
-	GameObject() = default;
-	GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
-	~GameObject() = default;
+    // Add a matching constructor to fix E0289
+    GameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true)
+        : BaseObject(device, transform, folderPath, objectName, textureFolder, flipUVy) {}
 
-	void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
-
-	void Draw(ID3D11DeviceContext* context);
-
-	Transform& GetTransform();
-	Mesh& GetMesh();
-	const DirectX::XMFLOAT4X4 GetWorldMatrix();
+    void Update(float deltaTime) override;
 };

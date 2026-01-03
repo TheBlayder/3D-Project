@@ -8,14 +8,6 @@ void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
 	m_transform.SetPosition(DirectX::XMVectorAdd(m_transform.GetPosition(), DirectX::XMVectorScale(DirectX::XMLoadFloat3(&direction), amount)));
 }
 
-void Camera::RotateAroundAxis(float amount) // Will only rotate around the up axis for now
-{
-	using namespace DirectX;
-	XMVECTOR currentRotation = m_transform.GetRotation();
-	XMVECTOR rotationAmount = XMVectorScale(m_up, amount);
-	m_transform.SetRotation(XMVectorAdd(currentRotation, rotationAmount));
-}
-
 void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 {
 	using namespace DirectX;
@@ -27,16 +19,8 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 }
 
 Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
-    : m_projData(projData)
 {
-	using namespace DirectX;
-	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
-	m_transform.SetRotation(XMVectorSet(0.f, 0.f, 0.001f, 0.f));
-
-	XMFLOAT4X4 viewProjMatrix;
-	GenerateViewProjMatrix(viewProjMatrix);
-    m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
-
+	Init(device, projData, initialPosition);
 }
 
 Camera::~Camera()
@@ -54,15 +38,31 @@ Camera::~Camera()
 	}
 }
 
+void Camera::Init(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
+{
+	m_projData = projData;
+	
+	using namespace DirectX;
+	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
+	m_transform.SetRotation(XMVectorSet(0.f, 0.f, 0.001f, 0.f));
+
+	XMFLOAT4X4 viewProjMatrix;
+	GenerateViewProjMatrix(viewProjMatrix);
+	m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
+}
+
 // === MOVEMENT ===
 void Camera::MoveForward(float amount)
 {
 	MoveInDirection(amount, m_transform.GetRotationF3());
 }
 
-void Camera::RotateRight(float amount)
+void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
 {
-	RotateAroundAxis(amount);
+	using namespace DirectX;
+	XMVECTOR currentRotation = m_transform.GetRotation();
+	XMVECTOR rotationAmount = XMVectorScale(XMLoadFloat3(&axis), amount);
+	m_transform.SetRotation(XMVectorAdd(currentRotation, rotationAmount));
 }
 
 // === CONSTANT BUFFER ===

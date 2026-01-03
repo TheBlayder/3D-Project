@@ -32,8 +32,7 @@ private:
 	ConstantBuffer* m_cameraBuffer = nullptr;
 	
 	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
-	void RotateAroundAxis(float amount);
-
+	
 	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
 
 public:
@@ -41,9 +40,12 @@ public:
 	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 	~Camera();
 
+	void Init(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
+
 	// Movement (needs redo)
 	void MoveForward(float amount);
-	void RotateRight(float amount);
+
+	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
 
 	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);

@@ -1,4 +1,5 @@
 #include "BaseScene.h"
+#include "GameObject.h"
 
 #include <algorithm>
 
@@ -34,21 +35,20 @@ void BaseScene::BindLights(ID3D11DeviceContext* context)
 	m_lightHandler->BindLightBuffer(context);
 }
 
-void BaseScene::AddGameObject(GameObject* gameObject)
+void BaseScene::AddBaseObject(BaseObject* baseObject)
 {
-	m_gameObjects.push_back(gameObject);
+	m_sceneObjects.push_back(baseObject);
 }
 
-void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
+void BaseScene::AddBaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
 {
-	GameObject* newGameObject = new GameObject();
-	newGameObject->Init(device, transform, folderPath, objectName, textureFolder, flipUVy);
-	m_gameObjects.push_back(newGameObject);
+	BaseObject* newBaseObject = new GameObject(device, transform, folderPath, objectName, textureFolder, flipUVy);
+	m_sceneObjects.push_back(newBaseObject);
 }
 
-std::vector<GameObject*>& BaseScene::GetGameObjects()
+std::vector<BaseObject*>& BaseScene::GetBaseObjects()
 {
-	return m_gameObjects;
+	return m_sceneObjects;
 }
 
 BaseScene::~BaseScene()
@@ -60,9 +60,9 @@ BaseScene::~BaseScene()
 	if (m_lightHandler)
 		delete m_lightHandler;
 
-	for (auto obj : m_gameObjects)
+	for (auto obj : m_sceneObjects)
 	{
 		delete obj;
 	}
-	m_gameObjects.clear();
+	m_sceneObjects.clear();
 }
