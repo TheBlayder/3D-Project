@@ -18,9 +18,9 @@ void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 	MH::CreateViewProjMatrix(viewProjMatrix, viewMatrix, projMatrix);
 }
 
-Camera::Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
+Camera::Camera(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition)
 {
-	Init(device, projData, initialPosition);
+	Init(device, projData, width, height, initialPosition);
 }
 
 Camera::~Camera()
@@ -38,9 +38,10 @@ Camera::~Camera()
 	}
 }
 
-void Camera::Init(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition)
+void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition)
 {
 	m_projData = projData;
+	m_DH = new DeferredHandler(device, width, height);
 	
 	using namespace DirectX;
 	m_transform.SetPosition(XMLoadFloat3(&initialPosition));
@@ -75,7 +76,7 @@ void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 }
 
 // === GETTERS ===
-const DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
+DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
 {
 	using namespace DirectX;
 	XMFLOAT4X4 viewProjMatrix;
@@ -88,27 +89,26 @@ DeferredHandler* Camera::GetDeferredHandler()
 	return m_DH;
 }
 
-const DX::XMFLOAT3& Camera::GetForward() const
+DX::XMFLOAT3 Camera::GetForward() const
 {
 	return m_transform.GetRotationF3();
 }
 
-const DX::XMFLOAT3& Camera::GetPosition() const
+DX::XMFLOAT3 Camera::GetPosition() const
 {
     return m_transform.GetPositionF3();
 }
 
-const DX::XMFLOAT3& Camera::GetRight() const
+DX::XMFLOAT3 Camera::GetRight() const
 {
 	DX::XMFLOAT3 right;
-	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetPosition(), m_up));
+	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetRotation(), m_up));
 	return right;
 }
 
-const DX::XMFLOAT3& Camera::GetUp() const
+DX::XMFLOAT3 Camera::GetUp() const
 {
 	DX::XMFLOAT3 up;
 	DirectX::XMStoreFloat3(&up, m_up);
-	
 	return up;
 }

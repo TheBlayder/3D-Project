@@ -24,7 +24,7 @@ namespace MatrixHelper
 
     inline void CreateViewMatrix(DX::XMFLOAT4X4& viewMatrix, const DX::XMVECTOR& position, const DX::XMVECTOR& forward, const DX::XMVECTOR& up)
     {
-        DX::XMMATRIX view = DX::XMMatrixLookAtLH(position, forward, up);
+        DX::XMMATRIX view = DX::XMMatrixLookAtLH(position, DX::XMVectorAdd(forward, position), up);
         DX::XMStoreFloat4x4(&viewMatrix, view);
     }
 

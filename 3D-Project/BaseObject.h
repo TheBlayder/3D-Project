@@ -21,7 +21,7 @@ public:
 
 	virtual void Update(float deltaTime) = 0;
 
-	void Draw(ID3D11DeviceContext* context) const;
+	virtual void Draw(ID3D11DeviceContext* context) const;
 
 	Transform& GetTransform();
 	Mesh& GetMesh();

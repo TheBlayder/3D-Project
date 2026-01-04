@@ -45,6 +45,7 @@ public:
 		XMVECTOR sceneCenter = XMVectorZero();
 		float lightDistance = 100.f;
 		XMVECTOR lightPos = XMVectorSubtract(sceneCenter, XMVectorScale(dir_n, lightDistance));
+		XMVECTOR forward = XMVectorSubtract(sceneCenter, lightPos); // non-zero
 
 		// Choose an up vector that is not colinear with the light direction.
 		// If the light direction is (nearly) parallel to (0,1,0), using (0,1,0) as up will produce a degenerate view matrix.
@@ -56,7 +57,7 @@ public:
 			up = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 		}
 
-		MatrixHelper::CreateViewMatrix(view, lightPos, sceneCenter, up);
+		MatrixHelper::CreateViewMatrix(view, lightPos, forward, up);
 
 		const float orthoSize = 100.f;
 		const float nearZ = 0.1f;

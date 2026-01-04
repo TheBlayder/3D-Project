@@ -55,6 +55,12 @@
     <Filter Include="Header Files\Scene\Scenes">
       <UniqueIdentifier>{05393c42-c17e-4758-b72b-26941512855a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene\Objects\Mesh">
+      <UniqueIdentifier>{6b3a7269-8a73-4787-9349-dad9aa669c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Objects\Mesh">
+      <UniqueIdentifier>{a37dfabf-2303-41d2-aae9-155f7216a4ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -77,12 +83,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="SubMesh.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
     <ClCompile Include="IndexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
@@ -107,6 +107,12 @@
     </ClCompile>
     <ClCompile Include="DCEM.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Scene\Objects\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="SubMesh.cpp">
+      <Filter>Source Files\Scene\Objects\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +152,6 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files\External-Libs</Filter>
     </ClInclude>
-    <ClInclude Include="SubMesh.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="IndexBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
@@ -188,6 +188,12 @@
     <ClInclude Include="DCEM.h">
       <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Scene\Objects\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="SubMesh.h">
+      <Filter>Header Files\Scene\Objects\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="VertexShader.hlsl">
@@ -197,6 +203,9 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="ComputeShader.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="DCEM-PS.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

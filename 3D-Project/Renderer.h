@@ -9,34 +9,40 @@
 #include "Camera.h"
 #include "DeferredHandler.h"
 
+using namespace Microsoft;
+
 class Renderer
 {
 private:
 	// Direct3D components
-	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
+	WRL::ComPtr<ID3D11Device> m_device;
+	WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
+	WRL::ComPtr<IDXGISwapChain> m_swapChain;
 	D3D11_VIEWPORT m_viewport;
 
-	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
+	// Views
+	WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
 
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
+	// Input layout
+	WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
+	// Rasterizer states
+	WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
 
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_shadowSamplerState;
+	// Sampler states
+	WRL::ComPtr<ID3D11SamplerState> m_samplerState;
+	WRL::ComPtr<ID3D11SamplerState> m_shadowSamplerState;
 
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
+	// Shaders
+	WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
+	WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
+	WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
+	WRL::ComPtr<ID3D11PixelShader> m_DCEMPixelShader;
 
 	// Constant buffers
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
-
-	DeferredHandler* m_deferredHandler = nullptr;
 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
@@ -51,13 +57,15 @@ private:
 	void GeometryPass(BaseScene* scene);
 	void LightPass(BaseScene* scene);
 
+	void RenderDCEMObjects(BaseScene* scene);
+
 public:
 	Renderer() = default;
-	~Renderer();
+	~Renderer() = default;
 
 	bool Init(const Window& window);
 	void RenderFrame(BaseScene* scene, const float deltaTime);
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetImmediateContext();
+	ID3D11Device* GetDevice() { return m_device.Get(); }
+	ID3D11DeviceContext* GetImmediateContext() { return m_immediateContext.Get(); }
 };

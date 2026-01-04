@@ -3,7 +3,7 @@
 class TestScene : public BaseScene
 {
 private:
-	void LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, Window& window) override;
+	void LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height) override;
 	void LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context) override;
 	void LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context) override;
 public:

@@ -3,11 +3,6 @@
 #include "BaseObject.h"
 #include "ReadCSO.h"
 
-Renderer::~Renderer()
-{   
-	if (m_deferredHandler) { delete m_deferredHandler; }
-}
-
 bool Renderer::Init(const Window& window)
 {
 	// Set up device and swapchain
@@ -35,20 +30,19 @@ bool Renderer::Init(const Window& window)
 	// Set up constant buffers
 	if (!CreateConstantBuffers()) return false;
 
-	m_deferredHandler = new DeferredHandler(m_device.Get(), window.GetWidth(), window.GetHeight());
-
     return true;
 }
 
 void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
-	m_deferredHandler->ClearBuffers(m_immediateContext.Get());
+	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
 
 	// Update scene (camera, objects, lights, etc.)
 	scene->UpdateScene(deltaTime);
 
 	ShadowPass(scene);	
 	GeometryPass(scene);
+	RenderDCEMObjects(scene);
 	LightPass(scene);
 	
 	m_swapChain->Present(0, 0);
@@ -56,7 +50,7 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 
 void Renderer::ShadowPass(BaseScene* scene)
 {
-	const std::vector<BaseObject*>& sceneObjects = scene->GetBaseObjects();
+	const std::vector<BaseObject*>& sceneObjects = scene->GetSceneObjects();
 	m_immediateContext->PSSetShader(nullptr, nullptr, 0); // No pixel shader for shadow pass
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
@@ -114,20 +108,25 @@ void Renderer::ShadowPass(BaseScene* scene)
 
 void Renderer::GeometryPass(BaseScene* scene)
 {
+	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+
 	// Update camera constant buffer BEFORE drawing so vertex shader uses correct view-proj
 	DirectX::XMFLOAT4X4 viewProjMatrix = scene->GetCamera()->GetViewProjMatrix();
 	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
+	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
 
 	// Bind G-buffer render targets and depth
-	m_deferredHandler->BindGeometryPass(m_immediateContext.Get());
+	scene->GetCamera()->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
-	std::vector<BaseObject*>& sceneObjects = scene->GetBaseObjects();
+	std::vector<BaseObject*>& sceneObjects = scene->GetSceneObjects();
 	for (auto& obj : sceneObjects)
 	{
 		// Update world matrix constant buffer for each object
 		DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
 		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
 
 		obj->Draw(m_immediateContext.Get());
 	}
@@ -136,7 +135,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 void Renderer::LightPass(BaseScene* scene)
 {
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
-	m_deferredHandler->BindLightPass(m_immediateContext.Get());
+	scene->GetCamera()->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
 
 	// Bind UAV (backbuffer) for compute shader output
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
@@ -158,6 +157,22 @@ void Renderer::LightPass(BaseScene* scene)
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
 
 	scene->GetLightHandler()->UnbindDepthTextures(m_immediateContext.Get());
+}
+
+void Renderer::RenderDCEMObjects(BaseScene* scene)
+{
+	const std::vector<DCEM*>& dcemObjects = scene->GetDCEMObjects();
+	DirectX::XMFLOAT3 cameraPosition = scene->GetCamera()->GetPosition();
+	for (auto& dcem : dcemObjects)
+	{
+		DirectX::XMFLOAT4X4 worldMatrix = dcem->GetWorldMatrix();
+		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
+		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
+		dcem->Draw(m_immediateContext.Get(), cameraPosition, m_DCEMPixelShader.Get());
+	}
+
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
+	m_immediateContext->RSSetViewports(1, &m_viewport);
 }
 
 void Renderer::CreateViewport(const Window& window)
@@ -266,6 +281,15 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error creating compute shader!" << std::endl;
 		return false;
 	}
+
+	// DCEM Pixel Shader
+	if (!CSOReader::ReadCSO("DCEM-PS.cso", byteCode))
+	{
+		std::cerr << "Error reading DCEM pixel shader bytecode!" << std::endl;
+		return false;
+	}
+
+	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, m_DCEMPixelShader.GetAddressOf());
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
@@ -426,14 +450,4 @@ bool Renderer::CreateConstantBuffers()
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
 
 	return true;
-}
-
-ID3D11Device* Renderer::GetDevice()
-{
-	return m_device.Get();
-}
-
-ID3D11DeviceContext* Renderer::GetImmediateContext()
-{
-	return m_immediateContext.Get();
 }

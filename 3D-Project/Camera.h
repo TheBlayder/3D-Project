@@ -37,10 +37,10 @@ private:
 
 public:
 	Camera() = default;
-	Camera(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
+	Camera(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 	~Camera();
 
-	void Init(ID3D11Device* device, ProjectionData& projData, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
+	void Init(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 
 	// Movement (needs redo)
 	void MoveForward(float amount);
@@ -50,11 +50,10 @@ public:
 	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
-	// Getters
-	const DirectX::XMFLOAT4X4 GetViewProjMatrix();
+	DirectX::XMFLOAT4X4 GetViewProjMatrix();
 	DeferredHandler* GetDeferredHandler();
-	const DX::XMFLOAT3& GetForward() const;
-	const DX::XMFLOAT3& GetPosition() const;
-	const DX::XMFLOAT3& GetRight() const;
-	const DX::XMFLOAT3& GetUp() const;
+	DX::XMFLOAT3 GetForward() const;
+	DX::XMFLOAT3 GetPosition() const;
+	DX::XMFLOAT3 GetRight() const;
+	DX::XMFLOAT3 GetUp() const;
 };

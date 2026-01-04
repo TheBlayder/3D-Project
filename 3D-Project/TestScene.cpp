@@ -11,19 +11,19 @@ void TestScene::UpdateScene(const float deltaTime)
 	m_sceneObjects[0]->GetTransform().SetRotation(strawberryRotation);
 }
 
-void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, Window& window)
+void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
 {
 	using namespace DirectX;
 
-	XMFLOAT3 camInitialPos = { 0.0f, 0.0f, -3.0f };
+	XMFLOAT3 camInitialPos = { 0.0f, 3.0f, -5.0f };
 	ProjectionData projData;
 	projData.fovInDeg = 90.0f;
-	projData.aspectRatio = static_cast<float>(window.GetWidth()) / static_cast<float>(window.GetHeight());
+	projData.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 1000.0f;
 
 	if (m_camera) delete m_camera;
-	m_camera = new Camera(device, projData, camInitialPos);
+	m_camera = new Camera(device, projData, width, height, camInitialPos);
 }
 
 void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context)
@@ -32,22 +32,33 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Strawberry
 	Transform strawberryTransform;
+	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.f, 0.0f, 0.0f));
+	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
-	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 5.f, 0.0f, 0.0f));
-	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
-	AddBaseObject(device, strawberryTransform, folderPath, objectName, textureFolder);
+	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
 
 	// Floor
 	Transform floorTransform;
-	folderPath = "./Objects/Cube";
-	objectName = "cube.obj";
 	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -1.5f, 0.0f, 0.0f));
 	floorTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	floorTransform.SetScale(DirectX::XMVectorSet(10.f, 0.5f, 10.f, 0.0f));
-	AddBaseObject(device, floorTransform, folderPath, objectName);
+	folderPath = "./Objects/Cube";
+	objectName = "cube.obj";
+	AddGameObject(device, floorTransform, folderPath, objectName);
+
+	// DCEM Cube
+	Transform DCEMTransform;
+	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 3.0f, 7.0f, 0.0f));
+	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
+	DCEMTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	folderPath = "./Objects/Cube";
+	objectName = "cube.obj";
+	UINT resolution = 512;
+	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName);
+
 }
 
 void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context)
@@ -61,10 +72,10 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	m_lightHandler = new LightHandler(spotLightResolution, dirLightResolution);
 
 	SpotLightData spotLightData = {};
-	spotLightData.position = XMFLOAT3(0.f, 15.f, 0.f);
-	spotLightData.intensity = 50.f;
-	spotLightData.color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
-	spotLightData.direction = XMFLOAT3(0.f, -1.f, 0.f);
+	spotLightData.position = XMFLOAT3(0.f, 1.f, -10.f);
+	spotLightData.direction = XMFLOAT3(0.f, 0.f, 1.f);
+	spotLightData.intensity = 90.f;
+	spotLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
 	spotLightData.innerConeInDeg = 10.f;
 	spotLightData.outerConeinDeg = 30.f;
 	spotLightData.range = 30.f;
@@ -73,7 +84,7 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	DirectionalLightData dirLightData = {};
 	dirLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
 	dirLightData.direction = XMFLOAT3(0.f, -1.f, 0.f);
-	dirLightData.intensity = 1.f;
+	dirLightData.intensity = 0.9f;
 	m_lightHandler->AddDirectionalLight(dirLightData);
 
 	m_lightHandler->Init(device, context, m_camera->GetPosition());

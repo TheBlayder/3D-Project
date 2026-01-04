@@ -1,12 +1,17 @@
 #pragma once
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include <array>
 #include <wrl/client.h>
+#include <string>
 
-
+#include "ConstantBuffer.h"	
 #include "BaseObject.h"
 #include "Camera.h"
+#include "Mesh.h"
 
+using namespace Microsoft;
+namespace DX = DirectX;
 
 enum TEXTURE_CUBE_FACES
 {
@@ -18,19 +23,26 @@ enum TEXTURE_CUBE_FACES
 	NEG_Z = 5
 };
 
-class DCEM : public BaseObject {
+class DCEM {
 private:
 	std::array<Camera, 6> m_cameras;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_cubeMapTex;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_cubeMapRTV;
+	WRL::ComPtr<ID3D11Texture2D> m_cubeMapTex;
+	WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
+	WRL::ComPtr<ID3D11RenderTargetView> m_cubeMapRTV;
+	D3D11_VIEWPORT m_viewport;
+	
+	Transform m_transform;
+	Mesh m_mesh;
+	UINT m_resolution;
 
-	UINT m_size;
-
-public:
-	DCEM(Transform& transform, UINT size);
-	void Update(float deltaTime) override;
+	ConstantBuffer m_cameraBuffer;
 
 	void Init(ID3D11Device* device);
-	
+
+public:
+	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName);
+
+	void Draw(ID3D11DeviceContext* context, const DX::XMFLOAT3& cameraPosition, ID3D11PixelShader* dcemPS);
+
+	const DirectX::XMFLOAT4X4 GetWorldMatrix();
 };
