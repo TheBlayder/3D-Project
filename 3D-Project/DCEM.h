@@ -26,9 +26,13 @@ enum TEXTURE_CUBE_FACES
 class DCEM {
 private:
 	std::array<Camera, 6> m_cameras;
+	std::array<WRL::ComPtr<ID3D11RenderTargetView>, 6> m_cubeMapRTVs;
 	WRL::ComPtr<ID3D11Texture2D> m_cubeMapTex;
 	WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
-	WRL::ComPtr<ID3D11RenderTargetView> m_cubeMapRTV;
+
+	WRL::ComPtr<ID3D11Texture2D> m_depthTex;
+	WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
+
 	D3D11_VIEWPORT m_viewport;
 	
 	Transform m_transform;
@@ -39,10 +43,14 @@ private:
 
 	void Init(ID3D11Device* device);
 
+	void Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, const size_t face);
+	void Draw(ID3D11DeviceContext* context, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face);
+
 public:
 	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName);
 
-	void Draw(ID3D11DeviceContext* context, const DX::XMFLOAT3& cameraPosition, ID3D11PixelShader* dcemPS);
+	void RenderAndDraw(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, 
+		ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP);
 
 	const DirectX::XMFLOAT4X4 GetWorldMatrix();
 };

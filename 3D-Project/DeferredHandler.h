@@ -32,6 +32,9 @@ public:
 	inline bool Init(ID3D11Device* device, const UINT WINDOW_WIDTH, const UINT WINDOW_HEIGHT);
 	inline void BindGeometryPass(ID3D11DeviceContext* context);
 	inline void BindLightPass(ID3D11DeviceContext* context);
+
+	inline void UnbindGeometryPass(ID3D11DeviceContext* context);
+		
 	inline void ClearBuffers(ID3D11DeviceContext* context, std::array<float, 4> clearColor);
 
 	ID3D11DepthStencilView* GetDSV() { return m_DSV.Get(); }
@@ -100,11 +103,7 @@ inline void DeferredHandler::BindGeometryPass(ID3D11DeviceContext* context)
 }
 
 inline void DeferredHandler::BindLightPass(ID3D11DeviceContext* context)
-{
-	// Unbind render targets from geometry pass write
-	ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
-	context->OMSetRenderTargets(nrOfGBuffers, nullRTVs, nullptr);
-	
+{	
 	// Bind G-Buffers as shader resource views for light pass read in compute shader
 	ID3D11ShaderResourceView* SRVs[] = {
 		m_positionGBuffer.GetSRV(),
@@ -114,6 +113,13 @@ inline void DeferredHandler::BindLightPass(ID3D11DeviceContext* context)
 		m_specularGBuffer.GetSRV()
 	};
 	context->CSSetShaderResources(0, nrOfGBuffers, SRVs);
+}
+
+inline void DeferredHandler::UnbindGeometryPass(ID3D11DeviceContext* context)
+{
+	// Unbind render targets from geometry pass write
+	ID3D11RenderTargetView* nullRTVs[] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+	context->OMSetRenderTargets(nrOfGBuffers, nullRTVs, nullptr);
 }
 
 inline void DeferredHandler::ClearBuffers(ID3D11DeviceContext* context, std::array<float, 4> clearColor = {0.f, 0.f, 0.f, 0.f})

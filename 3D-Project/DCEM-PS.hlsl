@@ -1,9 +1,13 @@
+// Standard Sampler (from Renderer)
 SamplerState samplerState : register(s0);
 
-TextureCube cubeMap : register(t0);
-Texture2D ambientTexture : register(t1);
-Texture2D diffuseTexture : register(t2);
-Texture2D specularTexture : register(t3);
+// Textures coming from the submesh draw call (from SubMesh)
+Texture2D ambientTexture : register(t0);
+Texture2D diffuseTexture : register(t1);
+Texture2D specularTexture : register(t2);
+
+// Cube map (from DCEM)
+TextureCube cubeMap : register(t3);
 
 // Material properties (from SubMesh)
 cbuffer materialBuffer : register(b0)
@@ -53,10 +57,10 @@ PSOutput main(PSInput input) : SV_TARGET
     output.position = float4(input.WORLD_POSITION.xyz, 1.0f);
     output.normal = float4(normalize(input.NORMAL.xyz), 0.0f);
     
-    float3 viewDir = normalize(input.WORLD_POSITION.xyz - cameraPosition.xyz);
-    float3 reflectDir = reflect(viewDir, normalize(input.NORMAL.xyz));
+    float3 incomingView = normalize(input.WORLD_POSITION.xyz - cameraPosition.xyz);
+    float3 reflectedView = reflect(incomingView, normalize(input.NORMAL.xyz));
     
-    output.ambient = cubeMap.Sample(samplerState, reflectDir) * ambientStrength;
+    output.ambient = cubeMap.Sample(samplerState, reflectedView) * ambientStrength;
     output.diffuse = diffuseTexture.Sample(samplerState, input.UV);
     output.specular = hasSpecularTexture ? specularTexture.Sample(samplerState, input.UV) : float4(0, 0, 0, 1);
 

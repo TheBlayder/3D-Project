@@ -42,7 +42,6 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 
 	ShadowPass(scene);	
 	GeometryPass(scene);
-	RenderDCEMObjects(scene);
 	LightPass(scene);
 	
 	m_swapChain->Present(0, 0);
@@ -130,6 +129,25 @@ void Renderer::GeometryPass(BaseScene* scene)
 
 		obj->Draw(m_immediateContext.Get());
 	}
+	
+	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
+
+	RenderDCEMObjects(scene);
+}
+
+void Renderer::RenderDCEMObjects(BaseScene* scene)
+{
+	const std::vector<DCEM*>& dcemObjects = scene->GetDCEMObjects();
+	if (dcemObjects.empty()) return;
+
+	// First render the DCEM object's cubemap
+	for (auto& dcem : dcemObjects)
+	{
+		dcem->RenderAndDraw(m_immediateContext.Get(), scene->GetSceneObjects(), &m_worldBuffer, 
+			&m_viewProjectionBuffer, scene->GetCamera(), m_DCEMPixelShader.Get(), m_pixelShader.Get(), &m_viewport);
+	}
+
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0); // Reset pixel shader
 }
 
 void Renderer::LightPass(BaseScene* scene)
@@ -159,21 +177,6 @@ void Renderer::LightPass(BaseScene* scene)
 	scene->GetLightHandler()->UnbindDepthTextures(m_immediateContext.Get());
 }
 
-void Renderer::RenderDCEMObjects(BaseScene* scene)
-{
-	const std::vector<DCEM*>& dcemObjects = scene->GetDCEMObjects();
-	DirectX::XMFLOAT3 cameraPosition = scene->GetCamera()->GetPosition();
-	for (auto& dcem : dcemObjects)
-	{
-		DirectX::XMFLOAT4X4 worldMatrix = dcem->GetWorldMatrix();
-		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
-		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
-		dcem->Draw(m_immediateContext.Get(), cameraPosition, m_DCEMPixelShader.Get());
-	}
-
-	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-	m_immediateContext->RSSetViewports(1, &m_viewport);
-}
 
 void Renderer::CreateViewport(const Window& window)
 {
