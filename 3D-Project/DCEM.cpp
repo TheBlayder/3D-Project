@@ -111,7 +111,7 @@ void DCEM::Init(ID3D11Device* device)
 	}
 }
 
-void DCEM::RenderAndDraw(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, 
+void DCEM::RenderAndDraw(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer,
 	ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP)
 {
 	for (size_t i = 0; i < 6; ++i)
@@ -126,7 +126,7 @@ void DCEM::RenderAndDraw(ID3D11DeviceContext* context, const std::vector<BaseObj
 	Draw(context, worldBuffer, viewProjBuffer, camera);
 }
 
-void DCEM::Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face)
+void DCEM::Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face)
 {
 	context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
 

@@ -49,7 +49,7 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 
 void Renderer::ShadowPass(BaseScene* scene)
 {
-	const std::vector<BaseObject*>& sceneObjects = scene->GetSceneObjects();
+	auto& sceneObjects = scene->GetSceneObjects();
 	m_immediateContext->PSSetShader(nullptr, nullptr, 0); // No pixel shader for shadow pass
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
@@ -119,7 +119,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 	scene->GetCamera()->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
-	std::vector<BaseObject*>& sceneObjects = scene->GetSceneObjects();
+	auto& sceneObjects = scene->GetSceneObjects();
 	for (auto& obj : sceneObjects)
 	{
 		// Update world matrix constant buffer for each object
@@ -137,17 +137,16 @@ void Renderer::GeometryPass(BaseScene* scene)
 
 void Renderer::RenderDCEMObjects(BaseScene* scene)
 {
-	const std::vector<DCEM*>& dcemObjects = scene->GetDCEMObjects();
+	auto& dcemObjects = scene->GetDCEMObjects();
 	if (dcemObjects.empty()) return;
 
-	// First render the DCEM object's cubemap
 	for (auto& dcem : dcemObjects)
 	{
 		dcem->RenderAndDraw(m_immediateContext.Get(), scene->GetSceneObjects(), &m_worldBuffer, 
 			&m_viewProjectionBuffer, scene->GetCamera(), m_DCEMPixelShader.Get(), m_pixelShader.Get(), &m_viewport);
 	}
 
-	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0); // Reset pixel shader
+	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 }
 
 void Renderer::LightPass(BaseScene* scene)
@@ -155,7 +154,7 @@ void Renderer::LightPass(BaseScene* scene)
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
 	scene->GetCamera()->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
 
-	// Bind UAV (backbuffer) for compute shader output
+	// Bind UAV (backbuffer)
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
 
 	// Bind light sources

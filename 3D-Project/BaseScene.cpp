@@ -3,9 +3,11 @@
 #include "DCEM.h"
 
 #include <algorithm>
+#include <memory>
 
 void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
 {	
+	m_quadTree = QuadTree<BaseObject>();
 	LoadScene(device, context, width, height);
 }
 
@@ -18,69 +20,52 @@ void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, co
 
 void BaseScene::UpdateSceneLights(ID3D11DeviceContext* context)
 {
-	m_lightHandler->UpdateLightBuffer(context, m_camera->GetPosition());
+	if (m_lightHandler && m_camera)
+		m_lightHandler->UpdateLightBuffer(context, m_camera->GetPosition());
 }
 
 Camera* BaseScene::GetCamera() const
 {
-	return m_camera;
+	return m_camera.get();
 }
 
 LightHandler* BaseScene::GetLightHandler() const
 {
-	return m_lightHandler;
+	return m_lightHandler.get();
 }
 
 void BaseScene::BindLights(ID3D11DeviceContext* context)
 {
-	m_lightHandler->BindLightBuffer(context);
+	if (m_lightHandler)
+		m_lightHandler->BindLightBuffer(context);
 }
 
-void BaseScene::AddBaseObject(BaseObject* baseObject)
+void BaseScene::AddBaseObject(std::unique_ptr<BaseObject> baseObject)
 {
-	m_sceneObjects.push_back(baseObject);
+	if (baseObject)
+		m_sceneObjects.emplace_back(std::move(baseObject));
 }
 
 void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
 {
-	BaseObject* newBaseObject = new GameObject(device, transform, folderPath, objectName, textureFolder, flipUVy);
-	m_sceneObjects.push_back(newBaseObject);
+	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, flipUVy);
+	m_sceneObjects.emplace_back(std::move(newBaseObject));
 }
 
 void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName)
 {
-	DCEM* newDCEM = new DCEM(device, transform, resolution, folderPath, objectName);
-	m_dcemObjects.push_back(newDCEM);
+	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName);
+	m_dcemObjects.emplace_back(std::move(newDCEM));
 }
 
-std::vector<BaseObject*>& BaseScene::GetSceneObjects()
+std::vector<std::unique_ptr<BaseObject>>& BaseScene::GetSceneObjects()
 {
 	return m_sceneObjects;
 }
 
-std::vector<DCEM*>& BaseScene::GetDCEMObjects()
+std::vector<std::unique_ptr<DCEM>>& BaseScene::GetDCEMObjects()
 {
 	return m_dcemObjects;
 }
 
-BaseScene::~BaseScene()
-{
-	// Clean up owned pointers
-	if (m_camera)
-		delete m_camera;
-
-	if (m_lightHandler)
-		delete m_lightHandler;
-
-	for (auto obj : m_sceneObjects)
-	{
-		delete obj;
-	}
-	m_sceneObjects.clear();
-
-	for (auto dcem : m_dcemObjects)
-	{
-		delete dcem;
-	}
-	m_dcemObjects.clear();
-}
+BaseScene::~BaseScene() = default;

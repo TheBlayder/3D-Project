@@ -22,8 +22,9 @@ void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* cont
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 1000.0f;
 
-	if (m_camera) delete m_camera;
-	m_camera = new Camera(device, projData, width, height, camInitialPos);
+	if (m_camera)
+		m_camera.reset();
+	m_camera = std::make_unique<Camera>(device, projData, width, height, camInitialPos);
 }
 
 void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context)
@@ -65,11 +66,12 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 {
 	using namespace DirectX;
 	
-	if (m_lightHandler) delete m_lightHandler;
+	if (m_lightHandler)
+		m_lightHandler.reset();
 
 	const UINT spotLightResolution = 1024;
 	const UINT dirLightResolution = 2048;
-	m_lightHandler = new LightHandler(spotLightResolution, dirLightResolution);
+	m_lightHandler = std::make_unique<LightHandler>(spotLightResolution, dirLightResolution);
 
 	SpotLightData spotLightData = {};
 	spotLightData.position = XMFLOAT3(0.f, 1.f, -10.f);

@@ -143,6 +143,7 @@
     <ClCompile Include="LightHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="BaseScene.cpp" />
     <ClCompile Include="SpotLight.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="LightHandler.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="OBJ_Loader.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="ReadCSO.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="BaseScene.h" />

@@ -11,6 +11,9 @@ void BaseObject::Init(ID3D11Device* device, const Transform& transform, std::str
 {
 	m_transform = transform;
 	m_mesh.Init(device, folderPath, objectName, textureFolder, flipUVy);
+	m_boundingBox = m_mesh.GetBoundingBox();
+	DirectX::XMFLOAT4X4 worldMatrix = GetWorldMatrix();
+	m_boundingBox.Transform(m_boundingBox, DirectX::XMLoadFloat4x4(&worldMatrix));
 }
 
 void BaseObject::Draw(ID3D11DeviceContext* context) const
@@ -22,6 +25,11 @@ void BaseObject::Draw(ID3D11DeviceContext* context) const
 		// Draw sub-meshes
 		m_mesh.PerformSubMeshDrawCall(context, i);
 	}
+}
+
+void BaseObject::SetBoundingBox(const DirectX::BoundingBox& box)
+{
+	m_boundingBox = box;
 }
 
 Transform& BaseObject::GetTransform()
@@ -40,4 +48,9 @@ const DirectX::XMFLOAT4X4 BaseObject::GetWorldMatrix()
 	XMFLOAT4X4 worldMatrix;
 	MatrixHelper::CreateWorldMatrix(worldMatrix, m_transform);
 	return worldMatrix;
+}
+
+DirectX::BoundingBox& BaseObject::GetBoundingBox()
+{
+	return m_boundingBox;
 }

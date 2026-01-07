@@ -3,6 +3,7 @@
 #define DIRECTXTK_WIC_LOADER_FLAGS
 
 #include <d3d11.h>
+#include <DirectXCollision.h>
 #include <vector>
 #include <string>
 
@@ -16,6 +17,7 @@ private:
 	std::vector<SubMesh> m_subMeshes;
 	VertexBuffer m_vertexBuffer;
 	IndexBuffer m_indexBuffer;
+	DirectX::BoundingBox m_boundingBox;
 
 	void CreateDefaultTexture(ID3D11Device* device, ID3D11ShaderResourceView** textureSRV);
 
@@ -36,6 +38,7 @@ public:
 
 	void UnbindSubMeshResources(ID3D11DeviceContext* context) const;
 
+	DirectX::BoundingBox GetBoundingBox();
 	UINT GetNrOfVerticiesInMesh() const;
 	size_t GetNrOfSubMeshes() const;
 	ID3D11ShaderResourceView* GetAmbientSRV(size_t subMeshIndex) const;

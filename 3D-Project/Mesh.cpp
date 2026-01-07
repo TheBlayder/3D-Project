@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include <vector>
 #include <wrl/client.h>
-
 #include <WICTextureLoader.h>
+
 #include "OBJ_Loader.h"
 #include "SimpleVertex.h"
 
@@ -125,6 +125,14 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 	// Initialize index buffer
 	m_indexBuffer.Init(device, static_cast<UINT>(tempIndices.size()), tempIndices.data());
 
+	std::vector<DirectX::XMFLOAT3> positions;
+	positions.reserve(tempVertices.size());
+	for (const auto& v : tempVertices)
+	{
+		positions.emplace_back(v.position[0], v.position[1], v.position[2]);
+	}
+
+	m_boundingBox.CreateFromPoints(m_boundingBox, positions.size(), positions.data(), sizeof(DX::XMFLOAT3));
 }
 
 void Mesh::BindMeshBuffers(ID3D11DeviceContext* context) const
@@ -153,6 +161,11 @@ void Mesh::UnbindSubMeshResources(ID3D11DeviceContext* context) const
 	{
 		subMesh.UnbindResources(context);
 	}
+}
+
+DirectX::BoundingBox Mesh::GetBoundingBox()
+{
+	return m_boundingBox;
 }
 
 UINT Mesh::GetNrOfVerticiesInMesh() const

@@ -114,6 +114,9 @@
     <ClCompile Include="SubMesh.cpp">
       <Filter>Source Files\Scene\Objects\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="QuadTree.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
@@ -193,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="SubMesh.h">
       <Filter>Header Files\Scene\Objects\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="QuadTree.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
