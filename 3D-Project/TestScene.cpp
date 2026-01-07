@@ -53,11 +53,11 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	Transform DCEMTransform;
 	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 3.0f, 7.0f, 0.0f));
 	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	DCEMTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
+	DCEMTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
-	UINT resolution = 512;
-	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName);
+	UINT resolution = 256;
+	//AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName);
 
 }
 

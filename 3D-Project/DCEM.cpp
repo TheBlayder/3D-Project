@@ -87,19 +87,12 @@ void DCEM::Init(ID3D11Device* device)
 	// DSV
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 	dsvDesc.Format = depthDesc.Format;
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-	dsvDesc.Texture2DArray.MipSlice = 0;
-	dsvDesc.Texture2DArray.ArraySize = 1;
+	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	dsvDesc.Texture2D.MipSlice = 0;
 
-	for (UINT i = 0; i < 6; ++i)
-	{
-		dsvDesc.Texture2DArray.FirstArraySlice = i;
-		hr = device->CreateDepthStencilView(m_depthTex.Get(), &dsvDesc, m_DSVs[i].GetAddressOf());
-		if (FAILED(hr))
-			throw std::runtime_error("Could not create DCEM DSV");
-	}
-
-
+	hr = device->CreateDepthStencilView(m_depthTex.Get(), &dsvDesc, m_DSV.GetAddressOf());
+	if (FAILED(hr))
+		throw std::runtime_error("Could not create DCEM DSV");
 
 	// Camera setup
 	ProjectionData projData = {};
@@ -107,8 +100,8 @@ void DCEM::Init(ID3D11Device* device)
 	projData.aspectRatio = 1.f;
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 100.f;
-	float upRotations[6] = { DX::XM_PIDIV2, -DX::XM_PIDIV2, 0.0f, 0.0f, 0.0f, DX::XM_PI }; // Rotations around local up
-	float rightRotations[6] = { 0.0f, 0.0f, -DX::XM_PIDIV2, DX::XM_PIDIV2, 0.0f, 0.0f }; // Rotations around local right vector
+	float upRotations[6] = { DX::XM_PIDIV2, -DX::XM_PIDIV2,		0.0f,			0.0f,		0.0f, DX::XM_PI }; // Rotations around local up
+	float rightRotations[6] = { 0.0f,		0.0f,			-DX::XM_PIDIV2, DX::XM_PIDIV2, 0.0f,  0.0f }; // Rotations around local right vector
 
 	for (size_t i = 0; i < 6; ++i)
 	{
@@ -118,40 +111,37 @@ void DCEM::Init(ID3D11Device* device)
 	}
 }
 
-/// <summary>
-/// Renders and draws one face of the DCEM at a time
-/// </summary>
 void DCEM::RenderAndDraw(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, 
 	ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP)
 {
 	for (size_t i = 0; i < 6; ++i)
 	{
 		context->RSSetViewports(1, &m_viewport);
-		Render(context, sceneObjects, worldBuffer, viewProjBuffer, i);
+		context->PSSetShader(dcemPS, nullptr, 0);
+		Render(context, sceneObjects, worldBuffer, viewProjBuffer, camera, i);
 
 	}
 	context->RSSetViewports(1, returnVP);
-	context->PSSetShader(dcemPS, nullptr, 0);
-	Draw(context, worldBuffer, viewProjBuffer, camera);
-
-	// Reset bound SRV and constant buffer to avoid leaking state
-	ID3D11ShaderResourceView* nullSRVs[4] = { nullptr, nullptr, nullptr, nullptr };
-	context->PSSetShaderResources(0, 4, nullSRVs);
-
-	ID3D11Buffer* nullCB[1] = { nullptr };
-	context->PSSetConstantBuffers(1, 1, nullCB);
-
 	context->PSSetShader(returnPS, nullptr, 0);
+	Draw(context, worldBuffer, viewProjBuffer, camera);
 }
 
-void DCEM::Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, const size_t face)
+void DCEM::Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face)
 {
-	context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSVs[face].Get());
+	context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
 
 	// Clear the face
 	float clearColor[4] = { 0, 0, 0, 0 };
 	context->ClearRenderTargetView(m_cubeMapRTVs[face].Get(), clearColor);
-	context->ClearDepthStencilView(m_DSVs[face].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
+
+	// Update camera position constant buffer for the pixel shader
+	DX::XMFLOAT3 camPos = camera->GetPosition();
+	DX::XMFLOAT4 camPos4 = { camPos.x, camPos.y, camPos.z, 1.0f };
+	m_cameraBuffer.Update(context, &camPos4);
+	context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
 
 	// Update and set view-projection for this face in the vertex shader
 	DX::XMFLOAT4X4 viewProjMatrix = m_cameras[face].GetViewProjMatrix();
@@ -171,16 +161,21 @@ void DCEM::Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& 
 	// Unbind cubemap RTVs and restore previous OM targets and viewport
 	ID3D11RenderTargetView* nullRTV = nullptr;
 	context->OMSetRenderTargets(1, &nullRTV, nullptr);
+
+	ID3D11ShaderResourceView* nullSRV[] = { nullptr };
+	context->PSSetShaderResources(0, 1, nullSRV);
+
+	ID3D11Buffer* nullBuffer[] = { nullptr };
+	context->PSSetConstantBuffers(0, 1, nullBuffer);
 }
 
 void DCEM::Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera)
 {
-	m_mesh.UnbindSubMeshResources(context);
+	camera->GetDeferredHandler()->BindGeometryPass(context);
 	
-	context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
-
 	// Bind DCEMS world matrix
-	DX::XMFLOAT4X4 worldMatrix = GetWorldMatrix();
+	DX::XMFLOAT4X4 worldMatrix;
+	GetWorldMatrix(worldMatrix);
 	viewProjBuffer->Update(context, &worldMatrix);
 	context->VSSetConstantBuffers(0, 1, worldBuffer->GetBufferPtr());
 
@@ -189,23 +184,14 @@ void DCEM::Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, Const
 	viewProjBuffer->Update(context, &viewProjMatrix);
 	context->VSSetConstantBuffers(1, 1, viewProjBuffer->GetBufferPtr());
 
-	// Update camera position constant buffer for the pixel shader
-	DX::XMFLOAT3 camPos = camera->GetPosition();
-	DX::XMFLOAT4 camPos4 = { camPos.x, camPos.y, camPos.z, 1.0f };
-	m_cameraBuffer.Update(context, &camPos4);
-	context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
-
 	m_mesh.BindMeshBuffers(context);
 	for (size_t i = 0; i < m_mesh.GetNrOfSubMeshes(); ++i)
 	{
-		m_mesh.PerformSubMeshDCEMDrawCall(context, i);
+		m_mesh.PerformSubMeshDrawCall(context, i);
 	}
 }
 
-const DirectX::XMFLOAT4X4 DCEM::GetWorldMatrix()
+const void DCEM::GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix)
 {
-	using namespace DirectX;
-	XMFLOAT4X4 worldMatrix;
 	MatrixHelper::CreateWorldMatrix(worldMatrix, m_transform);
-	return worldMatrix;
 }

@@ -31,7 +31,7 @@ private:
 	WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
 
 	WRL::ComPtr<ID3D11Texture2D> m_depthTex;
-	std::array<WRL::ComPtr<ID3D11DepthStencilView>, 6> m_DSVs;
+	WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
 
 	D3D11_VIEWPORT m_viewport;
 	
@@ -43,7 +43,7 @@ private:
 
 	void Init(ID3D11Device* device);
 
-	void Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, const size_t face);
+	void Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face);
 	void Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera);
 
 public:
@@ -52,5 +52,5 @@ public:
 	void RenderAndDraw(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, 
 		ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP);
 
-	const DirectX::XMFLOAT4X4 GetWorldMatrix();
+	const void GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix);
 };
