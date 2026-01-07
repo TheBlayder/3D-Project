@@ -51,6 +51,22 @@ void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
 }
 
+void SubMesh::PerformDCEMDrawCall(ID3D11DeviceContext* context) const
+{
+	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
+}
+
+void SubMesh::UnbindResources(ID3D11DeviceContext* context) const
+{
+	// Unbind SRVs
+	ID3D11ShaderResourceView* nullSRVs[3] = { nullptr, nullptr, nullptr };
+	context->PSSetShaderResources(0, 3, nullSRVs);
+
+	// Unbind constant buffer
+	ID3D11Buffer* nullCB[1] = { nullptr };
+	context->PSSetConstantBuffers(0, 1, nullCB);
+}
+
 ID3D11ShaderResourceView* SubMesh::GetAmbientSRV() const
 {
 	return m_ambientTexture.Get();

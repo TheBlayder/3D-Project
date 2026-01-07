@@ -53,6 +53,9 @@ public:
 		DX::XMFLOAT3 ambientComponent, DX::XMFLOAT3 diffuseComponent, DX::XMFLOAT3 specularComponent, float specularExponent);
 
 	void PerformDrawCall(ID3D11DeviceContext* context) const;
+	void PerformDCEMDrawCall(ID3D11DeviceContext* context) const;
+	
+	void UnbindResources(ID3D11DeviceContext* context) const;
 
 	ID3D11ShaderResourceView* GetAmbientSRV() const;
 	ID3D11ShaderResourceView* GetDiffuseSRV() const;

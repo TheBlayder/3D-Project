@@ -31,7 +31,7 @@ private:
 	WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
 
 	WRL::ComPtr<ID3D11Texture2D> m_depthTex;
-	WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
+	std::array<WRL::ComPtr<ID3D11DepthStencilView>, 6> m_DSVs;
 
 	D3D11_VIEWPORT m_viewport;
 	
@@ -44,7 +44,7 @@ private:
 	void Init(ID3D11Device* device);
 
 	void Render(ID3D11DeviceContext* context, const std::vector<BaseObject*>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, const size_t face);
-	void Draw(ID3D11DeviceContext* context, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face);
+	void Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera);
 
 public:
 	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName);
