@@ -5,10 +5,11 @@
 #include <algorithm>
 #include <memory>
 
-void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
+void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window)
 {	
+	this->window = const_cast<Window*>(window);
 	m_quadTree = QuadTree<BaseObject>();
-	LoadScene(device, context, width, height);
+	LoadScene(device, context, window->GetWidth(), window->GetHeight());
 }
 
 void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
@@ -21,7 +22,11 @@ void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, co
 void BaseScene::UpdateSceneLights(ID3D11DeviceContext* context)
 {
 	if (m_lightHandler && m_camera)
-		m_lightHandler->UpdateLightBuffer(context, m_camera->GetPosition());
+	{
+		DirectX::XMFLOAT3 camPosF3;
+		DirectX::XMStoreFloat3(&camPosF3, m_camera->GetPosition());
+		m_lightHandler->UpdateLightBuffer(context, camPosF3);
+	}
 }
 
 Camera* BaseScene::GetCamera() const

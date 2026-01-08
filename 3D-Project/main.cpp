@@ -33,7 +33,7 @@ int APIENTRY wWinMain(
 	}
 
 	BaseScene* scene = new TestScene();
-	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), window.GetWidth(), window.GetHeight());
+	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), &window);
 
 	// === MAIN LOOP ===
 	MSG msg = { };

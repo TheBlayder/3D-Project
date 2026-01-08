@@ -4,6 +4,8 @@ void TestScene::UpdateScene(const float deltaTime)
 {
 	using namespace DirectX;
 
+	m_camera->Update(this->GetWindow()->GetInputHandler(), deltaTime);
+
 	// Rotating strawberry
 	float rotationSpeed = 30.f;
 	XMVECTOR strawberryRotation = m_sceneObjects[0]->GetTransform().GetRotation();
@@ -89,6 +91,8 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	dirLightData.intensity = 0.9f;
 	m_lightHandler->AddDirectionalLight(dirLightData);
 
-	m_lightHandler->Init(device, context, m_camera->GetPosition());
+	DirectX::XMFLOAT3 camPosF3;
+	DirectX::XMStoreFloat3(&camPosF3, m_camera->GetPosition());
+	m_lightHandler->Init(device, context, camPosF3);
 }
 

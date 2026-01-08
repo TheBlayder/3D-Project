@@ -27,6 +27,8 @@ protected:
 
 	QuadTree<BaseObject> m_quadTree;
 
+	Window* window = nullptr;
+
 	void UpdateSceneLights(ID3D11DeviceContext* context);
 
 	void LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height);
@@ -38,7 +40,7 @@ protected:
 public:
 	BaseScene() = default;
 	virtual ~BaseScene();
-	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height);
+	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window);
 	virtual void UpdateScene(const float deltaTime) = 0;
 
 
@@ -50,6 +52,7 @@ public:
 	Camera* GetCamera() const;
 	LightHandler* GetLightHandler() const;
 	void BindLights(ID3D11DeviceContext* context);
+	Window* GetWindow() const { return window; }
 
 	std::vector<std::unique_ptr<BaseObject>>& GetSceneObjects();
 	std::vector<std::unique_ptr<DCEM>>& GetDCEMObjects();

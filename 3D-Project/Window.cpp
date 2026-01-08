@@ -1,5 +1,6 @@
 #include "Window.h"
 
+#include <windowsx.h>
 #include <exception>
 
 Window::Window(HINSTANCE instance, int nCmdShow, UINT width, UINT height) : m_hInstance(instance), m_width(width), m_height(height), m_hWindow(nullptr)
@@ -72,41 +73,66 @@ LRESULT Window::StaticWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM 
 // === HANDLER FOR WINDOW MESSAGES ===
 LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	const unsigned char key = static_cast<unsigned char>(wParam);
+
 	switch (message)
 	{
 		// Keyboard input handling
 		case WM_KEYDOWN:
-			if (wParam == VK_ESCAPE)
+		{
+			const bool wasDown = lParam & (1 << 30);
+
+			if(!wasDown) // Key was not previously down, so it's a new press
+			{
+				m_inputHandler.setKeyState(key, InputHandler::DOWN | InputHandler::PRESSED);
+			}
+			if (key == VK_ESCAPE)
 			{
 				PostQuitMessage(0);
 			}
 			return 0;
-
+		}
 		case WM_KEYUP:
-			// Handle key release
+		{
+			m_inputHandler.setKeyState(key, InputHandler::RELEASED);
 			return 0;
+		}
 
 		// Mouse input handling
 		case WM_MOUSEMOVE:
-			// Handle mouse movement
+		{
+			const int xPos = GET_X_LPARAM(lParam);
+			const int yPos = GET_Y_LPARAM(lParam);
+			m_inputHandler.setMousePos(xPos, yPos);
 			return 0;
+		}
 		case WM_LBUTTONDOWN:
-			// Handle left mouse button down
+		{
+			if(!m_inputHandler.LMDowm())
+				m_inputHandler.setLMouseKeyState(InputHandler::DOWN | InputHandler::PRESSED);
 			return 0;
+		}
 		case WM_LBUTTONUP:
-			// Handle left mouse button up
+		{
+			m_inputHandler.setLMouseKeyState(InputHandler::RELEASED);
 			return 0;
+		}
 		case WM_RBUTTONDOWN:
-			// Handle right mouse button down
+		{
+			if (!m_inputHandler.RMDowm())
+				m_inputHandler.setRMouseKeyState(InputHandler::DOWN | InputHandler::PRESSED);
 			return 0;
+		}
 		case WM_RBUTTONUP:
-			// Handle right mouse button up
+		{
+			m_inputHandler.setRMouseKeyState(InputHandler::RELEASED);
 			return 0;
+		}
 
-		// Destruction of the window
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
+
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 	}

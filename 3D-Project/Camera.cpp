@@ -3,9 +3,17 @@
 
 namespace MH = MatrixHelper;
 
-void Camera::MoveInDirection(float amount, const DirectX::XMFLOAT3& direction)
+void Camera::MoveInDirection(float amount, const DirectX::XMVECTOR& direction)
 {
-	m_transform.SetPosition(DirectX::XMVectorAdd(m_transform.GetPosition(), DirectX::XMVectorScale(DirectX::XMLoadFloat3(&direction), amount)));
+	m_transform.SetPosition(DirectX::XMVectorAdd(m_transform.GetPosition(), DirectX::XMVectorScale(direction, amount)));
+}
+
+void Camera::RotateAroundAxis(float amount, const DirectX::XMVECTOR& axis)
+{
+	using namespace DirectX;
+	XMVECTOR cameraRotation = m_transform.GetRotation();
+	cameraRotation = XMVectorAdd(cameraRotation, DirectX::XMVectorScale(axis, amount));
+	m_transform.SetRotation(cameraRotation);
 }
 
 void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
@@ -52,18 +60,25 @@ void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT wid
 	m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
 }
 
-// === MOVEMENT ===
-void Camera::MoveForward(float amount)
-{
-	MoveInDirection(amount, m_transform.GetRotationF3());
-}
 
-void Camera::RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis)
+void Camera::Update(InputHandler& input, float deltaTime)
 {
-	using namespace DirectX;
-	XMVECTOR currentRotation = m_transform.GetRotation();
-	XMVECTOR rotationAmount = XMVectorScale(XMLoadFloat3(&axis), amount);
-	m_transform.SetRotation(XMVectorAdd(currentRotation, rotationAmount));
+	const float moveAmount = m_cameraSpeed * deltaTime;
+
+	if (input.isDown('W'))
+		MoveInDirection(moveAmount, GetForward());
+	if (input.isDown('S'))
+		MoveInDirection(-moveAmount, GetForward());
+	if (input.isDown('A'))
+		MoveInDirection(-moveAmount, GetRight());
+	if (input.isDown('D'))
+		MoveInDirection(moveAmount, GetRight());
+
+	if (input.isDown(VK_SPACE))
+		MoveInDirection(moveAmount, GetUp());
+	if (input.isDown(VK_CONTROL))
+		MoveInDirection(-moveAmount, GetUp());
+
 }
 
 // === CONSTANT BUFFER ===
@@ -89,26 +104,47 @@ DeferredHandler* Camera::GetDeferredHandler()
 	return m_DH;
 }
 
-DX::XMFLOAT3 Camera::GetForward() const
+DirectX::XMVECTOR Camera::GetForward() const
 {
-	return m_transform.GetRotationF3();
+	using namespace DirectX;
+
+	XMVECTOR rot = m_transform.GetRotation();
+	float pitch = XMConvertToRadians(XMVectorGetX(rot));
+	float yaw   = XMConvertToRadians(XMVectorGetY(rot));
+	float roll  = XMConvertToRadians(XMVectorGetZ(rot));
+
+	XMMATRIX rotMat = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+	XMVECTOR forward = XMVector3TransformNormal(XMVectorSet(0.f, 0.f, -1.f, 0.f), rotMat);
+	forward = XMVector3Normalize(forward);
+	return forward;
 }
 
-DX::XMFLOAT3 Camera::GetPosition() const
+DirectX::XMVECTOR Camera::GetPosition() const
 {
-    return m_transform.GetPositionF3();
+	return m_transform.GetPosition();
 }
 
-DX::XMFLOAT3 Camera::GetRight() const
+DirectX::XMVECTOR Camera::GetRight() const
 {
-	DX::XMFLOAT3 right;
-	DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(m_transform.GetRotation(), m_up));
+	using namespace DirectX;
+
+	const XMVECTOR worldUp = m_up;
+	XMVECTOR forward = GetForward();
+	XMVECTOR right = XMVector3Cross(worldUp, forward);
+	right = XMVector3Normalize(right);
+
 	return right;
 }
 
-DX::XMFLOAT3 Camera::GetUp() const
+DirectX::XMVECTOR Camera::GetUp() const
 {
-	DX::XMFLOAT3 up;
-	DirectX::XMStoreFloat3(&up, m_up);
+	using namespace DirectX;
+
+	XMVECTOR forward = GetForward();
+	XMVECTOR right = GetRight();
+
+	XMVECTOR up = XMVector3Cross(right, forward);
+	up = XMVector3Normalize(up);
+
 	return up;
 }

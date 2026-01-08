@@ -31,9 +31,11 @@ private:
 	ProjectionData m_projData;
 	ConstantBuffer* m_cameraBuffer = nullptr;
 	
-	void MoveInDirection(float amount, const DirectX::XMFLOAT3& direction);
+	void MoveInDirection(float amount, const DirectX::XMVECTOR& direction);
 	
 	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
+
+	const float m_cameraSpeed = 15.f;
 
 public:
 	Camera() = default;
@@ -42,18 +44,18 @@ public:
 
 	void Init(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 
-	// Movement (needs redo)
-	void MoveForward(float amount);
+	void RotateAroundAxis(float amount, const DirectX::XMVECTOR& axis);
 
-	void RotateAroundAxis(float amount, const DirectX::XMFLOAT3& axis);
+	void Update(InputHandler& input, float deltaTime);
 
 	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
 	DirectX::XMFLOAT4X4 GetViewProjMatrix();
 	DeferredHandler* GetDeferredHandler();
-	DX::XMFLOAT3 GetForward() const;
-	DX::XMFLOAT3 GetPosition() const;
-	DX::XMFLOAT3 GetRight() const;
-	DX::XMFLOAT3 GetUp() const;
+
+	DX::XMVECTOR GetForward() const;
+	DX::XMVECTOR GetPosition() const;
+	DX::XMVECTOR GetRight() const;
+	DX::XMVECTOR GetUp() const;
 };

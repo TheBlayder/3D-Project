@@ -106,8 +106,14 @@ void DCEM::Init(ID3D11Device* device)
 	for (size_t i = 0; i < 6; ++i)
 	{
 		m_cameras[i].Init(device, projData, m_resolution, m_resolution, m_transform.GetPositionF3());
-		m_cameras[i].RotateAroundAxis(upRotations[i], DX::XMFLOAT3(0.f, 1.f, 0.f));
-		m_cameras[i].RotateAroundAxis(rightRotations[i], DX::XMFLOAT3(1.f, 0.f, 0.f));
+
+		DX::XMFLOAT3 upAxisF3(0.f, 1.f, 0.f);
+		DX::XMVECTOR upAxis = DX::XMLoadFloat3(&upAxisF3);
+		m_cameras[i].RotateAroundAxis(upRotations[i], upAxis);
+
+		DX::XMFLOAT3 rightAxisF3(1.f, 0.f, 0.f);
+		DX::XMVECTOR rightAxis = DX::XMLoadFloat3(&rightAxisF3);
+		m_cameras[i].RotateAroundAxis(rightRotations[i], rightAxis);
 	}
 }
 
@@ -138,8 +144,9 @@ void DCEM::Render(ID3D11DeviceContext* context, const std::vector<std::unique_pt
 	context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
 
 	// Update camera position constant buffer for the pixel shader
-	DX::XMFLOAT3 camPos = camera->GetPosition();
-	DX::XMFLOAT4 camPos4 = { camPos.x, camPos.y, camPos.z, 1.0f };
+	DirectX::XMFLOAT3 camPosF3;
+	DirectX::XMStoreFloat3(&camPosF3, camera->GetPosition());
+	DX::XMFLOAT4 camPos4 = { camPosF3.x, camPosF3.y, camPosF3.z, 1.0f };
 	m_cameraBuffer.Update(context, &camPos4);
 	context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
 

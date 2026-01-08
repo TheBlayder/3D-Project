@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <string>
+#include "InputHandler.h"
 
 class Window
 {
@@ -11,6 +12,8 @@ private:
 	HWND m_hWindow;
 	UINT m_width, m_height;
 	HINSTANCE m_hInstance;
+
+	InputHandler m_inputHandler;
 
 public:
 
@@ -23,6 +26,8 @@ public:
 	HWND GetWindowHandle() const;
 	UINT GetWidth() const;
 	UINT GetHeight() const;
+
+	InputHandler& GetInputHandler() { return m_inputHandler; }
 };
 
 
