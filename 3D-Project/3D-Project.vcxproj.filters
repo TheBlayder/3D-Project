@@ -99,9 +99,6 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Source Files\Scene\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BaseObject.cpp">
       <Filter>Source Files\Scene\Objects</Filter>
     </ClCompile>
@@ -212,6 +209,12 @@
       <Filter>Resource Files</Filter>
     </FxCompile>
     <FxCompile Include="DCEM-PS.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="HullShader.hlsl">
+      <Filter>Resource Files</Filter>
+    </FxCompile>
+    <FxCompile Include="DomainShader.hlsl">
       <Filter>Resource Files</Filter>
     </FxCompile>
   </ItemGroup>

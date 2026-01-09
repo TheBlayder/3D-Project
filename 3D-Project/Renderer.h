@@ -26,6 +26,7 @@ private:
 	// Input layout
 	WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	//D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
 
 	// Rasterizer states
 	WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
@@ -38,12 +39,16 @@ private:
 	WRL::ComPtr<ID3D11VertexShader> m_vertexShader;
 	WRL::ComPtr<ID3D11PixelShader> m_pixelShader;
 	WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
+
 	WRL::ComPtr<ID3D11PixelShader> m_DCEMPixelShader;
+
+	WRL::ComPtr<ID3D11HullShader> m_hullShader;
+	WRL::ComPtr<ID3D11DomainShader> m_domainShader;
 
 	// Constant buffers
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
-
+	 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
 	bool CreateShaders(std::string& vShaderByteCodeOUT);

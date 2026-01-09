@@ -247,7 +247,6 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error reading vertex shader bytecode!" << std::endl;
 		return false;
 	}
-	
 	HRESULT hr = m_device->CreateVertexShader(vShaderByteCodeOUT.data(), vShaderByteCodeOUT.size(), nullptr, m_vertexShader.GetAddressOf());
 	if(FAILED(hr))
 	{
@@ -262,7 +261,6 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error reading pixel shader bytecode!" << std::endl;
 		return false;
 	}
-
 	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, m_pixelShader.GetAddressOf());
 	if(FAILED(hr))
 	{
@@ -276,7 +274,6 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error reading compute shader bytecode!" << std::endl;
 		return false;
 	}
-
 	hr = m_device->CreateComputeShader(byteCode.data(), byteCode.size(), nullptr, m_computeShader.GetAddressOf());
 	if(FAILED(hr))
 	{
@@ -290,12 +287,45 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 		std::cerr << "Error reading DCEM pixel shader bytecode!" << std::endl;
 		return false;
 	}
-
 	hr = m_device->CreatePixelShader(byteCode.data(), byteCode.size(), nullptr, m_DCEMPixelShader.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating DCEM pixel shader!" << std::endl;
+		return false;
+	}
+
+	// Hull Shader
+	if (!CSOReader::ReadCSO("HullShader.cso", byteCode))
+	{
+		std::cerr << "Error reading hull shader bytecode!" << std::endl;
+		return false;
+	}
+	hr = m_device->CreateHullShader(byteCode.data(), byteCode.size(), nullptr, m_hullShader.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating hull shader!" << std::endl;
+		return false;
+	}
+
+	// Domain Shader
+	if (!CSOReader::ReadCSO("DomainShader.cso", byteCode))
+	{
+		std::cerr << "Error reading domain shader bytecode!" << std::endl;
+		return false;
+	}
+	hr = m_device->CreateDomainShader(byteCode.data(), byteCode.size(), nullptr, m_domainShader.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating domain shader!" << std::endl;
+		return false;
+	}
 
 	m_immediateContext->VSSetShader(m_vertexShader.Get(), nullptr, 0);
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
+
+	/*m_immediateContext->HSSetShader(m_hullShader.Get(), nullptr, 0);
+	m_immediateContext->DSSetShader(m_domainShader.Get(), nullptr, 0);*/
 
 	return true;
 }
