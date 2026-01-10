@@ -17,7 +17,7 @@ private:
 
 	struct Node 
 	{
-		T* elementAdress;
+		T* elementAdress = nullptr;
 		std::unique_ptr<Node> children[4];
 		DirectX::BoundingBox bounds;
 	};
@@ -55,6 +55,8 @@ void QuadTree<T>::PrintTree(const std::unique_ptr<Node>& node)
 template<typename T>
 void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
 {
+	if (!node) return;
+
 	bool collides = node->bounds.Intersects(elementAdress->GetBoundingBox());
 	if (!collides) // If no collision, do not add
 		return;
@@ -63,8 +65,11 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
 	bool isLeaf = (!node->children[0]);
 	if (isLeaf)
 	{
-		if (node->elementAdress == nullptr)
+		if (node->elementAdress == nullptr) 
+		{
 			node->elementAdress = elementAdress; // If empty, add element
+			return; 
+		}
 		else
 		{
 			SubdivideNode(node); // If occupied, subdivide and re-add existing and new element
@@ -75,7 +80,6 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
 				AddToNode(node->children[i], node->elementAdress);
 			}
 
-			// Clear current element
 			node->elementAdress = nullptr;
 		}
 	}
@@ -126,18 +130,19 @@ void QuadTree<T>::CheckNode(std::unique_ptr<Node>& node, const DirectX::Bounding
 template<typename T>
 void QuadTree<T>::SubdivideNode(std::unique_ptr<Node>& node)
 {
-	// If occupied, split node and re-add existing and new element
-	DirectX::XMVECTOR center = node->bounds.Center;
-	DirectX::XMVECTOR extents = node->bounds.Extents;
-	DirectX::XMVECTOR halfExtents = { extents.x / 2.0f, extents.y, extents.z / 2.0f };
+	using namespace DirectX;
+
+	XMVECTOR center = XMLoadFloat3(&node->bounds.Center);
+	XMVECTOR extents = XMLoadFloat3(&node->bounds.Extents);
+	XMVECTOR halfExtents = XMVectorMultiply(extents, {0.5f, 1.f, 0.5f});
 
 	// Children bounding volume offsets:
-	const DirectX::XMVECTOR offsets[4] =
+	const XMVECTOR offsets[4] =
 	{
-		{ -halfExtents.x, 0.0f,  halfExtents.z }, // Top-Left
-		{  halfExtents.x, 0.0f,  halfExtents.z }, // Bottom-Right
-		{ -halfExtents.x, 0.0f, -halfExtents.z }, // Bottom-Left
-		{  halfExtents.x, 0.0f, -halfExtents.z }  // Bottom-Right
+		XMVectorSet(-XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f), // Top-Left
+		XMVectorSet(XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f), // Top-Right
+		XMVectorSet(-XMVectorGetX(halfExtents), 0.0f, -XMVectorGetZ(halfExtents), 0.0f), // Bottom-Left
+		XMVectorSet(XMVectorGetX(halfExtents), 0.0f, -XMVectorGetZ(halfExtents), 0.0f)  // Bottom-Right
 	};
 
 	// Generate children
@@ -145,13 +150,13 @@ void QuadTree<T>::SubdivideNode(std::unique_ptr<Node>& node)
 	{
 		node->children[i] = std::make_unique<Node>();
 
-		DirectX::XMVECTOR childCenter = DirectX::XMVectorAdd(center, offsets[i]); // Calculate child center
+		XMVECTOR childCenter = XMVectorAdd(center, offsets[i]); // Calculate child center
 
 		// Create bounding box for child
-		DirectX::BoundingBox::CreateFromPoints(
+		BoundingBox::CreateFromPoints(
 			node->children[i]->bounds,
-			DirectX::XMVectorSubtract(childCenter, halfExtents),
-			DirectX::XMVectorAdd(childCenter, halfExtents)
+			XMVectorSubtract(childCenter, halfExtents),
+			XMVectorAdd(childCenter, halfExtents)
 		);
 	}
 
@@ -179,8 +184,16 @@ void QuadTree<T>::PrintTree()
 template<typename T>
 std::vector<T*> QuadTree<T>::CheckTree(const DirectX::BoundingFrustum& frustum)
 {
-	std::vector<T*> foundObjects;
+	std::vector<const T*> foundObjects;
 	CheckNode(m_root, frustum, foundObjects);
 
-	return foundObjects;
+	// Convert std::vector<const T*> to std::vector<T*>
+	std::vector<T*> result;
+	result.reserve(foundObjects.size());
+	for (const T* ptr : foundObjects)
+	{
+		result.push_back(const_cast<T*>(ptr));
+	}
+
+	return result;
 }
