@@ -16,6 +16,18 @@ void Camera::RotateAroundAxis(float amount, const DirectX::XMVECTOR& axis)
 	m_transform.SetRotation(cameraRotation);
 }
 
+void Camera::GenerateViewMatrix(DX::XMFLOAT4X4& viewMatrix)
+{
+	using namespace DirectX;
+	MH::CreateViewMatrix(viewMatrix, m_transform.GetPosition(), m_transform.GetRotation(), m_up);
+}
+
+void Camera::GenerateProjectionMatrix(DX::XMFLOAT4X4& projMatrix)
+{
+	using namespace DirectX;
+	MH::CreateProjectionMatrix(projMatrix, m_projData.fovInDeg, m_projData.aspectRatio, m_projData.nearPlane, m_projData.m_farPlane);
+}
+
 void Camera::GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix)
 {
 	using namespace DirectX;
@@ -90,6 +102,22 @@ void Camera::UpdateConstantBuffer(ID3D11DeviceContext* context)
 	m_cameraBuffer->Update(context, &viewProjMatrix);
 }
 
+DirectX::XMFLOAT4X4 Camera::GetViewMatrix()
+{
+	using namespace DirectX;
+	XMFLOAT4X4 viewMatrix;
+	GenerateViewMatrix(viewMatrix);
+	return viewMatrix;
+}
+
+DirectX::XMFLOAT4X4 Camera::GetProjectionMatrix()
+{
+	using namespace DirectX;
+	XMFLOAT4X4 projMatrix;
+	GenerateProjectionMatrix(projMatrix);
+	return projMatrix;
+}
+
 // === GETTERS ===
 DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
 {
@@ -147,4 +175,14 @@ DirectX::XMVECTOR Camera::GetUp() const
 	up = XMVector3Normalize(up);
 
 	return up;
+}
+
+float Camera::GetFov() const
+{
+	return m_projData.fovInDeg;
+}
+
+void Camera::SetFov(float fovInDeg)
+{
+	m_projData.fovInDeg = fovInDeg;
 }

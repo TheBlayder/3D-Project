@@ -7,15 +7,16 @@
 
 namespace DX = DirectX;
 
-DCEM::DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName)
+DCEM::DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
+	: BaseObject(device, transform, folderPath, objectName)
 {
-	m_transform = transform;
+	this->dcemPS = dcemPS;
+	this->returnPS = returnPS;
 	m_resolution = resolution;
 
 	DX::XMFLOAT4 zero = { 0,0,0,0 };
 	m_cameraBuffer = ConstantBuffer(device, sizeof(DX::XMFLOAT4), &zero);
 
-	m_mesh.Init(device, folderPath, objectName);
 	Init(device);
 }
 
@@ -117,84 +118,55 @@ void DCEM::Init(ID3D11Device* device)
 	}
 }
 
-void DCEM::RenderAndDraw(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer,
-	ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP)
+void DCEM::Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer, 
+ConstantBuffer* viewProjBuffer, Camera* camera)
 {
-	for (size_t i = 0; i < 6; ++i)
+	for(size_t face = 0; face < 6; ++face)
 	{
-		context->RSSetViewports(1, &m_viewport);
-		context->PSSetShader(dcemPS, nullptr, 0);
-		Render(context, sceneObjects, worldBuffer, viewProjBuffer, camera, i);
+		context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
 
-	}
-	context->RSSetViewports(1, returnVP);
-	context->PSSetShader(returnPS, nullptr, 0);
-	Draw(context, worldBuffer, viewProjBuffer, camera);
-}
+		// Clear the face
+		float clearColor[4] = { 0, 0, 0, 0 };
+		context->ClearRenderTargetView(m_cubeMapRTVs[face].Get(), clearColor);
+		context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-void DCEM::Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face)
-{
-	context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
+		context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
 
-	// Clear the face
-	float clearColor[4] = { 0, 0, 0, 0 };
-	context->ClearRenderTargetView(m_cubeMapRTVs[face].Get(), clearColor);
-	context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		// Update camera position constant buffer for the pixel shader
+		DirectX::XMFLOAT3 camPosF3;
+		DirectX::XMStoreFloat3(&camPosF3, camera->GetPosition());
+		DX::XMFLOAT4 camPos4 = { camPosF3.x, camPosF3.y, camPosF3.z, 1.0f };
+		m_cameraBuffer.Update(context, &camPos4);
+		context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
 
-	context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
+		// Update and set view-projection for this face in the vertex shader
+		DX::XMFLOAT4X4 viewProjMatrix = m_cameras[face].GetViewProjMatrix();
+		viewProjBuffer->Update(context, &viewProjMatrix);
+		context->VSSetConstantBuffers(1, 1, viewProjBuffer->GetBufferPtr());
 
-	// Update camera position constant buffer for the pixel shader
-	DirectX::XMFLOAT3 camPosF3;
-	DirectX::XMStoreFloat3(&camPosF3, camera->GetPosition());
-	DX::XMFLOAT4 camPos4 = { camPosF3.x, camPosF3.y, camPosF3.z, 1.0f };
-	m_cameraBuffer.Update(context, &camPos4);
-	context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
+		// Draw all scene objects
+		for (auto& obj : sceneObjects)
+		{
+			// Check if object is this DCEM itself to avoid self-rendering
+			if (obj.get() == this)
+				continue;
 
-	// Update and set view-projection for this face in the vertex shader
-	DX::XMFLOAT4X4 viewProjMatrix = m_cameras[face].GetViewProjMatrix();
-	viewProjBuffer->Update(context, &viewProjMatrix);
-	context->VSSetConstantBuffers(1, 1, viewProjBuffer->GetBufferPtr());
+			DX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
+			worldBuffer->Update(context, &worldMatrix);
+			context->VSSetConstantBuffers(0, 1, worldBuffer->GetBufferPtr());
 
-	// Draw all scene objects
-	for (auto& obj : sceneObjects)
-	{
-		DX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
-		worldBuffer->Update(context, &worldMatrix);
-		context->VSSetConstantBuffers(0, 1, worldBuffer->GetBufferPtr());
+			obj->Draw(context);
+		}
 
-		obj->Draw(context);
-	}
+		// Unbind cubemap RTVs and restore previous binds
+		ID3D11RenderTargetView* nullRTV = nullptr;
+		context->OMSetRenderTargets(1, &nullRTV, nullptr);
 
-	// Unbind cubemap RTVs and restore previous OM targets and viewport
-	ID3D11RenderTargetView* nullRTV = nullptr;
-	context->OMSetRenderTargets(1, &nullRTV, nullptr);
+		ID3D11ShaderResourceView* nullSRV[] = { nullptr };
+		context->PSSetShaderResources(0, 1, nullSRV);
 
-	ID3D11ShaderResourceView* nullSRV[] = { nullptr };
-	context->PSSetShaderResources(0, 1, nullSRV);
-
-	ID3D11Buffer* nullBuffer[] = { nullptr };
-	context->PSSetConstantBuffers(0, 1, nullBuffer);
-}
-
-void DCEM::Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera)
-{
-	camera->GetDeferredHandler()->BindGeometryPass(context);
-	
-	// Bind DCEMS world matrix
-	DX::XMFLOAT4X4 worldMatrix;
-	GetWorldMatrix(worldMatrix);
-	viewProjBuffer->Update(context, &worldMatrix);
-	context->VSSetConstantBuffers(0, 1, worldBuffer->GetBufferPtr());
-
-	// Reset camera view-proj matrix
-	DirectX::XMFLOAT4X4 viewProjMatrix = camera->GetViewProjMatrix();
-	viewProjBuffer->Update(context, &viewProjMatrix);
-	context->VSSetConstantBuffers(1, 1, viewProjBuffer->GetBufferPtr());
-
-	m_mesh.BindMeshBuffers(context);
-	for (size_t i = 0; i < m_mesh.GetNrOfSubMeshes(); ++i)
-	{
-		m_mesh.PerformSubMeshDrawCall(context, i);
+		ID3D11Buffer* nullBuffer[] = { nullptr };
+		context->PSSetConstantBuffers(0, 1, nullBuffer);
 	}
 }
 

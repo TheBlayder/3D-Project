@@ -33,6 +33,8 @@ private:
 	
 	void MoveInDirection(float amount, const DirectX::XMVECTOR& direction);
 	
+	void GenerateViewMatrix(DX::XMFLOAT4X4& viewMatrix);
+	void GenerateProjectionMatrix(DX::XMFLOAT4X4& projMatrix);
 	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
 
 	const float m_cameraSpeed = 15.f;
@@ -51,6 +53,8 @@ public:
 	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
+	DirectX::XMFLOAT4X4 GetViewMatrix();
+	DirectX::XMFLOAT4X4 GetProjectionMatrix();
 	DirectX::XMFLOAT4X4 GetViewProjMatrix();
 	DeferredHandler* GetDeferredHandler();
 
@@ -58,4 +62,7 @@ public:
 	DX::XMVECTOR GetPosition() const;
 	DX::XMVECTOR GetRight() const;
 	DX::XMVECTOR GetUp() const;
+
+	float GetFov() const;
+	void SetFov(float fovInDeg);
 };

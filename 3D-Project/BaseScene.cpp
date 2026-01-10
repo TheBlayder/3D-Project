@@ -5,17 +5,18 @@
 #include <algorithm>
 #include <memory>
 
-void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window)
+void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {	
 	this->window = const_cast<Window*>(window);
 	m_quadTree = QuadTree<BaseObject>();
-	LoadScene(device, context, window->GetWidth(), window->GetHeight());
+	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS);
 }
 
-void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
+void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height,
+	ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {
 	LoadSceneCameras(device, context, width, height);
-	LoadSceneGameObjects(device, context);
+	LoadSceneGameObjects(device, context, dcemPS, returnPS);
 	LoadSceneLights(device, context);
 }
 
@@ -51,15 +52,19 @@ void BaseScene::AddBaseObject(std::unique_ptr<BaseObject> baseObject)
 		m_sceneObjects.emplace_back(std::move(baseObject));
 }
 
-void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
+void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
+	std::string& objectName, const std::string& textureFolder, const bool flipUVy)
 {
 	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, flipUVy);
+	m_quadTree.AddElement(newBaseObject.get());
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
 }
 
-void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName)
+void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, 
+	std::string& folderPath, std::string& objectName, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {
-	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName);
+	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
+	m_quadTree.AddElement(newDCEM.get());
 	m_dcemObjects.emplace_back(std::move(newDCEM));
 }
 
@@ -71,6 +76,21 @@ std::vector<std::unique_ptr<BaseObject>>& BaseScene::GetSceneObjects()
 std::vector<std::unique_ptr<DCEM>>& BaseScene::GetDCEMObjects()
 {
 	return m_dcemObjects;
+}
+
+std::vector<BaseObject*> BaseScene::GetVisableSceneObjects(Camera* camera)
+{
+    using namespace DirectX;
+    BoundingFrustum frustum;
+    XMFLOAT4X4 projMatrixF4 = camera->GetProjectionMatrix();
+    XMMATRIX projMatrix = XMLoadFloat4x4(&projMatrixF4);
+	BoundingFrustum::CreateFromMatrix(frustum, projMatrix);
+
+	XMFLOAT4X4 viewMatrixF4 = camera->GetViewMatrix();
+    XMMATRIX worldMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&viewMatrixF4));
+	frustum.Transform(frustum, worldMatrix);
+
+    return m_quadTree.CheckTree(frustum);
 }
 
 BaseScene::~BaseScene() = default;

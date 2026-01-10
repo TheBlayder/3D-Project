@@ -1,6 +1,6 @@
 #include "TestScene.h"
 
-void TestScene::UpdateScene(const float deltaTime)
+void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer)
 {
 	using namespace DirectX;
 
@@ -11,6 +11,12 @@ void TestScene::UpdateScene(const float deltaTime)
 	XMVECTOR strawberryRotation = m_sceneObjects[0]->GetTransform().GetRotation();
 	strawberryRotation = XMVectorAdd(strawberryRotation, XMVectorSet(0.0f, rotationSpeed * deltaTime, 0.0f, 0.0f));
 	m_sceneObjects[0]->GetTransform().SetRotation(strawberryRotation);
+
+	auto& dcemObjects = GetDCEMObjects();
+	for(auto& dcem : dcemObjects)
+	{
+		dcem->Render(context, m_sceneObjects, worldBuffer, viewProjBuffer, m_camera.get());
+	}
 }
 
 void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
@@ -29,7 +35,7 @@ void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* cont
 	m_camera = std::make_unique<Camera>(device, projData, width, height, camInitialPos);
 }
 
-void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context)
+void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {
 	using namespace DirectX;
 
@@ -60,7 +66,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
 	UINT resolution = 256;
-	//AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName);
+	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
 
 }
 

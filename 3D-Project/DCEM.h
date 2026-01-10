@@ -10,7 +10,6 @@
 #include "Camera.h"
 #include "Mesh.h"
 
-using namespace Microsoft;
 namespace DX = DirectX;
 
 enum TEXTURE_CUBE_FACES
@@ -23,35 +22,39 @@ enum TEXTURE_CUBE_FACES
 	NEG_Z = 5
 };
 
-class DCEM 
+class DCEM : public BaseObject
 {
 private:
 	std::array<Camera, 6> m_cameras;
-	std::array<WRL::ComPtr<ID3D11RenderTargetView>, 6> m_cubeMapRTVs;
-	WRL::ComPtr<ID3D11Texture2D> m_cubeMapTex;
-	WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
+	std::array<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>, 6> m_cubeMapRTVs;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_cubeMapTex;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_cubeMapSRV;
 
-	WRL::ComPtr<ID3D11Texture2D> m_depthTex;
-	WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthTex;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
+
+	ID3D11PixelShader* dcemPS;
+	ID3D11PixelShader* returnPS;
 
 	D3D11_VIEWPORT m_viewport;
 	
-	Transform m_transform;
-	Mesh m_mesh;
 	UINT m_resolution;
 
 	ConstantBuffer m_cameraBuffer;
 
 	void Init(ID3D11Device* device);
 
-	void Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera, const size_t face);
-	void Draw(ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera);
 
 public:
-	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName);
+	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName, 
+		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
 
-	void RenderAndDraw(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer,
-		ConstantBuffer* viewProjBuffer, Camera* camera, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, D3D11_VIEWPORT* returnVP);
+	void Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, 
+		ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera);
+
+	void Draw(ID3D11DeviceContext* context) const override {};
+
+	void Update(float deltaTime) override {};
 
 	const void GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix);
 };

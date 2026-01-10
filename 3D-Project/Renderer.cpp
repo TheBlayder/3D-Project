@@ -38,7 +38,7 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
 
 	// Update scene (camera, objects, lights, etc.)
-	scene->UpdateScene(deltaTime);
+	scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
 
 	ShadowPass(scene);	
 	GeometryPass(scene);
@@ -131,22 +131,6 @@ void Renderer::GeometryPass(BaseScene* scene)
 	}
 	
 	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
-
-	RenderDCEMObjects(scene);
-}
-
-void Renderer::RenderDCEMObjects(BaseScene* scene)
-{
-	auto& dcemObjects = scene->GetDCEMObjects();
-	if (dcemObjects.empty()) return;
-
-	for (auto& dcem : dcemObjects)
-	{
-		dcem->RenderAndDraw(m_immediateContext.Get(), scene->GetSceneObjects(), &m_worldBuffer, 
-			&m_viewProjectionBuffer, scene->GetCamera(), m_DCEMPixelShader.Get(), m_pixelShader.Get(), &m_viewport);
-	}
-
-	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 }
 
 void Renderer::LightPass(BaseScene* scene)
