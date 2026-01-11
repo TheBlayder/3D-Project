@@ -18,11 +18,11 @@ protected:
 public:
 	BaseObject() = default;
 	BaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true, const bool tesselate = false);
+		std::string& objectName, const std::string& textureFolder = "", const bool tesselate = false, const bool flipUVy = true);
 	virtual ~BaseObject() = default;
 
 	virtual void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true, const bool tesselate = false);
+		std::string& objectName, const std::string& textureFolder = "", const bool tesselate = false, const bool flipUVy = true);
 
 	virtual void Update(float deltaTime) = 0;
 

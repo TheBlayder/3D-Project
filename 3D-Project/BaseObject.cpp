@@ -3,13 +3,13 @@
 #include "HelperFuncs.h"
 
 BaseObject::BaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, 
-	const std::string& textureFolder, const bool flipUVy, const bool tesselate)
+	const std::string& textureFolder, const bool tesselate, const bool flipUVy)
 {
-	Init(device, transform, folderPath, objectName, textureFolder, flipUVy, tesselate);
+	Init(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
 }
 
 void BaseObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, 
-	const std::string& textureFolder, const bool flipUVy, const bool tesselate)
+	const std::string& textureFolder, const bool tesselate, const bool flipUVy)
 {
 	m_transform = transform;
 	m_tesselationEnabled = tesselate;

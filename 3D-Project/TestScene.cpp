@@ -41,13 +41,22 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Strawberry
 	Transform strawberryTransform;
-	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.f, 0.0f, 0.0f));
+	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.1f, 0.0f, 0.0f));
 	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
 	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
+
+	// Boat
+	Transform boatTransform;
+	boatTransform.SetPosition(DirectX::XMVectorSet(0.7f, 0.0f, 3.0f, 0.0f));
+	boatTransform.SetRotation(DirectX::XMVectorSet(0.0f, -90.f, 0.0f, 0.0f));
+	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
+	folderPath = "./Objects/boat";
+	objectName = "boat.obj";
+	AddGameObject(device, boatTransform, folderPath, objectName, "", true);
 
 	// Floor
 	Transform floorTransform;
@@ -56,7 +65,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	floorTransform.SetScale(DirectX::XMVectorSet(10.f, 0.5f, 10.f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
-	AddGameObject(device, floorTransform, folderPath, objectName, "", true, true);
+	AddGameObject(device, floorTransform, folderPath, objectName, "", true);
 
 	// DCEM Cube
 	Transform DCEMTransform;
@@ -66,7 +75,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
 	UINT resolution = 256;
-	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
+	//AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
 }
 
 void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context)

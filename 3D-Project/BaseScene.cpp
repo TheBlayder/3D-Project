@@ -53,9 +53,9 @@ void BaseScene::AddBaseObject(std::unique_ptr<BaseObject> baseObject)
 }
 
 void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-	std::string& objectName, const std::string& textureFolder, const bool flipUVy, const bool tesselate)
+	std::string& objectName, const std::string& textureFolder, const bool tesselate, const bool flipUVy)
 {
-	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, flipUVy, tesselate);
+	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
 	//m_quadTree.AddElement(newBaseObject.get());
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
 }
