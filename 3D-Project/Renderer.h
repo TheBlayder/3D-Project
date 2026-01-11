@@ -9,6 +9,12 @@
 #include "Camera.h"
 #include "DeferredHandler.h"
 
+struct TesselationData
+{
+	float distanceToObjectCenter = 0.f;
+	DirectX::XMFLOAT3 padding = {0.f ,0.f, 0.f};
+};
+
 class Renderer
 {
 private:
@@ -28,6 +34,7 @@ private:
 
 	// Rasterizer states
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_wireframeRasterizerState;
 
 	// Sampler states
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
@@ -46,6 +53,9 @@ private:
 	// Constant buffers
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
+	ConstantBuffer m_tesselationBuffer;
+
+	TesselationData m_tessData;
 	 
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
@@ -55,6 +65,10 @@ private:
 	bool CreateSamplerStates();
 	bool CreateRasterizerStates();
 	bool CreateConstantBuffers();
+
+	bool m_showWireframe = false;
+	bool m_tesselationEnabled = false;
+	bool SetTesselation(const bool enable);
 
 	void ShadowPass(BaseScene* scene);
 	void GeometryPass(BaseScene* scene);
@@ -72,4 +86,6 @@ public:
 
 	ID3D11PixelShader* GetDCEMPixelShader() { return m_DCEMPixelShader.Get(); }
 	ID3D11PixelShader* GetReturnPixelShader() { return m_pixelShader.Get(); }
+
+	void SetWireframe(const bool enable);
 };

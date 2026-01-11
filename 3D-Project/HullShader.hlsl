@@ -2,13 +2,15 @@
 cbuffer DistanceToObjectCenter : register(b0)
 {
     float distance;
+    float3 padding;
 };
 
 struct VSOutput
 {
-    float3 worldPos : WORLD_POSITION;
-    float3 normal : NORMAL;
-    float2 uv : UV;
+    float4 position : SV_POSITION;
+    float4 WORLD_POSITION : WORLD_POSITION;
+    float4 NORMAL : NORMAL;
+    float2 UV : UV;
 };
 
 struct HS_CONSTANT_DATA_OUTPUT
@@ -19,9 +21,9 @@ struct HS_CONSTANT_DATA_OUTPUT
 
 struct HSOutput
 {
-    float3 worldPos : WORLD_POSITION;
-    float3 normal : NORMAL;
-    float2 uv : UV;
+    float3 WORLD_POSITION : WORLD_POSITION;
+    float3 NORMAL : NORMAL;
+    float2 UV : UV;
 };
 
 #define NUM_CONTROL_POINTS 3
@@ -30,9 +32,9 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(InputPatch<VSOutput, NUM_CONTROL_PO
 {
 	HS_CONSTANT_DATA_OUTPUT output;
 	
-    float maxDistance = 60.f;
-    float baseTessFactor = 32.f;
-    float minTessFactor = 1.f;
+    float maxDistance = 40.f;
+    float baseTessFactor = 16.f;
+    float minTessFactor = 0.1f;
 	
     float tessFactor = lerp(baseTessFactor, minTessFactor, saturate(distance / maxDistance));
 
@@ -55,9 +57,9 @@ HSOutput main(
 {
     HSOutput output;
 
-	output.worldPos = ip[i].worldPos;
-	output.normal = ip[i].normal;
-    output.uv = ip[i].uv;
+    output.WORLD_POSITION.xyz = ip[i].WORLD_POSITION.xyz;
+    output.NORMAL.xyz = ip[i].NORMAL.xyz;
+    output.UV = ip[i].UV;
 
 	return output;
 }

@@ -13,15 +13,16 @@ protected:
 	Transform m_transform;
 	Mesh m_mesh;
 	DirectX::BoundingBox m_boundingBox;
+	bool m_tesselationEnabled = false;
 
 public:
 	BaseObject() = default;
 	BaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
+		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true, const bool tesselate = false);
 	virtual ~BaseObject() = default;
 
 	virtual void Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true);
+		std::string& objectName, const std::string& textureFolder = "", const bool flipUVy = true, const bool tesselate = false);
 
 	virtual void Update(float deltaTime) = 0;
 
@@ -33,4 +34,5 @@ public:
 	Mesh& GetMesh();
 	const DirectX::XMFLOAT4X4 GetWorldMatrix();
 	DirectX::BoundingBox& GetBoundingBox();
+	bool IsTesselationEnabled() const { return m_tesselationEnabled; }
 };

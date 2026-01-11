@@ -56,7 +56,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	floorTransform.SetScale(DirectX::XMVectorSet(10.f, 0.5f, 10.f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
-	AddGameObject(device, floorTransform, folderPath, objectName);
+	AddGameObject(device, floorTransform, folderPath, objectName, "", true, true);
 
 	// DCEM Cube
 	Transform DCEMTransform;
@@ -67,7 +67,6 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	objectName = "cube.obj";
 	UINT resolution = 256;
 	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
-
 }
 
 void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context)

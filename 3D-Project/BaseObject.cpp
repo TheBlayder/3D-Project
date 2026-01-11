@@ -2,14 +2,17 @@
 
 #include "HelperFuncs.h"
 
-BaseObject::BaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
+BaseObject::BaseObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, 
+	const std::string& textureFolder, const bool flipUVy, const bool tesselate)
 {
-	Init(device, transform, folderPath, objectName, textureFolder, flipUVy);
+	Init(device, transform, folderPath, objectName, textureFolder, flipUVy, tesselate);
 }
 
-void BaseObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, const std::string& textureFolder, const bool flipUVy)
+void BaseObject::Init(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, 
+	const std::string& textureFolder, const bool flipUVy, const bool tesselate)
 {
 	m_transform = transform;
+	m_tesselationEnabled = tesselate;
 	m_mesh.Init(device, folderPath, objectName, textureFolder, flipUVy);
 	m_boundingBox = m_mesh.GetBoundingBox();
 	DirectX::XMFLOAT4X4 worldMatrix = GetWorldMatrix();

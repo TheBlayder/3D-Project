@@ -49,6 +49,18 @@ int APIENTRY wWinMain(
 			DispatchMessage(&msg);
 		}
 
+		// Enable/disable wireframe mode
+		if(window.GetInputHandler().isDown('F'))
+		{
+			renderer.SetWireframe(true);
+			window.GetInputHandler().setKeyState('F', InputHandler::RELEASED); // Prevent continuous toggling
+		}
+		else if(window.GetInputHandler().isDown('G'))
+		{
+			renderer.SetWireframe(false);
+			window.GetInputHandler().setKeyState('G', InputHandler::RELEASED);
+		}
+
 		renderer.RenderFrame(scene, deltaTime);
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();

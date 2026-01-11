@@ -47,7 +47,7 @@ public:
 
 	void AddBaseObject(std::unique_ptr<BaseObject> baseObject);
 	void AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, std::string& objectName, 
-		const std::string& textureFolder = "", const bool flipUVy = true);
+		const std::string& textureFolder = "", const bool flipUVy = true, const bool tesselate = false);
 	void AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName,
 		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
 

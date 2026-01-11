@@ -33,6 +33,35 @@ bool Renderer::Init(const Window& window)
     return true;
 }
 
+bool Renderer::SetTesselation(const bool enable)
+{
+	if(enable && !m_tesselationEnabled)
+	{
+		m_tesselationEnabled = true;
+		m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+		m_immediateContext->IASetPrimitiveTopology(m_primitiveTopology);
+		m_immediateContext->HSSetShader(m_hullShader.Get(), nullptr, 0);
+		m_immediateContext->DSSetShader(m_domainShader.Get(), nullptr, 0);
+
+		m_immediateContext->HSSetConstantBuffers(0, 1, m_tesselationBuffer.GetBufferPtr());
+		m_immediateContext->DSSetConstantBuffers(0, 1, m_viewProjectionBuffer.GetBufferPtr());
+	}
+	else if(!enable && m_tesselationEnabled)
+	{
+		m_tesselationEnabled = false;
+		m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		m_immediateContext->IASetPrimitiveTopology(m_primitiveTopology);
+		m_immediateContext->HSSetShader(nullptr, nullptr, 0);
+		m_immediateContext->DSSetShader(nullptr, nullptr, 0);
+
+		ID3D11Buffer* nullBuf = nullptr;
+		m_immediateContext->HSSetConstantBuffers(0, 1, &nullBuf);
+		m_immediateContext->DSSetConstantBuffers(0, 1, &nullBuf);
+	}
+
+	return enable;
+} 
+
 void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
 	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
@@ -40,12 +69,13 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 	// Update scene (camera, objects, lights, etc.)
 	scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
 
-	ShadowPass(scene);	
-	GeometryPass(scene);
-	LightPass(scene);
+	this->ShadowPass(scene);	
+	this->GeometryPass(scene);
+	this->LightPass(scene);
 	
 	m_swapChain->Present(0, 0);
 }
+
 
 void Renderer::ShadowPass(BaseScene* scene)
 {
@@ -127,6 +157,17 @@ void Renderer::GeometryPass(BaseScene* scene)
 		m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix); // Update world matrix to worldBuffer
 		m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
 
+		if(this->SetTesselation(obj->IsTesselationEnabled()) == true)
+		{
+			// Update tesselation constant buffer
+			DirectX::XMFLOAT3 objectPos = obj->GetBoundingBox().Center;
+			DirectX::XMVECTOR cameraPos = scene->GetCamera()->GetPosition();
+			DirectX::XMVECTOR toObject = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&objectPos), cameraPos);
+			m_tessData.distanceToObjectCenter = DirectX::XMVectorGetX(DirectX::XMVector3Length(toObject));
+
+			m_tesselationBuffer.Update(m_immediateContext.Get(), &m_tessData);
+		}
+
 		obj->Draw(m_immediateContext.Get());
 	}
 	
@@ -135,6 +176,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 
 void Renderer::LightPass(BaseScene* scene)
 {
+
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
 	scene->GetCamera()->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
 
@@ -308,9 +350,6 @@ bool Renderer::CreateShaders(std::string& vShaderByteCodeOUT)
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
 
-	/*m_immediateContext->HSSetShader(m_hullShader.Get(), nullptr, 0);
-	m_immediateContext->DSSetShader(m_domainShader.Get(), nullptr, 0);*/
-
 	return true;
 }
 
@@ -433,10 +472,23 @@ bool Renderer::CreateRasterizerStates()
 	rasterizerDesc.DepthClipEnable = TRUE;
 
 	HRESULT hr = m_device->CreateRasterizerState(&rasterizerDesc, m_defaultRasterizerState.GetAddressOf());
-
 	if(FAILED(hr))
 	{
 		std::cerr << "Error creating rasterizer state!" << std::endl;
+		return false;
+	}
+
+	// Wireframe rasterizer state
+	D3D11_RASTERIZER_DESC wireframeDesc = {};
+	wireframeDesc.FillMode = D3D11_FILL_WIREFRAME;
+	wireframeDesc.CullMode = D3D11_CULL_BACK;
+	wireframeDesc.FrontCounterClockwise = FALSE;
+	wireframeDesc.DepthClipEnable = TRUE;
+
+	hr = m_device->CreateRasterizerState(&wireframeDesc, m_wireframeRasterizerState.GetAddressOf());
+	if(FAILED(hr))
+	{
+		std::cerr << "Error creating wireframe rasterizer state!" << std::endl;
 		return false;
 	}
 
@@ -448,6 +500,7 @@ bool Renderer::CreateConstantBuffers()
 {
 	DirectX::XMFLOAT4X4 identityMatrix;
 	DirectX::XMStoreFloat4x4(&identityMatrix, DirectX::XMMatrixIdentity());
+
 	// World matrix buffer
 	if (!m_worldBuffer.Init(m_device.Get(), sizeof(DirectX::XMFLOAT4X4), &identityMatrix))
 	{
@@ -462,8 +515,29 @@ bool Renderer::CreateConstantBuffers()
 		return false;
 	}
 
+	// Tesselation buffer
+	if(!m_tesselationBuffer.Init(m_device.Get(), sizeof(TesselationData), &m_tessData))
+	{
+		std::cerr << "Error creating tesselation constant buffer!" << std::endl;
+		return false;
+	}
+
 	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
 
 	return true;
+}
+
+void Renderer::SetWireframe(const bool enable)
+{
+	m_showWireframe = enable;
+
+	if (m_showWireframe)
+	{
+		m_immediateContext->RSSetState(m_wireframeRasterizerState.Get());
+	}
+	else
+	{
+		m_immediateContext->RSSetState(m_defaultRasterizerState.Get());
+	}
 }
