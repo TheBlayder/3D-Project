@@ -67,7 +67,7 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
 
 	// Update scene (camera, objects, lights, etc.)
-	scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
+	//scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
 
 	this->ShadowPass(scene);	
 	this->GeometryPass(scene);
@@ -101,7 +101,6 @@ void Renderer::ShadowPass(BaseScene* scene)
 		// Draw all game objects from the light's perspective
 		for(auto& obj : sceneObjects)
 		{
-			// Update world matrix constant buffer for each object and bind it
 			DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
 			m_worldBuffer.Update(m_immediateContext.Get(), &worldMatrix);
 
@@ -171,6 +170,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 		obj->Draw(m_immediateContext.Get());
 	}
 	
+	this->SetTesselation(false);
 	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
 }
 

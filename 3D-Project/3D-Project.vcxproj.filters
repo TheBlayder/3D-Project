@@ -61,6 +61,36 @@
     <Filter Include="Header Files\Scene\Objects\Mesh">
       <UniqueIdentifier>{a37dfabf-2303-41d2-aae9-155f7216a4ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Default">
+      <UniqueIdentifier>{859eb599-e5c9-4d3d-a98e-501dfabebf48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Tessellation">
+      <UniqueIdentifier>{069ab354-3116-47ac-99d1-c522d9f5c633}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Particle">
+      <UniqueIdentifier>{dfbbe49c-735b-43c4-a360-56891b4c552a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Other">
+      <UniqueIdentifier>{820b6a93-dcdd-40ef-8b44-f816bd33f91c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Objects\Object Classes">
+      <UniqueIdentifier>{c4a31b9d-a3ff-4542-a2c9-25b6d5aaa934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Camera">
+      <UniqueIdentifier>{16ec2ea2-f3d6-428f-b8e6-7aed9efa112d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene\Particles">
+      <UniqueIdentifier>{755e2f95-36a5-4ae7-ab30-1acc6d339788}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Objects\Objects">
+      <UniqueIdentifier>{fa555807-6bb0-40e8-9334-fd74c6f518c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Objects\Camera">
+      <UniqueIdentifier>{c1bf34bf-ff14-4df9-aac7-f8c58d7443a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene\Objects\Particles">
+      <UniqueIdentifier>{3c5fdb35-0007-4b4c-8c1f-faca0ebdf793}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,17 +102,11 @@
     <ClCompile Include="Window.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="IndexBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
@@ -99,34 +123,40 @@
     <ClCompile Include="TestScene.cpp">
       <Filter>Source Files\Scene\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="BaseObject.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="DCEM.cpp">
-      <Filter>Source Files\Scene\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files\Scene\Objects\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="SubMesh.cpp">
       <Filter>Source Files\Scene\Objects\Mesh</Filter>
     </ClCompile>
+    <ClCompile Include="BaseObject.cpp">
+      <Filter>Source Files\Scene\Objects\Object Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="DCEM.cpp">
+      <Filter>Source Files\Scene\Objects\Object Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Scene\Objects\Object Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Scene\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleHandler.cpp">
+      <Filter>Source Files\Scene\Particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h">
       <Filter>Header Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Header Files\Scene\Objects</Filter>
     </ClInclude>
     <ClInclude Include="VertexBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Header Files\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="HelperFuncs.h">
       <Filter>Header Files\Internal-Libs</Filter>
@@ -179,12 +209,6 @@
     <ClInclude Include="TestScene.h">
       <Filter>Header Files\Scene\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="BaseObject.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="DCEM.h">
-      <Filter>Header Files\Scene\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Header Files\Scene\Objects\Mesh</Filter>
     </ClInclude>
@@ -194,25 +218,55 @@
     <ClInclude Include="QuadTree.h">
       <Filter>Header Files\Internal-Libs</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseObject.h">
+      <Filter>Header Files\Scene\Objects\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="DCEM.h">
+      <Filter>Header Files\Scene\Objects\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\Scene\Objects\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Scene\Objects\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="ParticleHandler.h">
+      <Filter>Header Files\Scene\Objects\Particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>Resource Files</Filter>
+    <FxCompile Include="ComputeShader.hlsl">
+      <Filter>Resource Files\Default</Filter>
     </FxCompile>
     <FxCompile Include="PixelShader.hlsl">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Default</Filter>
     </FxCompile>
-    <FxCompile Include="ComputeShader.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="DCEM-PS.hlsl">
-      <Filter>Resource Files</Filter>
-    </FxCompile>
-    <FxCompile Include="HullShader.hlsl">
-      <Filter>Resource Files</Filter>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>Resource Files\Default</Filter>
     </FxCompile>
     <FxCompile Include="DomainShader.hlsl">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Tessellation</Filter>
+    </FxCompile>
+    <FxCompile Include="HullShader.hlsl">
+      <Filter>Resource Files\Tessellation</Filter>
+    </FxCompile>
+    <FxCompile Include="DCEM-PS.hlsl">
+      <Filter>Resource Files\Other</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleCS.hlsl">
+      <Filter>Resource Files\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleGS.hlsl">
+      <Filter>Resource Files\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticleVS.hlsl">
+      <Filter>Resource Files\Particle</Filter>
+    </FxCompile>
+    <FxCompile Include="ParticlePS.hlsl">
+      <Filter>Resource Files\Particle</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
