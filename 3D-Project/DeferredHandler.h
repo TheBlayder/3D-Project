@@ -131,5 +131,5 @@ inline void DeferredHandler::ClearBuffers(ID3D11DeviceContext* context, std::arr
 	context->ClearRenderTargetView(m_ambientGBuffer.GetRTV(), clearColor.data());
 	context->ClearRenderTargetView(m_specularGBuffer.GetRTV(), clearColor.data());
 	
-	context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }

@@ -123,15 +123,16 @@ ConstantBuffer* viewProjBuffer, Camera* camera)
 {
 	for(size_t face = 0; face < 6; ++face)
 	{
-		context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
+		//context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
+		m_cameras[face].GetDeferredHandler()->BindGeometryPass(context);
+		context->RSSetViewports(1, &m_viewport);
 
 		// Clear the face
-		float clearColor[4] = { 0, 0, 0, 0 };
+		/*float clearColor[4] = { 0, 0, 0, 0 };
 		context->ClearRenderTargetView(m_cubeMapRTVs[face].Get(), clearColor);
-		context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		context->PSSetShaderResources(0, 1, m_cubeMapSRV.GetAddressOf());
-
+		context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);*/
+		m_cameras[face].GetDeferredHandler()->ClearBuffers(context);
+		 
 		// Update camera position constant buffer for the pixel shader
 		DirectX::XMFLOAT3 camPosF3;
 		DirectX::XMStoreFloat3(&camPosF3, camera->GetPosition());
@@ -158,16 +159,34 @@ ConstantBuffer* viewProjBuffer, Camera* camera)
 			obj->Draw(context);
 		}
 
-		// Unbind cubemap RTVs and restore previous binds
-		ID3D11RenderTargetView* nullRTV = nullptr;
-		context->OMSetRenderTargets(1, &nullRTV, nullptr);
+		//// Unbind cubemap RTVs and restore previous binds
+		//ID3D11RenderTargetView* nullRTV = nullptr;
+		//context->OMSetRenderTargets(1, &nullRTV, nullptr);
 
-		ID3D11ShaderResourceView* nullSRV[] = { nullptr };
-		context->PSSetShaderResources(0, 1, nullSRV);
-
-		ID3D11Buffer* nullBuffer[] = { nullptr };
-		context->PSSetConstantBuffers(0, 1, nullBuffer);
+		//ID3D11Buffer* nullBuffer[] = { nullptr };
+		//context->PSSetConstantBuffers(0, 1, nullBuffer);
+		m_cameras[face].GetDeferredHandler()->UnbindGeometryPass(context);
 	}
+}
+
+void DCEM::Draw(ID3D11DeviceContext* context) const
+{
+	context->PSSetShader(dcemPS, nullptr, 0);
+
+	context->PSSetShaderResources(3, 1, m_cubeMapSRV.GetAddressOf());
+
+	m_mesh.BindMeshBuffers(context);
+
+	for (size_t i = 0; i < m_mesh.GetNrOfSubMeshes(); ++i)
+	{
+		// Draw sub-meshes
+		m_mesh.PerformSubMeshDrawCall(context, i);
+	}
+
+	ID3D11ShaderResourceView* nullsrv = nullptr;
+	context->PSSetShaderResources(4, 1, &nullsrv);
+
+	context->PSSetShader(this->returnPS, nullptr, 0);
 }
 
 const void DCEM::GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix)

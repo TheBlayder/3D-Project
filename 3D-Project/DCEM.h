@@ -52,7 +52,7 @@ public:
 	void Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, 
 		ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer, Camera* camera);
 
-	void Draw(ID3D11DeviceContext* context) const override {};
+	void Draw(ID3D11DeviceContext* context) const override;
 
 	void Update(float deltaTime) override {};
 

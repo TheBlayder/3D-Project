@@ -65,7 +65,7 @@ void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, 
 {
 	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
 	//m_quadTree.AddElement(newDCEM.get());
-	m_dcemObjects.emplace_back(std::move(newDCEM));
+	m_sceneObjects.emplace_back(std::move(newDCEM));
 }
 
 std::vector<std::unique_ptr<BaseObject>>& BaseScene::GetSceneObjects()

@@ -51,7 +51,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Boat
 	Transform boatTransform;
-	boatTransform.SetPosition(DirectX::XMVectorSet(0.7f, 0.0f, 3.0f, 0.0f));
+	boatTransform.SetPosition(DirectX::XMVectorSet(5.f, 0.0f, 0.0f, 0.0f));
 	boatTransform.SetRotation(DirectX::XMVectorSet(0.0f, -90.f, 0.0f, 0.0f));
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
@@ -69,9 +69,9 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// DCEM Cube
 	Transform DCEMTransform;
-	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 3.0f, 7.0f, 0.0f));
+	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, 7.0f, 0.0f));
 	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	DCEMTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
+	DCEMTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.0f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
 	UINT resolution = 256;
