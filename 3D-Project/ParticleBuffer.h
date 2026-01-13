@@ -22,4 +22,7 @@ public:
 	ID3D11Buffer* GetBuffer() const { return m_buffer.Get(); }
 	ID3D11ShaderResourceView* GetSRV() const { return m_SRV.Get(); }
 	ID3D11UnorderedAccessView* GetUAV() const { return m_UAV.Get(); }
+
+	UINT GetParticleSize() const { return m_particleSize; }
+	UINT GetNrOfParticles() const { return m_nrOfParticles; }
 };

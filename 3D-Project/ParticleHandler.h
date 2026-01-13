@@ -7,12 +7,15 @@
 #include "ParticleBuffer.h"
 #include "ReadCSO.h"
 
+namespace DX = DirectX;
 
 struct Particle
 {
-	DirectX::XMFLOAT3 position;
-	DirectX::XMFLOAT3 velocity;
-	float life;
+	DX::XMFLOAT3 position;
+	float size;
+	DX::XMFLOAT3 velocity;
+	float padding;
+	DX::XMFLOAT4 color;
 };
 
 class ParticleHandler
@@ -44,4 +47,5 @@ public:
 	ID3D11ShaderResourceView* GetParticleSRV() const { return m_particleBuffer.GetSRV(); }
 	ID3D11UnorderedAccessView* GetParticleUAV() const { return m_particleBuffer.GetUAV(); }
 
+	UINT GetNrOfParticles() const { return m_particleBuffer.GetNrOfParticles(); }
 };
