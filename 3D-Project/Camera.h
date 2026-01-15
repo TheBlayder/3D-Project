@@ -37,7 +37,7 @@ private:
 	void GenerateProjectionMatrix(DX::XMFLOAT4X4& projMatrix);
 	void GenerateViewProjMatrix(DX::XMFLOAT4X4& viewProjMatrix);
 
-	const float m_cameraSpeed = 15.f;
+	const float m_cameraSpeed = 10.f;
 
 public:
 	Camera() = default;

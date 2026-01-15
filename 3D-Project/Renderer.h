@@ -26,11 +26,11 @@ private:
 
 	// Views
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
 
 	// Input layout
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	//D3D_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
 
 	// Rasterizer states
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_defaultRasterizerState;
@@ -53,10 +53,10 @@ private:
 	// Constant buffers
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
-	ConstantBuffer m_tesselationBuffer;
 
 	TesselationData m_tessData;
-	 
+	ConstantBuffer m_tesselationBuffer;
+
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
 	bool CreateShaders(std::string& vShaderByteCodeOUT);
@@ -73,6 +73,7 @@ private:
 	void ShadowPass(BaseScene* scene);
 	void GeometryPass(BaseScene* scene);
 	void LightPass(BaseScene* scene);
+	void RenderParticles(BaseScene* scene);
 
 public:
 	Renderer() = default;

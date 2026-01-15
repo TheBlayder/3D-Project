@@ -6,6 +6,8 @@ void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context,
 
 	m_camera->Update(this->GetWindow()->GetInputHandler(), deltaTime);
 
+	m_particleHandler.Update(context, deltaTime);
+
 	// Rotating strawberry
 	float rotationSpeed = 30.f;
 	XMVECTOR strawberryRotation = m_sceneObjects[0]->GetTransform().GetRotation();
@@ -51,7 +53,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Boat
 	Transform boatTransform;
-	boatTransform.SetPosition(DirectX::XMVectorSet(5.f, 0.0f, 0.0f, 0.0f));
+	boatTransform.SetPosition(DirectX::XMVectorSet(0.f, 0.0f, 5.0f, 0.0f));
 	boatTransform.SetRotation(DirectX::XMVectorSet(0.0f, -90.f, 0.0f, 0.0f));
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
@@ -108,5 +110,19 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	DirectX::XMFLOAT3 camPosF3;
 	DirectX::XMStoreFloat3(&camPosF3, m_camera->GetPosition());
 	m_lightHandler->Init(device, context, camPosF3);
+}
+
+void TestScene::InitializeParticles(ID3D11Device* device, ID3D11DeviceContext* context, bool hasParticles)
+{
+	if(hasParticles == false)
+		return;
+
+	m_hasParticles = true;
+	bool isDynamic = false;
+	bool hasSRV = true;
+	bool hasUAV = true;
+	UINT nrOfParticles = 2000;
+
+	m_particleHandler.Init(device, context, nrOfParticles, isDynamic, hasSRV, hasUAV);
 }
 

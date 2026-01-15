@@ -1,4 +1,47 @@
-float4 main() : SV_TARGET
+
+struct PSInput
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float4 position : SV_POSITION;
+    float4 NORMAL : NORMAL;
+    float4 color : COLOR;
+    float2 UV : UV;
+};
+
+struct PSOutput
+{
+    float4 position : SV_Target0;
+    float4 normal : SV_Target1;
+    float4 ambient : SV_Target2;
+    float4 diffuse : SV_Target3;
+    float4 specular : SV_Target4;
+};
+
+//const float ambientStrength = 0.3f;
+//PSOutput main(PSInput input) : SV_TARGET
+//{
+//    PSOutput output;
+    
+//    output.position = input.position;
+//    output.normal = input.NORMAL;
+    
+//    output.ambient = input.color * ambientStrength;
+//    output.diffuse = input.color;
+//    output.specular = input.color;
+    
+//	return output;
+//}
+
+float4 main(PSInput input) : SV_TARGET
+{
+    // Simple circle/sphere shape for particle
+    float2 centeredUV = input.UV * 2.0f - 1.0f;
+    float dist = length(centeredUV);
+    
+    if (dist > 1.0f)
+        discard;
+    
+    // Soft edge falloff
+    float alpha = 1.0f - smoothstep(0.8f, 1.0f, dist);
+    
+    return float4(input.color.rgb, input.color.a * alpha);
 }

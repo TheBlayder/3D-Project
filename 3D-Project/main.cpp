@@ -33,7 +33,8 @@ int APIENTRY wWinMain(
 	}
 
 	BaseScene* scene = new TestScene();
-	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), &window, renderer.GetDCEMPixelShader(), renderer.GetReturnPixelShader());
+	bool hasParticles = true;
+	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), &window, renderer.GetDCEMPixelShader(), renderer.GetReturnPixelShader(), hasParticles);
 
 	// === MAIN LOOP ===
 	MSG msg = { };

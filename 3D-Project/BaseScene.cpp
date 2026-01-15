@@ -5,19 +5,20 @@
 #include <algorithm>
 #include <memory>
 
-void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
+void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles)
 {	
 	this->window = const_cast<Window*>(window);
 	m_quadTree = QuadTree<BaseObject>();
-	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS);
+	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS, hasParticles);
 }
 
 void BaseScene::LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height,
-	ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
+	ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles)
 {
 	LoadSceneCameras(device, context, width, height);
 	LoadSceneGameObjects(device, context, dcemPS, returnPS);
 	LoadSceneLights(device, context);
+	InitializeParticles(device, context, hasParticles);
 }
 
 void BaseScene::UpdateSceneLights(ID3D11DeviceContext* context)

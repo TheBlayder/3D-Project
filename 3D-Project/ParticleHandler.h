@@ -3,9 +3,12 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <wrl/client.h>
+#include <vector>
 
+#include "ConstantBuffer.h"
 #include "ParticleBuffer.h"
 #include "ReadCSO.h"
+#include "Camera.h"
 
 namespace DX = DirectX;
 
@@ -14,8 +17,21 @@ struct Particle
 	DX::XMFLOAT3 position;
 	float size;
 	DX::XMFLOAT3 velocity;
-	float padding;
+	float padding = 0;
 	DX::XMFLOAT4 color;
+};
+
+struct TimeBufferData
+{
+	float deltaTime = 0;
+	DX::XMFLOAT3 padding = {0.f, 0.f, 0.f};
+};
+
+struct CameraBufferData
+{
+	DX::XMFLOAT4X4 vpMatrix;
+	DX::XMFLOAT3 cameraPosition = { 0.f, 0.f, 0.f };
+	float padding = 0;
 };
 
 class ParticleHandler
@@ -26,17 +42,20 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11GeometryShader> m_particleGS = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_particleCS = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	ParticleBuffer m_particleBuffer;
+	ConstantBuffer m_cameraBuffer;
+	ConstantBuffer m_timeBuffer;
 
-	void CreateShaders(ID3D11Device* device, ID3D11DeviceContext* context, std::string& vShaderByteCode);
-	void CreateInputLayout(ID3D11Device* device, const std::string& vShaderByteCode, UINT particleSize);
+	void CreateShaders(ID3D11Device* device, ID3D11DeviceContext* context);
 
 public:
 	ParticleHandler() = default;
 	~ParticleHandler() = default;
 
-	void Init(ID3D11Device* device, ID3D11DeviceContext* context, UINT particleSize, UINT nrOfParticles, bool dynamic, bool hasSRV, bool hasUAV);
+	void Init(ID3D11Device* device, ID3D11DeviceContext* context, UINT nrOfParticles, bool dynamic, bool hasSRV, bool hasUAV);
+
+	void Update(ID3D11DeviceContext* context, const float deltaTime);
+	void Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRIMITIVE_TOPOLOGY returnTopology, ID3D11InputLayout* returnInputLayout);
 
 	// Getters
 	ID3D11VertexShader* GetParticleVS() const { return m_particleVS.Get(); }

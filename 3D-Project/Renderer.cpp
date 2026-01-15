@@ -66,16 +66,21 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
 	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
 
-	// Update scene (camera, objects, lights, etc.)
-	//scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
+	// Update scene (camera, objects, lights, particles, etc.)
+	scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
 
 	this->ShadowPass(scene);	
 	this->GeometryPass(scene);
 	this->LightPass(scene);
+
+	// Render particles AFTER deferred lighting, directly to backbuffer
+	if (scene->HasParticles())
+	{
+		this->RenderParticles(scene);
+	}
 	
 	m_swapChain->Present(0, 0);
 }
-
 
 void Renderer::ShadowPass(BaseScene* scene)
 {
@@ -169,18 +174,18 @@ void Renderer::GeometryPass(BaseScene* scene)
 
 		obj->Draw(m_immediateContext.Get());
 	}
-	
 	this->SetTesselation(false);
+
+	//scene->GetParticleHandler().Draw(m_immediateContext.Get(), scene->GetCamera(), m_primitiveTopology, m_inputLayout.Get());
+	
 	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
 }
 
 void Renderer::LightPass(BaseScene* scene)
 {
-
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
 	scene->GetCamera()->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
 
-	// Bind UAV (backbuffer)
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
 
 	// Bind light sources
@@ -188,6 +193,8 @@ void Renderer::LightPass(BaseScene* scene)
 
 	// Bind shadow maps
 	scene->GetLightHandler()->BindDepthTextures(m_immediateContext.Get());
+
+	m_immediateContext->CSSetShader(m_computeShader.Get(), nullptr, 0);
 
 	// Compute dispatch
 	const float threadGroupSizeXY = 8.f; // Must match [numthreads(x,y,z)] in compute shader
@@ -200,6 +207,25 @@ void Renderer::LightPass(BaseScene* scene)
 	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
 
 	scene->GetLightHandler()->UnbindDepthTextures(m_immediateContext.Get());
+}
+
+void Renderer::RenderParticles(BaseScene* scene)
+{
+	// Unbind UAV from compute shader output
+	ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
+	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
+
+	// Bind backbuffer as render target for particle rendering
+	// Get depth buffer from deferred handler to enable depth testing
+	ID3D11DepthStencilView* depthDSV = scene->GetCamera()->GetDeferredHandler()->GetDSV();
+	m_immediateContext->OMSetRenderTargets(1, m_backBufferRTV.GetAddressOf(), depthDSV);
+
+	// Draw particles
+	scene->GetParticleHandler().Draw(m_immediateContext.Get(), scene->GetCamera(), m_primitiveTopology, m_inputLayout.Get());
+
+	// Unbind render targets
+	ID3D11RenderTargetView* nullRTV[] = { nullptr };
+	m_immediateContext->OMSetRenderTargets(1, nullRTV, nullptr);
 }
 
 
@@ -391,6 +417,7 @@ bool Renderer::CreateUAV()
 		return false;
 	}
 
+	// Create UAV for compute shader
 	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
 	uavDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
@@ -402,6 +429,14 @@ bool Renderer::CreateUAV()
 	if (FAILED(hr))
 	{
 		std::cerr << "Error creating UAV!" << std::endl;
+		return false;
+	}
+
+	// Create RTV for render target output (particles)
+	hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backBufferRTV.GetAddressOf());
+	if (FAILED(hr))
+	{
+		std::cerr << "Error creating back buffer RTV!" << std::endl;
 		return false;
 	}
 

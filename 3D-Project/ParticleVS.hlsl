@@ -1,9 +1,10 @@
 struct Particle
 {
     float3 position;
-    float3 velocity;
-    float4 color;
     float size;
+    float3 velocity;
+    float padding;
+    float4 color;
 };
 
 struct VSOutput

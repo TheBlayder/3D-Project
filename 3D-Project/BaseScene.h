@@ -13,6 +13,7 @@
 #include "BaseObject.h"
 #include "DCEM.h"
 #include "QuadTree.h"
+#include "ParticleHandler.h"
 
 namespace DX = DirectX;
 
@@ -29,19 +30,23 @@ protected:
 
 	Window* window = nullptr;
 
+	bool m_hasParticles = false;
+	ParticleHandler m_particleHandler;
+
 	void UpdateSceneLights(ID3D11DeviceContext* context);
 
 	void LoadScene(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height, 
-		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
+		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles);
 
 	virtual void LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context) = 0;
 	virtual void LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* context, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS) = 0;
 	virtual void LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height) = 0;
+	virtual void InitializeParticles(ID3D11Device* device, ID3D11DeviceContext* context, bool hasParticles) = 0;
 
 public:
 	BaseScene() = default;
 	virtual ~BaseScene();
-	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
+	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles);
 	virtual void UpdateScene(const float deltaTime, ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer) = 0;
 
 
@@ -55,6 +60,9 @@ public:
 	LightHandler* GetLightHandler() const;
 	void BindLights(ID3D11DeviceContext* context);
 	Window* GetWindow() const { return window; }
+
+	bool HasParticles() const { return m_hasParticles; }
+	ParticleHandler& GetParticleHandler() { return m_particleHandler; }
 
 	std::vector<std::unique_ptr<BaseObject>>& GetSceneObjects();
 	std::vector<BaseObject*> GetVisableSceneObjects(Camera* camera);
