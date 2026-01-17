@@ -73,12 +73,6 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 	this->GeometryPass(scene);
 	this->LightPass(scene);
 
-	// Render particles AFTER deferred lighting, directly to backbuffer
-	if (scene->HasParticles())
-	{
-		this->RenderParticles(scene);
-	}
-	
 	m_swapChain->Present(0, 0);
 }
 
@@ -176,7 +170,10 @@ void Renderer::GeometryPass(BaseScene* scene)
 	}
 	this->SetTesselation(false);
 
-	//scene->GetParticleHandler().Draw(m_immediateContext.Get(), scene->GetCamera(), m_primitiveTopology, m_inputLayout.Get());
+	if (scene->HasParticles())
+	{
+		this->RenderParticles(scene);
+	}
 	
 	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
 }
@@ -211,21 +208,8 @@ void Renderer::LightPass(BaseScene* scene)
 
 void Renderer::RenderParticles(BaseScene* scene)
 {
-	// Unbind UAV from compute shader output
-	ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
-	m_immediateContext->CSSetUnorderedAccessViews(0, 1, nullUAV, nullptr);
-
-	// Bind backbuffer as render target for particle rendering
-	// Get depth buffer from deferred handler to enable depth testing
-	ID3D11DepthStencilView* depthDSV = scene->GetCamera()->GetDeferredHandler()->GetDSV();
-	m_immediateContext->OMSetRenderTargets(1, m_backBufferRTV.GetAddressOf(), depthDSV);
-
 	// Draw particles
 	scene->GetParticleHandler().Draw(m_immediateContext.Get(), scene->GetCamera(), m_primitiveTopology, m_inputLayout.Get());
-
-	// Unbind render targets
-	ID3D11RenderTargetView* nullRTV[] = { nullptr };
-	m_immediateContext->OMSetRenderTargets(1, nullRTV, nullptr);
 }
 
 
