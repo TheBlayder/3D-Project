@@ -31,17 +31,6 @@ struct PSOutput
     float4 specular : SV_Target4;
 };
 
-//float4 main(PSInput input) : SV_TARGET
-//{
-//    float3 incomingView = normalize(input.WORLD_POSITION.xyz - cameraPosition.xyz);
-//    float3 reflectedView = reflect(incomingView, normalize(input.NORMAL.xyz));
-
-//    float4 output = cubeMap.Sample(samplerState, reflectedView);
-//    float4 output = 1;
-    
-//    return output;
-//}
-
 PSOutput main(PSInput input) : SV_TARGET
 {
     PSOutput output;
@@ -51,8 +40,8 @@ PSOutput main(PSInput input) : SV_TARGET
     float3 incomingView = normalize(input.WORLD_POSITION.xyz - cameraPosition.xyz);
     float3 reflectedView = reflect(incomingView, normalize(input.NORMAL.xyz));
     output.ambient = cubeMap.Sample(samplerState, reflectedView);
-    output.diffuse = 0;
-    output.specular = 0;
+    output.diffuse = float4(0.f, 0.f, 0.f, 1.f);
+    output.specular = float4(0.f, 0.f, 0.f, 1.f);
     
     return output;
 }

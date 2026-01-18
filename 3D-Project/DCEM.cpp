@@ -40,7 +40,7 @@ void DCEM::Init(ID3D11Device* device)
 	texDesc.SampleDesc.Count = 1;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
-	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	texDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
 	texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
@@ -48,52 +48,25 @@ void DCEM::Init(ID3D11Device* device)
 	if (FAILED(hr))
 		throw std::runtime_error("Could not create DCEM cube map texture");
 
-	// RTVs
-	D3D11_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-	rtvDesc.Format = texDesc.Format;
-	rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-	rtvDesc.Texture2DArray.MipSlice = 0;
-	rtvDesc.Texture2DArray.ArraySize = 1;
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+	uavDesc.Format = texDesc.Format;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+	uavDesc.Texture2DArray.MipSlice = 0;
+	uavDesc.Texture2DArray.ArraySize = 1;
 
 	for (UINT i = 0; i < 6; ++i)
 	{
-		rtvDesc.Texture2DArray.FirstArraySlice = i;
-		hr = device->CreateRenderTargetView(m_cubeMapTex.Get(), &rtvDesc, m_cubeMapRTVs[i].GetAddressOf());
+		uavDesc.Texture2DArray.FirstArraySlice = i;
+		hr = device->CreateUnorderedAccessView(m_cubeMapTex.Get(), &uavDesc, m_cubeMapUAVs[i].GetAddressOf());
 
 		if (FAILED(hr))
-			throw std::runtime_error("Could not create DCEM cube map RTV");
+			throw std::runtime_error("Could not create DCEM cube map UAV #" + std::to_string(i));
 	}
 
 	// SRV
-	device->CreateShaderResourceView(m_cubeMapTex.Get(), nullptr, m_cubeMapSRV.GetAddressOf());
-
-	// Depth texture
-	D3D11_TEXTURE2D_DESC depthDesc = {};
-	depthDesc.Width = m_resolution;
-	depthDesc.Height = m_resolution;
-	depthDesc.MipLevels = 1;
-	depthDesc.ArraySize = 1;
-	depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthDesc.SampleDesc.Count = 1;
-	depthDesc.SampleDesc.Quality = 0;
-	depthDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
-	depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthDesc.CPUAccessFlags = 0;
-	depthDesc.MiscFlags = 0;
-
-	hr = device->CreateTexture2D(&depthDesc, nullptr, m_depthTex.GetAddressOf());
+	hr = device->CreateShaderResourceView(m_cubeMapTex.Get(), nullptr, m_cubeMapSRV.GetAddressOf());
 	if (FAILED(hr))
-		throw std::runtime_error("Could not create DCEM depth texture");
-
-	// DSV
-	D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-	dsvDesc.Format = depthDesc.Format;
-	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	dsvDesc.Texture2D.MipSlice = 0;
-
-	hr = device->CreateDepthStencilView(m_depthTex.Get(), &dsvDesc, m_DSV.GetAddressOf());
-	if (FAILED(hr))
-		throw std::runtime_error("Could not create DCEM DSV");
+		throw std::runtime_error("Could not create DCEM cube map SRV");
 
 	// Camera setup
 	ProjectionData projData = {};
@@ -115,57 +88,6 @@ void DCEM::Init(ID3D11Device* device)
 		DX::XMFLOAT3 rightAxisF3(1.f, 0.f, 0.f);
 		DX::XMVECTOR rightAxis = DX::XMLoadFloat3(&rightAxisF3);
 		m_cameras[i].RotateAroundAxis(rightRotations[i], rightAxis);
-	}
-}
-
-void DCEM::Render(ID3D11DeviceContext* context, const std::vector<std::unique_ptr<BaseObject>>& sceneObjects, ConstantBuffer* worldBuffer, 
-ConstantBuffer* viewProjBuffer, Camera* camera)
-{
-	for(size_t face = 0; face < 6; ++face)
-	{
-		//context->OMSetRenderTargets(1, m_cubeMapRTVs[face].GetAddressOf(), m_DSV.Get());
-		m_cameras[face].GetDeferredHandler()->BindGeometryPass(context);
-		context->RSSetViewports(1, &m_viewport);
-
-		// Clear the face
-		/*float clearColor[4] = { 0, 0, 0, 0 };
-		context->ClearRenderTargetView(m_cubeMapRTVs[face].Get(), clearColor);
-		context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);*/
-		m_cameras[face].GetDeferredHandler()->ClearBuffers(context);
-		 
-		// Update camera position constant buffer for the pixel shader
-		DirectX::XMFLOAT3 camPosF3;
-		DirectX::XMStoreFloat3(&camPosF3, camera->GetPosition());
-		DX::XMFLOAT4 camPos4 = { camPosF3.x, camPosF3.y, camPosF3.z, 1.0f };
-		m_cameraBuffer.Update(context, &camPos4);
-		context->PSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
-
-		// Update and set view-projection for this face in the vertex shader
-		DX::XMFLOAT4X4 viewProjMatrix = m_cameras[face].GetViewProjMatrix();
-		viewProjBuffer->Update(context, &viewProjMatrix);
-		context->VSSetConstantBuffers(1, 1, viewProjBuffer->GetBufferPtr());
-
-		// Draw all scene objects
-		for (auto& obj : sceneObjects)
-		{
-			// Check if object is this DCEM itself to avoid self-rendering
-			if (obj.get() == this)
-				continue;
-
-			DX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
-			worldBuffer->Update(context, &worldMatrix);
-			context->VSSetConstantBuffers(0, 1, worldBuffer->GetBufferPtr());
-
-			obj->Draw(context);
-		}
-
-		//// Unbind cubemap RTVs and restore previous binds
-		//ID3D11RenderTargetView* nullRTV = nullptr;
-		//context->OMSetRenderTargets(1, &nullRTV, nullptr);
-
-		//ID3D11Buffer* nullBuffer[] = { nullptr };
-		//context->PSSetConstantBuffers(0, 1, nullBuffer);
-		m_cameras[face].GetDeferredHandler()->UnbindGeometryPass(context);
 	}
 }
 
@@ -192,4 +114,15 @@ void DCEM::Draw(ID3D11DeviceContext* context) const
 const void DCEM::GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix)
 {
 	MatrixHelper::CreateWorldMatrix(worldMatrix, m_transform);
+}
+
+std::array<ID3D11UnorderedAccessView**, 6> DCEM::GetUAVAdresses()
+{
+	std::array<ID3D11UnorderedAccessView**, 6> UAVs;
+	for (int i = 0; i < 6; ++i)
+	{
+		UAVs[i] = m_cubeMapUAVs[i].GetAddressOf();
+	}
+
+	return UAVs;
 }

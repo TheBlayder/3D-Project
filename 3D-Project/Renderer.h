@@ -25,8 +25,7 @@ private:
 	D3D11_VIEWPORT m_viewport;
 
 	// Views
-	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_UAV;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
+	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_backbBufferUAV;
 
 	// Input layout
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
@@ -57,6 +56,9 @@ private:
 	TesselationData m_tessData;
 	ConstantBuffer m_tesselationBuffer;
 
+	// Camera
+	Camera* m_activeCamera = nullptr;
+
 	void CreateViewport(const Window& window);
 	bool CreateDeviceAndSwapChain(const Window& window);
 	bool CreateShaders(std::string& vShaderByteCodeOUT);
@@ -70,9 +72,12 @@ private:
 	bool m_tesselationEnabled = false;
 	bool SetTesselation(const bool enable);
 
+	void RenderDCEMObjects(BaseScene* scene);
+
+	void DeferredRender(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV);
 	void ShadowPass(BaseScene* scene);
 	void GeometryPass(BaseScene* scene);
-	void LightPass(BaseScene* scene);
+	void LightPass(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV);
 	void RenderParticles(BaseScene* scene);
 
 public:
@@ -89,4 +94,5 @@ public:
 	ID3D11PixelShader* GetReturnPixelShader() { return m_pixelShader.Get(); }
 
 	void SetWireframe(const bool enable);
+	void SetActiveCamera(Camera* camera) { m_activeCamera = camera; }
 };

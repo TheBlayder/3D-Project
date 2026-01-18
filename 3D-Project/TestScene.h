@@ -11,6 +11,6 @@ private:
 	void InitializeParticles(ID3D11Device* device, ID3D11DeviceContext* context, bool hasParticles);
 public:
 	~TestScene() = default;
-	void UpdateScene(const float deltaTime, ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer) override;
+	void UpdateScene(const float deltaTime, ID3D11DeviceContext* context) override;
 };
 

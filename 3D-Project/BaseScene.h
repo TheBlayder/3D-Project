@@ -47,7 +47,7 @@ public:
 	BaseScene() = default;
 	virtual ~BaseScene();
 	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles);
-	virtual void UpdateScene(const float deltaTime, ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer) = 0;
+	virtual void UpdateScene(const float deltaTime, ID3D11DeviceContext* context) = 0;
 
 
 	void AddBaseObject(std::unique_ptr<BaseObject> baseObject);

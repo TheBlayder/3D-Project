@@ -1,6 +1,6 @@
 #include "TestScene.h"
 
-void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context, ConstantBuffer* worldBuffer, ConstantBuffer* viewProjBuffer)
+void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context)
 {
 	using namespace DirectX;
 
@@ -13,12 +13,6 @@ void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context,
 	XMVECTOR strawberryRotation = m_sceneObjects[0]->GetTransform().GetRotation();
 	strawberryRotation = XMVectorAdd(strawberryRotation, XMVectorSet(0.0f, rotationSpeed * deltaTime, 0.0f, 0.0f));
 	m_sceneObjects[0]->GetTransform().SetRotation(strawberryRotation);
-
-	auto& dcemObjects = GetDCEMObjects();
-	for(auto& dcem : dcemObjects)
-	{
-		dcem->Render(context, m_sceneObjects, worldBuffer, viewProjBuffer, m_camera.get());
-	}
 }
 
 void TestScene::LoadSceneCameras(ID3D11Device* device, ID3D11DeviceContext* context, const UINT width, const UINT height)
@@ -43,7 +37,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Strawberry
 	Transform strawberryTransform;
-	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.1f, 0.0f, 0.0f));
+	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.f, -2.0f, 0.0f));
 	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	std::string folderPath = "./Objects/Cake";
@@ -53,7 +47,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Boat
 	Transform boatTransform;
-	boatTransform.SetPosition(DirectX::XMVectorSet(0.f, 0.0f, 5.0f, 0.0f));
+	boatTransform.SetPosition(DirectX::XMVectorSet(0.f, 0.0f, 6.0f, 0.0f));
 	boatTransform.SetRotation(DirectX::XMVectorSet(0.0f, -90.f, 0.0f, 0.0f));
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
@@ -71,13 +65,13 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// DCEM Cube
 	Transform DCEMTransform;
-	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, 7.0f, 0.0f));
+	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, 2.0f, 0.0f));
 	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	DCEMTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.0f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
 	UINT resolution = 256;
-	//AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
+	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
 }
 
 void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context)

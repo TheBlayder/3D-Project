@@ -36,6 +36,8 @@ int APIENTRY wWinMain(
 	bool hasParticles = true;
 	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), &window, renderer.GetDCEMPixelShader(), renderer.GetReturnPixelShader(), hasParticles);
 
+
+	bool wireframeMode = false;
 	// === MAIN LOOP ===
 	MSG msg = { };
 	float deltaTime = 0.0f;
@@ -50,16 +52,20 @@ int APIENTRY wWinMain(
 			DispatchMessage(&msg);
 		}
 
-		// Enable/disable wireframe mode
-		if(window.GetInputHandler().isDown('F'))
+		// Enable/disable wireframe mode to show tesselation effect
+		if(window.GetInputHandler().isDown('T'))
 		{
-			renderer.SetWireframe(true);
-			window.GetInputHandler().setKeyState('F', InputHandler::RELEASED); // Prevent continuous toggling
-		}
-		else if(window.GetInputHandler().isDown('G'))
-		{
-			renderer.SetWireframe(false);
-			window.GetInputHandler().setKeyState('G', InputHandler::RELEASED);
+			if (wireframeMode)
+			{
+				wireframeMode = false;
+				renderer.SetWireframe(false);
+			}
+			else
+			{
+				wireframeMode = true;
+				renderer.SetWireframe(true);
+			}
+			window.GetInputHandler().setKeyState('T', InputHandler::RELEASED); // Prevent continuous toggling
 		}
 
 		renderer.RenderFrame(scene, deltaTime);

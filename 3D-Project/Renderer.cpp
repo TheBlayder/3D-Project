@@ -64,16 +64,41 @@ bool Renderer::SetTesselation(const bool enable)
 
 void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
-	scene->GetCamera()->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
-
 	// Update scene (camera, objects, lights, particles, etc.)
-	scene->UpdateScene(deltaTime, m_immediateContext.Get(), &m_worldBuffer, &m_viewProjectionBuffer);
+	scene->UpdateScene(deltaTime, m_immediateContext.Get());
 
-	this->ShadowPass(scene);	
-	this->GeometryPass(scene);
-	this->LightPass(scene);
+	this->RenderDCEMObjects(scene);
+
+	this->SetActiveCamera(scene->GetCamera());
+	this->DeferredRender(scene, m_backbBufferUAV.GetAddressOf());
 
 	m_swapChain->Present(0, 0);
+}
+
+void Renderer::RenderDCEMObjects(BaseScene* scene)
+{
+	auto& dcemObjects = scene->GetDCEMObjects();
+	if (dcemObjects.empty()) { return; }
+
+	for (auto& dcem : dcemObjects)
+	{
+		std::array<ID3D11UnorderedAccessView**, 6> UAVAdresses = dcem->GetUAVAdresses();
+		std::array<Camera, 6> cubeCameras = dcem->GetCameras();
+		for (int i = 0; i < 6; ++i)
+		{
+			this->SetActiveCamera(&cubeCameras[i]);
+			this->DeferredRender(scene, UAVAdresses[i]);
+		}
+	}
+}
+
+void Renderer::DeferredRender(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV)
+{
+	m_activeCamera->GetDeferredHandler()->ClearBuffers(m_immediateContext.Get());
+
+	this->ShadowPass(scene);
+	this->GeometryPass(scene);
+	this->LightPass(scene, targetUAV);
 }
 
 void Renderer::ShadowPass(BaseScene* scene)
@@ -139,12 +164,12 @@ void Renderer::GeometryPass(BaseScene* scene)
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
 
 	// Update camera constant buffer BEFORE drawing so vertex shader uses correct view-proj
-	DirectX::XMFLOAT4X4 viewProjMatrix = scene->GetCamera()->GetViewProjMatrix();
+	DirectX::XMFLOAT4X4 viewProjMatrix = m_activeCamera->GetViewProjMatrix();
 	m_viewProjectionBuffer.Update(m_immediateContext.Get(), &viewProjMatrix); // Update viewProj matrix to viewProjectionBuffer
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
 
 	// Bind G-buffer render targets and depth
-	scene->GetCamera()->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
+	m_activeCamera->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
 	auto& sceneObjects = scene->GetSceneObjects();
@@ -159,7 +184,7 @@ void Renderer::GeometryPass(BaseScene* scene)
 		{
 			// Update tesselation constant buffer
 			DirectX::XMFLOAT3 objectPos = obj->GetBoundingBox().Center;
-			DirectX::XMVECTOR cameraPos = scene->GetCamera()->GetPosition();
+			DirectX::XMVECTOR cameraPos = m_activeCamera->GetPosition();
 			DirectX::XMVECTOR toObject = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&objectPos), cameraPos);
 			m_tessData.distanceToObjectCenter = DirectX::XMVectorGetX(DirectX::XMVector3Length(toObject));
 
@@ -175,15 +200,15 @@ void Renderer::GeometryPass(BaseScene* scene)
 		this->RenderParticles(scene);
 	}
 	
-	scene->GetCamera()->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
+	m_activeCamera->GetDeferredHandler()->UnbindGeometryPass(m_immediateContext.Get());
 }
 
-void Renderer::LightPass(BaseScene* scene)
+void Renderer::LightPass(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV)
 {
 	// Bind G-buffers as SRVs and prepare UAV/backbuffer for output
-	scene->GetCamera()->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
+	m_activeCamera->GetDeferredHandler()->BindLightPass(m_immediateContext.Get());
 
-	m_immediateContext->CSSetUnorderedAccessViews(0, 1, m_UAV.GetAddressOf(), nullptr);
+	m_immediateContext->CSSetUnorderedAccessViews(0, 1, targetUAV, nullptr);
 
 	// Bind light sources
 	scene->BindLights(m_immediateContext.Get());
@@ -209,7 +234,7 @@ void Renderer::LightPass(BaseScene* scene)
 void Renderer::RenderParticles(BaseScene* scene)
 {
 	// Draw particles
-	scene->GetParticleHandler().Draw(m_immediateContext.Get(), scene->GetCamera(), m_primitiveTopology, m_inputLayout.Get());
+	scene->GetParticleHandler().Draw(m_immediateContext.Get(), m_activeCamera, m_primitiveTopology, m_inputLayout.Get());
 }
 
 
@@ -409,18 +434,10 @@ bool Renderer::CreateUAV()
 	uavDesc.Texture2DArray.FirstArraySlice = 0;
 	uavDesc.Texture2DArray.ArraySize = 1;
 
-	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_UAV.GetAddressOf());
+	hr = m_device->CreateUnorderedAccessView(backBuffer.Get(), &uavDesc, m_backbBufferUAV.GetAddressOf());
 	if (FAILED(hr))
 	{
 		std::cerr << "Error creating UAV!" << std::endl;
-		return false;
-	}
-
-	// Create RTV for render target output (particles)
-	hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backBufferRTV.GetAddressOf());
-	if (FAILED(hr))
-	{
-		std::cerr << "Error creating back buffer RTV!" << std::endl;
 		return false;
 	}
 
