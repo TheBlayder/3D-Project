@@ -22,14 +22,6 @@ DCEM::DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolut
 
 void DCEM::Init(ID3D11Device* device)
 {
-	// Viewport
-	m_viewport.TopLeftX = 0.0f;
-	m_viewport.TopLeftY = 0.0f;
-	m_viewport.Width = static_cast<FLOAT>(m_resolution);
-	m_viewport.Height = static_cast<FLOAT>(m_resolution);
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
-
 	// Cube map texture
 	D3D11_TEXTURE2D_DESC texDesc = {};
 	texDesc.Width = m_resolution;

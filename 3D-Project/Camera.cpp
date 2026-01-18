@@ -62,6 +62,13 @@ void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT wid
 {
 	m_projData = projData;
 	m_DH = new DeferredHandler(device, width, height);
+
+	m_viewport.TopLeftX = 0.0f;
+	m_viewport.TopLeftY = 0.0f;
+	m_viewport.Width = static_cast<FLOAT>(width);
+	m_viewport.Height = static_cast<FLOAT>(height);
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
 	
 	using namespace DirectX;
 	m_transform.SetPosition(XMLoadFloat3(&initialPosition));

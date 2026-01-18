@@ -9,7 +9,7 @@ bool Renderer::Init(const Window& window)
 	if(!CreateDeviceAndSwapChain(window)) return false;
 	
 	// Set up viewport
-	CreateViewport(window);
+	//CreateViewport(window);
 
 	// Set up shaders
 	std::string vShaderByteCode;
@@ -70,6 +70,8 @@ void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 	this->RenderDCEMObjects(scene);
 
 	this->SetActiveCamera(scene->GetCamera());
+	m_immediateContext->RSSetViewports(1, &m_activeCamera->GetViewport());
+
 	this->DeferredRender(scene, m_backbBufferUAV.GetAddressOf());
 
 	m_swapChain->Present(0, 0);
@@ -87,6 +89,8 @@ void Renderer::RenderDCEMObjects(BaseScene* scene)
 		for (int i = 0; i < 6; ++i)
 		{
 			this->SetActiveCamera(&cubeCameras[i]);
+			m_immediateContext->RSSetViewports(1, &cubeCameras[i].GetViewport());
+
 			this->DeferredRender(scene, UAVAdresses[i]);
 		}
 	}
@@ -155,7 +159,7 @@ void Renderer::ShadowPass(BaseScene* scene)
 	// Reset states
 	m_immediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 	m_immediateContext->PSSetShader(m_pixelShader.Get(), nullptr, 0);
-	m_immediateContext->RSSetViewports(1, &m_viewport);
+	m_immediateContext->RSSetViewports(1, &m_activeCamera->GetViewport());
 }
 
 void Renderer::GeometryPass(BaseScene* scene)
@@ -220,8 +224,8 @@ void Renderer::LightPass(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV
 
 	// Compute dispatch
 	const float threadGroupSizeXY = 8.f; // Must match [numthreads(x,y,z)] in compute shader
-	UINT dispatchX = static_cast<UINT>(ceilf(m_viewport.Width / threadGroupSizeXY));
-	UINT dispatchY = static_cast<UINT>(ceilf(m_viewport.Height / threadGroupSizeXY));
+	UINT dispatchX = static_cast<UINT>(ceilf(m_activeCamera->GetViewport().Width / threadGroupSizeXY));
+	UINT dispatchY = static_cast<UINT>(ceilf(m_activeCamera->GetViewport().Height / threadGroupSizeXY));
 	m_immediateContext->Dispatch(dispatchX, dispatchY, 1);
 
 	// Unbind compute shader and UAVs
@@ -238,16 +242,16 @@ void Renderer::RenderParticles(BaseScene* scene)
 }
 
 
-void Renderer::CreateViewport(const Window& window)
-{
-	m_viewport.TopLeftX = 0.0f;
-	m_viewport.TopLeftY = 0.0f;
-	m_viewport.Width = static_cast<FLOAT>(window.GetWidth());
-	m_viewport.Height = static_cast<FLOAT>(window.GetHeight());
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
-	m_immediateContext->RSSetViewports(1, &m_viewport);
-}
+//void Renderer::CreateViewport(const Window& window)
+//{
+//	m_viewport.TopLeftX = 0.0f;
+//	m_viewport.TopLeftY = 0.0f;
+//	m_viewport.Width = static_cast<FLOAT>(window.GetWidth());
+//	m_viewport.Height = static_cast<FLOAT>(window.GetHeight());
+//	m_viewport.MinDepth = 0.0f;
+//	m_viewport.MaxDepth = 1.0f;
+//	m_immediateContext->RSSetViewports(1, &m_viewport);
+//}
 
 bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 {

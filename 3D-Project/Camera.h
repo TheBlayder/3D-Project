@@ -24,6 +24,7 @@ class Camera
 {
 private:
 	DeferredHandler* m_DH = nullptr;
+	D3D11_VIEWPORT m_viewport;
 
 	Transform m_transform;
 	DX::XMVECTOR m_up = { 0.f, 1.f, 0.f, 0.f };
@@ -65,4 +66,6 @@ public:
 
 	float GetFov() const;
 	void SetFov(float fovInDeg);
+
+	D3D11_VIEWPORT& GetViewport() { return m_viewport; }
 };

@@ -22,7 +22,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
-	D3D11_VIEWPORT m_viewport;
+	//D3D11_VIEWPORT m_viewport;
 
 	// Views
 	Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_backbBufferUAV;

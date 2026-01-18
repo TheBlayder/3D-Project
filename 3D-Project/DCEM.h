@@ -33,8 +33,6 @@ private:
 	ID3D11PixelShader* dcemPS;
 	ID3D11PixelShader* returnPS;
 
-	D3D11_VIEWPORT m_viewport;
-
 	UINT m_resolution;
 
 	ConstantBuffer m_cameraBuffer;
