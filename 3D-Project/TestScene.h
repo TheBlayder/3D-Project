@@ -10,7 +10,7 @@ private:
 	void LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* context) override;
 	void InitializeParticles(ID3D11Device* device, ID3D11DeviceContext* context, bool hasParticles);
 public:
-	~TestScene() = default;
+	~TestScene() override;
 	void UpdateScene(const float deltaTime, ID3D11DeviceContext* context) override;
 };
 

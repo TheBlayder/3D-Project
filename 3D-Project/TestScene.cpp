@@ -1,5 +1,9 @@
 #include "TestScene.h"
 
+TestScene::~TestScene()
+{
+}
+
 void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context)
 {
 	using namespace DirectX;
@@ -42,7 +46,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Strawberry
 	Transform strawberryTransform;
-	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.f, -2.0f, 0.0f));
+	strawberryTransform.SetPosition(DirectX::XMVectorSet(0.0f, 1.f, -4.0f, 0.0f));
 	strawberryTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	strawberryTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.f, 0.0f));
 	std::string folderPath = "./Objects/Cake";
@@ -52,7 +56,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Boat
 	Transform boatTransform;
-	boatTransform.SetPosition(DirectX::XMVectorSet(0.f, 0.0f, 6.0f, 0.0f));
+	boatTransform.SetPosition(DirectX::XMVectorSet(0.f, 0.0f, 8.0f, 0.0f));
 	boatTransform.SetRotation(DirectX::XMVectorSet(0.0f, -90.f, 0.0f, 0.0f));
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
@@ -72,10 +76,10 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	Transform DCEMTransform;
 	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, 2.0f, 0.0f));
 	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	DCEMTransform.SetScale(DirectX::XMVectorSet(1.f, 1.f, 1.0f, 0.0f));
+	DCEMTransform.SetScale(DirectX::XMVectorSet(1.5f, 1.5f, 1.5f, 0.0f));
 	folderPath = "./Objects/Cube";
 	objectName = "cube.obj";
-	UINT resolution = 256;
+	UINT resolution = 512;
 	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
 }
 
@@ -91,7 +95,7 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	m_lightHandler = std::make_unique<LightHandler>(spotLightResolution, dirLightResolution);
 
 	SpotLightData spotLightData = {};
-	spotLightData.position = XMFLOAT3(0.f, 1.f, -10.f);
+	spotLightData.position = XMFLOAT3(0.f, 1.f, -15.f);
 	spotLightData.direction = XMFLOAT3(0.f, 0.f, 1.f);
 	spotLightData.intensity = 90.f;
 	spotLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);

@@ -5,9 +5,9 @@
 #include <algorithm>
 #include <memory>
 
-void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles)
+void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles)
 {	
-	this->window = const_cast<Window*>(window);
+	m_window = window;
 	m_quadTree = QuadTree<BaseObject>();
 	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS, hasParticles);
 }
@@ -66,6 +66,8 @@ void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, 
 {
 	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
 	//m_quadTree.AddElement(newDCEM.get());
+	
+	m_dcemObjects.emplace_back(newDCEM.get());
 	m_sceneObjects.emplace_back(std::move(newDCEM));
 }
 
@@ -74,7 +76,7 @@ std::vector<std::unique_ptr<BaseObject>>& BaseScene::GetSceneObjects()
 	return m_sceneObjects;
 }
 
-std::vector<std::unique_ptr<DCEM>>& BaseScene::GetDCEMObjects()
+std::vector<DCEM*>& BaseScene::GetDCEMObjects()
 {
 	return m_dcemObjects;
 }

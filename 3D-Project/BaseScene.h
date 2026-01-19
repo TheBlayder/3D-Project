@@ -24,11 +24,11 @@ protected:
 	std::unique_ptr<Camera> m_camera;
 	std::unique_ptr<LightHandler> m_lightHandler;
 	std::vector<std::unique_ptr<BaseObject>> m_sceneObjects;
-	std::vector<std::unique_ptr<DCEM>> m_dcemObjects;
+	std::vector<DCEM*> m_dcemObjects;
 
 	QuadTree<BaseObject> m_quadTree;
 
-	Window* window = nullptr;
+	Window* m_window;
 
 	bool m_hasParticles = false;
 	ParticleHandler m_particleHandler;
@@ -46,7 +46,7 @@ protected:
 public:
 	BaseScene() = default;
 	virtual ~BaseScene();
-	void Init(ID3D11Device* device, ID3D11DeviceContext* context, const Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles);
+	void Init(ID3D11Device* device, ID3D11DeviceContext* context, Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles);
 	virtual void UpdateScene(const float deltaTime, ID3D11DeviceContext* context) = 0;
 
 
@@ -59,12 +59,12 @@ public:
 	Camera* GetCamera() const;
 	LightHandler* GetLightHandler() const;
 	void BindLights(ID3D11DeviceContext* context);
-	Window* GetWindow() const { return window; }
+	Window* GetWindow() const { return m_window; }
 
 	bool HasParticles() const { return m_hasParticles; }
 	ParticleHandler& GetParticleHandler() { return m_particleHandler; }
 
 	std::vector<std::unique_ptr<BaseObject>>& GetSceneObjects();
 	std::vector<BaseObject*> GetVisableSceneObjects(Camera* camera);
-	std::vector<std::unique_ptr<DCEM>>& GetDCEMObjects();
+	std::vector<DCEM*>& GetDCEMObjects();
 };

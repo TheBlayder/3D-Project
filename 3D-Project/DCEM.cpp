@@ -17,7 +17,20 @@ DCEM::DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolut
 	DX::XMFLOAT4 zero = { 0,0,0,0 };
 	m_cameraBuffer = ConstantBuffer(device, sizeof(DX::XMFLOAT4), &zero);
 
+	for (size_t i = 0; i < m_cameras.size(); ++i)
+	{
+		m_cameras[i] = new Camera();
+	}
+
 	Init(device);
+}
+
+DCEM::~DCEM()
+{
+	for (size_t i = 0; i < m_cameras.size(); ++i)
+	{
+		delete m_cameras[i];
+	}
 }
 
 void DCEM::Init(ID3D11Device* device)
@@ -66,20 +79,27 @@ void DCEM::Init(ID3D11Device* device)
 	projData.aspectRatio = 1.f;
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 100.f;
-	float upRotations[6] = { DX::XM_PIDIV2, -DX::XM_PIDIV2,		0.0f,			0.0f,		0.0f, DX::XM_PI }; // Rotations around local up
-	float rightRotations[6] = { 0.0f,		0.0f,			-DX::XM_PIDIV2, DX::XM_PIDIV2, 0.0f,  0.0f }; // Rotations around local right vector
+
+	float rotations[6][3] = {
+	{ 0.0f,   90.0f,  0.0f },  // +X:
+	{ 0.0f,  -90.0f,  0.0f },  // -X:
+	{ -90.0f,  0.0f,  0.0f },  // +Y:
+	{ 90.0f,   0.0f,  0.0f },  // -Y:
+	{ 0.0f,    0.0f,  0.0001f },  // +Z:
+	{ 0.0f,  180.0f,  0.0f }   // -Z:
+	};
 
 	for (size_t i = 0; i < 6; ++i)
 	{
-		m_cameras[i].Init(device, projData, m_resolution, m_resolution, m_transform.GetPositionF3());
+		m_cameras[i]->Init(device, projData, m_resolution, m_resolution, m_transform.GetPositionF3());
 
-		DX::XMFLOAT3 upAxisF3(0.f, 1.f, 0.f);
-		DX::XMVECTOR upAxis = DX::XMLoadFloat3(&upAxisF3);
-		m_cameras[i].RotateAroundAxis(upRotations[i], upAxis);
-
-		DX::XMFLOAT3 rightAxisF3(1.f, 0.f, 0.f);
-		DX::XMVECTOR rightAxis = DX::XMLoadFloat3(&rightAxisF3);
-		m_cameras[i].RotateAroundAxis(rightRotations[i], rightAxis);
+		DX::XMVECTOR rotation = DX::XMVectorSet(
+			rotations[i][0],
+			rotations[i][1],
+			rotations[i][2],
+			0.0f
+		);
+		m_cameras[i]->GetTransform().SetRotation(rotation);
 	}
 }
 
@@ -100,7 +120,7 @@ void DCEM::Draw(ID3D11DeviceContext* context) const
 	}
 
 	ID3D11ShaderResourceView* nullsrv = nullptr;
-	context->PSSetShaderResources(4, 1, &nullsrv);
+	context->PSSetShaderResources(3, 1, &nullsrv);
 
 	ID3D11Buffer* nullBuffer = nullptr;
 	context->PSSetConstantBuffers(6, 1, &nullBuffer);

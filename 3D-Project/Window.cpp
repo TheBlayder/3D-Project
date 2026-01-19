@@ -97,38 +97,6 @@ LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 			m_inputHandler.setKeyState(key, InputHandler::RELEASED);
 			return 0;
 		}
-
-		// Mouse input handling
-		case WM_MOUSEMOVE:
-		{
-			const int xPos = GET_X_LPARAM(lParam);
-			const int yPos = GET_Y_LPARAM(lParam);
-			m_inputHandler.setMousePos(xPos, yPos);
-			return 0;
-		}
-		case WM_LBUTTONDOWN:
-		{
-			if(!m_inputHandler.LMDowm())
-				m_inputHandler.setLMouseKeyState(InputHandler::DOWN | InputHandler::PRESSED);
-			return 0;
-		}
-		case WM_LBUTTONUP:
-		{
-			m_inputHandler.setLMouseKeyState(InputHandler::RELEASED);
-			return 0;
-		}
-		case WM_RBUTTONDOWN:
-		{
-			if (!m_inputHandler.RMDowm())
-				m_inputHandler.setRMouseKeyState(InputHandler::DOWN | InputHandler::PRESSED);
-			return 0;
-		}
-		case WM_RBUTTONUP:
-		{
-			m_inputHandler.setRMouseKeyState(InputHandler::RELEASED);
-			return 0;
-		}
-
 		case WM_DESTROY:
 			PostQuitMessage(0);
 			return 0;
@@ -140,7 +108,6 @@ LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPAR
 }
 
 // === GETTERS ===
-
 HWND Window::GetWindowHandle() const
 {
 	return this->m_hWindow;

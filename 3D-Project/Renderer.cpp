@@ -3,7 +3,7 @@
 #include "BaseObject.h"
 #include "ReadCSO.h"
 
-bool Renderer::Init(const Window& window)
+bool Renderer::Init(const Window* window)
 {
 	// Set up device and swapchain
 	if(!CreateDeviceAndSwapChain(window)) return false;
@@ -85,11 +85,11 @@ void Renderer::RenderDCEMObjects(BaseScene* scene)
 	for (auto& dcem : dcemObjects)
 	{
 		std::array<ID3D11UnorderedAccessView**, 6> UAVAdresses = dcem->GetUAVAdresses();
-		std::array<Camera, 6> cubeCameras = dcem->GetCameras();
+		std::array<Camera*, 6> cubeCameras = dcem->GetCameras();
 		for (int i = 0; i < 6; ++i)
 		{
-			this->SetActiveCamera(&cubeCameras[i]);
-			m_immediateContext->RSSetViewports(1, &cubeCameras[i].GetViewport());
+			this->SetActiveCamera(cubeCameras[i]);
+			m_immediateContext->RSSetViewports(1, &cubeCameras[i]->GetViewport());
 
 			this->DeferredRender(scene, UAVAdresses[i]);
 		}
@@ -253,7 +253,7 @@ void Renderer::RenderParticles(BaseScene* scene)
 //	m_immediateContext->RSSetViewports(1, &m_viewport);
 //}
 
-bool Renderer::CreateDeviceAndSwapChain(const Window& window)
+bool Renderer::CreateDeviceAndSwapChain(const Window* window)
 {
 	UINT flags = 0;
 	if (_DEBUG)
@@ -262,8 +262,8 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 	D3D_FEATURE_LEVEL featureLevels[] = { D3D_FEATURE_LEVEL_11_0 };
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	swapChainDesc.BufferDesc.Width = window.GetWidth();
-	swapChainDesc.BufferDesc.Height = window.GetHeight();
+	swapChainDesc.BufferDesc.Width = window->GetWidth();
+	swapChainDesc.BufferDesc.Height = window->GetHeight();
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -275,7 +275,7 @@ bool Renderer::CreateDeviceAndSwapChain(const Window& window)
 
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_UNORDERED_ACCESS;
 	swapChainDesc.BufferCount = 2;
-	swapChainDesc.OutputWindow = window.GetWindowHandle();
+	swapChainDesc.OutputWindow = window->GetWindowHandle();
 	swapChainDesc.Windowed = true;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapChainDesc.Flags = 0;

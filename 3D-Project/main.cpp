@@ -23,7 +23,7 @@ int APIENTRY wWinMain(
 	const UINT WIN_WIDTH = 1280;
 	const UINT WIN_HEIGHT = 720;
 	
-	Window window(hInstance, nCmdShow, WIN_WIDTH, WIN_HEIGHT);
+	Window* window = new Window(hInstance, nCmdShow, WIN_WIDTH, WIN_HEIGHT);
 
 	Renderer renderer;
 	if (!renderer.Init(window))
@@ -34,7 +34,7 @@ int APIENTRY wWinMain(
 
 	BaseScene* scene = new TestScene();
 	bool hasParticles = true;
-	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), &window, renderer.GetDCEMPixelShader(), renderer.GetReturnPixelShader(), hasParticles);
+	scene->Init(renderer.GetDevice(), renderer.GetImmediateContext(), window, renderer.GetDCEMPixelShader(), renderer.GetReturnPixelShader(), hasParticles);
 
 
 	bool wireframeMode = false;
@@ -53,7 +53,7 @@ int APIENTRY wWinMain(
 		}
 
 		// Enable/disable wireframe mode to show tesselation effect
-		if(window.GetInputHandler().isDown('T'))
+		if(window->GetInputHandler().isDown('T'))
 		{
 			if (wireframeMode)
 			{
@@ -65,7 +65,7 @@ int APIENTRY wWinMain(
 				wireframeMode = true;
 				renderer.SetWireframe(true);
 			}
-			window.GetInputHandler().setKeyState('T', InputHandler::RELEASED); // Prevent continuous toggling
+			window->GetInputHandler().setKeyState('T', InputHandler::RELEASED); // Prevent continuous toggling
 		}
 
 		renderer.RenderFrame(scene, deltaTime);
@@ -76,6 +76,7 @@ int APIENTRY wWinMain(
 	}
 
 	delete scene;
+	delete window;
 
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
 	_CrtDumpMemoryLeaks();

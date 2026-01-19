@@ -59,6 +59,8 @@ public:
 	DirectX::XMFLOAT4X4 GetViewProjMatrix();
 	DeferredHandler* GetDeferredHandler();
 
+	Transform& GetTransform() { return m_transform; }
+
 	DX::XMVECTOR GetForward() const;
 	DX::XMVECTOR GetPosition() const;
 	DX::XMVECTOR GetRight() const;

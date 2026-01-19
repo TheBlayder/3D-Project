@@ -59,8 +59,8 @@ private:
 	// Camera
 	Camera* m_activeCamera = nullptr;
 
-	void CreateViewport(const Window& window);
-	bool CreateDeviceAndSwapChain(const Window& window);
+	//void CreateViewport(const Window& window);
+	bool CreateDeviceAndSwapChain(const Window* window);
 	bool CreateShaders(std::string& vShaderByteCodeOUT);
 	bool CreateInputLayout(const std::string& vShaderByteCode);
 	bool CreateUAV();
@@ -84,7 +84,7 @@ public:
 	Renderer() = default;
 	~Renderer() = default;
 
-	bool Init(const Window& window);
+	bool Init(const Window* window);
 	void RenderFrame(BaseScene* scene, const float deltaTime);
 
 	ID3D11Device* GetDevice() { return m_device.Get(); }
