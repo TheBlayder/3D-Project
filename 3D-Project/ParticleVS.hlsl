@@ -17,7 +17,7 @@ struct VSOutput
 
 StructuredBuffer<Particle> Particles : register(t0);
 
-VSOutput main( uint vertexID : SV_VertexID ) : POSITION
+VSOutput main( uint vertexID : SV_VertexID )
 {
     Particle p = Particles[vertexID];
     
