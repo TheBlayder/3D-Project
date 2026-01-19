@@ -23,15 +23,17 @@ private:
 	};
 
 	std::unique_ptr<Node> m_root;
+	size_t m_maxDepth;
 
 	void PrintTree(const std::unique_ptr<Node>& node);
-	void AddToNode(std::unique_ptr<Node>& node, T* elementAdress);
+	void AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_t currentDepth);
 	void CheckNode(std::unique_ptr<Node>& node, const DirectX::BoundingFrustum& frustum, std::vector<const T*>& foundObjects);
 
 	void SubdivideNode(std::unique_ptr<Node>& node);
 
 public:
-	QuadTree();
+	QuadTree(size_t maxDepth);
+	QuadTree() : m_maxDepth(0), m_root(nullptr) {}
 	void AddElement(T* elementAdress);
 	void PrintTree();
 	std::vector<T*> CheckTree(const DirectX::BoundingFrustum& frustum);
@@ -53,9 +55,19 @@ void QuadTree<T>::PrintTree(const std::unique_ptr<Node>& node)
 }
 
 template<typename T>
-void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
+void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_t currentDepth)
 {
 	if (!node) return;
+
+	if(currentDepth >= m_maxDepth)
+	{
+		// Max depth reached, add element here
+		if (node->elementAdress == nullptr)
+		{
+			node->elementAdress = elementAdress;
+		}
+		return;
+	}
 
 	bool collides = node->bounds.Intersects(elementAdress->GetBoundingBox());
 	if (!collides) // If no collision, do not add
@@ -77,7 +89,7 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
 			// Redistribute the current element to the appropriate child node
 			for (int i = 0; i < 4; ++i)
 			{
-				AddToNode(node->children[i], node->elementAdress);
+				AddToNode(node->children[i], node->elementAdress, currentDepth + 1);
 			}
 
 			node->elementAdress = nullptr;
@@ -87,7 +99,7 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress)
 	// Node is now always a parent, try to add to children
 	for (auto& child : node->children)
 	{
-		AddToNode(child, elementAdress);
+		AddToNode(child, elementAdress, currentDepth + 1);
 	}
 }
 
@@ -163,7 +175,7 @@ void QuadTree<T>::SubdivideNode(std::unique_ptr<Node>& node)
 }
 
 template<typename T>
-QuadTree<T>::QuadTree()
+QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 {
 	m_root = std::make_unique<Node>();
 	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(100.0f, 0.0f, 100.0f));
@@ -172,7 +184,7 @@ QuadTree<T>::QuadTree()
 template<typename T>
 void QuadTree<T>::AddElement(T* elementAdress)
 {
-	AddToNode(m_root, elementAdress);
+	AddToNode(m_root, elementAdress, 0);
 }
 
 template<typename T>

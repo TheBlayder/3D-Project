@@ -8,7 +8,9 @@
 void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window* window, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS, bool hasParticles)
 {	
 	m_window = window;
-	m_quadTree = QuadTree<BaseObject>();
+
+	size_t quadTreeMaxDepth = 5;
+	m_quadTree = QuadTree<BaseObject>(quadTreeMaxDepth);
 	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS, hasParticles);
 }
 

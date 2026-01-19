@@ -1,8 +1,6 @@
 #include "TestScene.h"
 
-TestScene::~TestScene()
-{
-}
+TestScene::~TestScene() {}
 
 void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context)
 {
