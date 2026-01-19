@@ -17,9 +17,8 @@ public:
 	bool Init(ID3D11Device* device, size_t byteSize, void* initData = nullptr);
 
 	ID3D11Buffer* GetBuffer() const;
-	ID3D11Buffer** GetBufferPtr();
+	ID3D11Buffer* const* GetBufferPtr() const;
 	const UINT GetSize();
 
 	void Update(ID3D11DeviceContext* context, void* data);
 };
-

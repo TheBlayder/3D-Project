@@ -39,14 +39,14 @@ private:
 
 	void Init(ID3D11Device* device);
 
-
 public:
 	DCEM(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName,
-		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
-
+	ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
+	
 	void Draw(ID3D11DeviceContext* context) const override;
-
+	
 	void Update(float deltaTime) override {};
+	void Update(ID3D11DeviceContext* context, float deltaTime, Camera* cam);
 
 	const void GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix);
 	const std::array<Camera, 6>& GetCameras() { return m_cameras; }

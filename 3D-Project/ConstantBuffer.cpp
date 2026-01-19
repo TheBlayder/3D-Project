@@ -40,7 +40,7 @@ ID3D11Buffer* ConstantBuffer::GetBuffer() const
 	return m_buffer.Get();
 }
 
-ID3D11Buffer** ConstantBuffer::GetBufferPtr()
+ID3D11Buffer* const* ConstantBuffer::GetBufferPtr() const
 {
 	return m_buffer.GetAddressOf();
 }

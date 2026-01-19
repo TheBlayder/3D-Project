@@ -89,6 +89,8 @@ void DCEM::Draw(ID3D11DeviceContext* context) const
 
 	context->PSSetShaderResources(3, 1, m_cubeMapSRV.GetAddressOf());
 
+	context->PSSetConstantBuffers(6, 1, m_cameraBuffer.GetBufferPtr());
+
 	m_mesh.BindMeshBuffers(context);
 
 	for (size_t i = 0; i < m_mesh.GetNrOfSubMeshes(); ++i)
@@ -100,7 +102,20 @@ void DCEM::Draw(ID3D11DeviceContext* context) const
 	ID3D11ShaderResourceView* nullsrv = nullptr;
 	context->PSSetShaderResources(4, 1, &nullsrv);
 
+	ID3D11Buffer* nullBuffer = nullptr;
+	context->PSSetConstantBuffers(6, 1, &nullBuffer);
+
 	context->PSSetShader(this->returnPS, nullptr, 0);
+}
+
+void DCEM::Update(ID3D11DeviceContext* context, float deltaTime, Camera* cam)
+{
+	using namespace DirectX;
+	XMVECTOR camPos = cam->GetPosition();
+	XMFLOAT4 camPosF4;
+	XMStoreFloat4(&camPosF4, camPos);
+
+	m_cameraBuffer.Update(context, &camPosF4);
 }
 
 const void DCEM::GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix)

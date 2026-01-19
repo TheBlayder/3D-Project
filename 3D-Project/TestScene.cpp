@@ -8,6 +8,11 @@ void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context)
 
 	m_particleHandler.Update(context, deltaTime);
 
+	for(auto& dcem : m_dcemObjects)
+	{
+		dcem->Update(context, deltaTime, m_camera.get());
+	}
+
 	// Rotating strawberry
 	float rotationSpeed = 30.f;
 	XMVECTOR strawberryRotation = m_sceneObjects[0]->GetTransform().GetRotation();

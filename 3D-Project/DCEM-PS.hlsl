@@ -2,7 +2,7 @@
 SamplerState samplerState : register(s0);
 
 // Camera properties (from DCEM)
-cbuffer CameraBuffer : register(b0)
+cbuffer CameraBuffer : register(b6)
 {
     float4 cameraPosition;
 };
