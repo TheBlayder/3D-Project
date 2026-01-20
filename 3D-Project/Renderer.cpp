@@ -176,8 +176,9 @@ void Renderer::GeometryPass(BaseScene* scene)
 	m_activeCamera->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
-	auto& sceneObjects = scene->GetSceneObjects();
-	for (auto& obj : sceneObjects)
+	//for (auto& obj : scene->GetVisableSceneObjects(m_activeCamera))
+	//scene->PrintThisTree();
+	for (auto& obj : scene->GetSceneObjects())
 	{
 		// Update world matrix constant buffer for each object
 		DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();

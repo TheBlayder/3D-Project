@@ -67,4 +67,6 @@ public:
 	std::vector<std::unique_ptr<BaseObject>>& GetSceneObjects();
 	std::vector<BaseObject*> GetVisableSceneObjects(Camera* camera);
 	std::vector<DCEM*>& GetDCEMObjects();
+
+	void PrintThisTree() { m_quadTree.PrintTree(); }
 };

@@ -59,7 +59,8 @@ void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, 
 	std::string& objectName, const std::string& textureFolder, const bool tesselate, const bool flipUVy)
 {
 	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
-	//m_quadTree.AddElement(newBaseObject.get());
+
+	m_quadTree.AddElement(newBaseObject.get());
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
 }
 
@@ -67,8 +68,8 @@ void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, 
 	std::string& folderPath, std::string& objectName, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {
 	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
-	//m_quadTree.AddElement(newDCEM.get());
 	
+	m_quadTree.AddElement(newDCEM.get());
 	m_dcemObjects.emplace_back(newDCEM.get());
 	m_sceneObjects.emplace_back(std::move(newDCEM));
 }
@@ -86,14 +87,23 @@ std::vector<DCEM*>& BaseScene::GetDCEMObjects()
 std::vector<BaseObject*> BaseScene::GetVisableSceneObjects(Camera* camera)
 {
     using namespace DirectX;
+
+	const float originalFov = camera->GetFov();
+
+	camera->SetFov(originalFov * 0.7f); // Temporary change FOV to be able to view culling during runtime
+
     BoundingFrustum frustum;
     XMFLOAT4X4 projMatrixF4 = camera->GetProjectionMatrix();
     XMMATRIX projMatrix = XMLoadFloat4x4(&projMatrixF4);
-	BoundingFrustum::CreateFromMatrix(frustum, projMatrix);
+    BoundingFrustum::CreateFromMatrix(frustum, projMatrix);
 
-	XMFLOAT4X4 viewMatrixF4 = camera->GetViewMatrix();
+    XMFLOAT4X4 viewMatrixF4 = camera->GetViewMatrix();
     XMMATRIX worldMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&viewMatrixF4));
-	frustum.Transform(frustum, worldMatrix);
+    BoundingFrustum worldFrustum;
+    frustum.Transform(worldFrustum, worldMatrix);
+    frustum = worldFrustum;
+
+	camera->SetFov(originalFov);
 
     return m_quadTree.CheckTree(frustum);
 }

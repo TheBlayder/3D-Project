@@ -6,6 +6,7 @@
 #include <DirectXCollision.h>
 #include <memory>
 #include <iostream>
+#include <queue>
 
 /// <summary>
 /// Class assuming that T has a public method "GetBoundingBox()" returning a DirectX::BoundingBox&
@@ -25,11 +26,12 @@ private:
 	std::unique_ptr<Node> m_root;
 	size_t m_maxDepth;
 
-	void PrintTree(const std::unique_ptr<Node>& node);
 	void AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_t currentDepth);
 	void CheckNode(std::unique_ptr<Node>& node, const DirectX::BoundingFrustum& frustum, std::vector<const T*>& foundObjects);
 
 	void SubdivideNode(std::unique_ptr<Node>& node);
+
+	void PrintNode(std::unique_ptr<Node>& node, size_t depth);
 
 public:
 	QuadTree(size_t maxDepth);
@@ -38,21 +40,6 @@ public:
 	void PrintTree();
 	std::vector<T*> CheckTree(const DirectX::BoundingFrustum& frustum);
 };
-
-
-template<typename T>
-void QuadTree<T>::PrintTree(const std::unique_ptr<Node>& node)
-{
-	if (!node)
-		return;
-
-	std::cout << "Node Bounds Center: (" << node->bounds.Center.x << ", " << node->bounds.Center.y << ", " << node->bounds.Center.z << ")\n";
-	std::cout << "Node Bounds Extents: (" << node->bounds.Extents.x << ", " << node->bounds.Extents.y << ", " << node->bounds.Extents.z << ")\n";
-	for (const auto& child : node->children)
-	{
-		PrintTree(child);
-	}
-}
 
 template<typename T>
 void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_t currentDepth)
@@ -74,7 +61,7 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_
 		return;
 
 	// Checks if node is a leaf by seeing if it has no children
-	bool isLeaf = (!node->children[0]);
+	bool isLeaf = (node->children[0] == nullptr);
 	if (isLeaf)
 	{
 		if (node->elementAdress == nullptr) 
@@ -84,12 +71,12 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_
 		}
 		else
 		{
-			SubdivideNode(node); // If occupied, subdivide and re-add existing and new element
+			this->SubdivideNode(node); // If occupied, subdivide and re-add existing and new element
 
 			// Redistribute the current element to the appropriate child node
 			for (int i = 0; i < 4; ++i)
 			{
-				AddToNode(node->children[i], node->elementAdress, currentDepth + 1);
+				this->AddToNode(node->children[i], node->elementAdress, currentDepth + 1);
 			}
 
 			node->elementAdress = nullptr;
@@ -99,7 +86,7 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_
 	// Node is now always a parent, try to add to children
 	for (auto& child : node->children)
 	{
-		AddToNode(child, elementAdress, currentDepth + 1);
+		this->AddToNode(child, elementAdress, currentDepth + 1);
 	}
 }
 
@@ -111,20 +98,23 @@ void QuadTree<T>::CheckNode(std::unique_ptr<Node>& node, const DirectX::Bounding
 		return;
 
 	// Checks if node is a leaf
-	bool isLeaf = (!node->children[0]);
+	bool isLeaf = (node->children[0] == nullptr);
 	if (isLeaf)
 	{
 		if (node->elementAdress)
 		{
-			//Check if there is a collision between the frustum and the object's bounding volume
-			collision = frustum.Intersects(node->elementAdress->GetBoundingBox());
-			if (collision)
+			if (node->elementAdress != nullptr)
 			{
-				// Check if object is already in the list to avoid duplicates
-				auto it = std::find(foundObjects.begin(), foundObjects.end(), node->elementAdress);
-				if (it == foundObjects.end())
+				//Check if there is a collision between the frustum and the object's bounding volume
+				collision = frustum.Intersects(node->elementAdress->GetBoundingBox());
+				if (collision)
 				{
-					foundObjects.push_back(node->elementAdress);
+					// Check if object is already in the list to avoid duplicates
+					auto it = std::find(foundObjects.begin(), foundObjects.end(), node->elementAdress);
+					if (it == foundObjects.end())
+					{
+						foundObjects.push_back(node->elementAdress);
+					}
 				}
 			}
 		}
@@ -134,7 +124,7 @@ void QuadTree<T>::CheckNode(std::unique_ptr<Node>& node, const DirectX::Bounding
 		// If not a leaf, check children
 		for (auto& child : node->children)
 		{
-			CheckNode(child, frustum, foundObjects);
+			this->CheckNode(child, frustum, foundObjects);
 		}
 	}
 }
@@ -175,6 +165,46 @@ void QuadTree<T>::SubdivideNode(std::unique_ptr<Node>& node)
 }
 
 template<typename T>
+inline void QuadTree<T>::PrintNode(std::unique_ptr<Node>& node, size_t depth)
+{
+	if (!node) return;
+
+	std::queue<std::pair<Node*, int>> queue;
+	queue.push({ node.get(), depth });
+
+	while (!queue.empty()) {
+		auto [currentNode, currentDepth] = queue.front();
+		queue.pop();
+
+		// Indentation based on depth
+		std::cout << std::string(currentDepth * 2, ' ') << "Node at depth " << currentDepth << ":\n";
+
+		// Bounding box details
+		std::cout << std::string(currentDepth * 2, ' ') << "  BoundingBox Center: ("
+			<< currentNode->bounds.Center.x << ", " << currentNode->bounds.Center.y << ", "
+			<< currentNode->bounds.Center.z << ")\n";
+		std::cout << std::string(currentDepth * 2, ' ') << "  BoundingBox Extents: ("
+			<< currentNode->bounds.Extents.x << ", " << currentNode->bounds.Extents.y << ", "
+			<< currentNode->bounds.Extents.z << ")\n";
+
+		// Print element address if present
+		if (currentNode->elementAdress) {
+			std::cout << std::string(currentDepth * 2, ' ') << " Element Address: " << currentNode->elementAdress
+				<< "\n";
+		}
+		else {
+			std::cout << std::string(currentDepth * 2, ' ') << " Element Address: None\n";
+		}
+
+		for (int i = 0; i < 4; ++i) {
+			if (currentNode->children[i]) {
+				queue.push({ currentNode->children[i].get(), currentDepth + 1 });
+			}
+		}
+	}
+}
+
+template<typename T>
 QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 {
 	m_root = std::make_unique<Node>();
@@ -184,20 +214,20 @@ QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 template<typename T>
 void QuadTree<T>::AddElement(T* elementAdress)
 {
-	AddToNode(m_root, elementAdress, 0);
+	this->AddToNode(m_root, elementAdress, 0);
 }
 
 template<typename T>
 void QuadTree<T>::PrintTree()
 {
-	PrintTree(m_root);
+	this->PrintNode(m_root, 0);
 }
 
 template<typename T>
 std::vector<T*> QuadTree<T>::CheckTree(const DirectX::BoundingFrustum& frustum)
 {
 	std::vector<const T*> foundObjects;
-	CheckNode(m_root, frustum, foundObjects);
+	this->CheckNode(m_root, frustum, foundObjects);
 
 	// Convert std::vector<const T*> to std::vector<T*>
 	std::vector<T*> result;
