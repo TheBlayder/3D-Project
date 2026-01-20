@@ -38,7 +38,7 @@ PSOutput main(PSInput input) : SV_TARGET
     output.normal = input.NORMAL;
     
     float3 incomingView = normalize(input.WORLD_POSITION.xyz - cameraPosition.xyz);
-    float3 reflectedView = reflect(incomingView, normalize(input.NORMAL.xyz));
+    float3 reflectedView = normalize(reflect(incomingView, normalize(input.NORMAL.xyz)));
     output.ambient = cubeMap.Sample(samplerState, reflectedView);
     output.diffuse = float4(0.f, 0.f, 0.f, 1.f);
     output.specular = float4(0.f, 0.f, 0.f, 1.f);

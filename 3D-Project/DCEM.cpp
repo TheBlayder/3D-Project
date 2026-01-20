@@ -80,13 +80,14 @@ void DCEM::Init(ID3D11Device* device)
 	projData.nearPlane = 0.1f;
 	projData.m_farPlane = 100.f;
 
+	// Standard DirectX cube map orientation (Right-handed to Left-handed conversion)
 	float rotations[6][3] = {
-	{ 0.0f,   90.0f,  0.0f },  // +X:
-	{ 0.0f,  -90.0f,  0.0f },  // -X:
-	{ -90.0f,  0.0f,  0.0f },  // +Y:
-	{ 90.0f,   0.0f,  0.0f },  // -Y:
-	{ 0.0f,    0.0f,  0.0001f },  // +Z:
-	{ 0.0f,  180.0f,  0.0f }   // -Z:
+		{ 0.0f,   90.0f,  0.0f },   // +X: Right
+		{ 0.0f,  -90.0f,  0.0f },   // -X: Left
+		{ -90.0f,  180.0f,  0.0f },   // +Y: Top (inverted from standard to match DirectX LH)
+		{ 90.0f,  0.0f,  0.0f },   // -Y: Bottom
+		{ 0.0f,    0.0f,  0.0001f }, // +Z: Front
+		{ 0.0f,  180.0f,  0.0f }    // -Z: Back
 	};
 
 	for (size_t i = 0; i < 6; ++i)
