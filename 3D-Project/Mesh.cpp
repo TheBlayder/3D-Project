@@ -22,6 +22,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 {
 	const std::string filePath = folderPath + "/" + objectName;
 	objl::Loader loader;
+
 	if (!loader.LoadFile(filePath))
 	{
 		throw std::runtime_error("Failed to load mesh from file: " + filePath);

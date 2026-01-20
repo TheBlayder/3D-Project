@@ -63,20 +63,31 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Floor
 	Transform floorTransform;
-	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -1.5f, 0.0f, 0.0f));
+	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -19.f, 0.0f, 0.0f));
 	floorTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	floorTransform.SetScale(DirectX::XMVectorSet(10.f, 0.5f, 10.f, 0.0f));
-	folderPath = "./Objects/Cube";
-	objectName = "cube.obj";
-	AddGameObject(device, floorTransform, folderPath, objectName, "", true);
+	floorTransform.SetScale(DirectX::XMVectorSet(1.f, 0.5f, 1.f, 0.0f));
+	folderPath = "./Objects/Desk/metal_table";
+	objectName = "metal_table.obj";
+	textureFolder = "/textures";
+	AddGameObject(device, floorTransform, folderPath, objectName, textureFolder);
+
+	// Desk
+	Transform deskTransform;
+	deskTransform.SetPosition(DirectX::XMVectorSet(4.0f, -1.1f, 0.0f, 0.0f));
+	deskTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
+	deskTransform.SetScale(DirectX::XMVectorSet(0.05f, 0.05f, 0.05f, 0.0f));
+	folderPath = "./Objects/Desk/metal_table";
+	objectName = "metal_table.obj";
+	textureFolder = "/textures";
+	AddGameObject(device, deskTransform, folderPath, objectName, textureFolder, false);
 
 	// DCEM Cube
 	Transform DCEMTransform;
 	DCEMTransform.SetPosition(DirectX::XMVectorSet(0.0f, 2.0f, 2.0f, 0.0f));
 	DCEMTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
 	DCEMTransform.SetScale(DirectX::XMVectorSet(1.5f, 1.5f, 1.5f, 0.0f));
-	folderPath = "./Objects/Cube";
-	objectName = "cube.obj";
+	folderPath = "./Objects/SimpleSphere";
+	objectName = "Sphere.obj";
 	UINT resolution = 512;
 	AddDCEMObject(device, DCEMTransform, resolution, folderPath, objectName, dcemPS, returnPS);
 }
@@ -101,6 +112,15 @@ void TestScene::LoadSceneLights(ID3D11Device* device, ID3D11DeviceContext* conte
 	spotLightData.outerConeinDeg = 30.f;
 	spotLightData.range = 30.f;
 	m_lightHandler->AddSpotLight(spotLightData);
+
+	Transform lightTransform;
+	XMVECTOR lightPos = XMLoadFloat3(&spotLightData.position);
+	lightTransform.SetPosition(lightPos);
+	lightTransform.SetRotation(DirectX::XMVectorSet(0.f, 0.f, 0.f, 0.f));
+	lightTransform.SetScale(DirectX::XMVectorSet(0.2f, 0.2f, 0.2f, 0.f));
+	std::string folderPath = "./Objects/Bulb";
+	std::string objectName = "BULB.obj";
+	AddGameObject(device, lightTransform, folderPath, objectName);
 
 	DirectionalLightData dirLightData = {};
 	dirLightData.color = XMFLOAT4(1.f, 1.f, 1.f, 1.f);
