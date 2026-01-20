@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "DCEM.h"
 
+#include "HelperFuncs.h"
+
 #include <algorithm>
 #include <memory>
 
@@ -9,7 +11,7 @@ void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window*
 {	
 	m_window = window;
 
-	size_t quadTreeMaxDepth = 5;
+	size_t quadTreeMaxDepth = 8;
 	m_quadTree = QuadTree<BaseObject>(quadTreeMaxDepth);
 	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS, hasParticles);
 }
@@ -88,22 +90,20 @@ std::vector<BaseObject*> BaseScene::GetVisableSceneObjects(Camera* camera)
 {
     using namespace DirectX;
 
-	const float originalFov = camera->GetFov();
-
-	camera->SetFov(originalFov * 0.7f); // Temporary change FOV to be able to view culling during runtime
+	ProjectionData projData = camera->GetProjectionData();
+	projData.fovInDeg -= 20.f;
 
     BoundingFrustum frustum;
-    XMFLOAT4X4 projMatrixF4 = camera->GetProjectionMatrix();
+	XMFLOAT4X4 projMatrixF4; 
+	MatrixHelper::CreateProjectionMatrix(projMatrixF4, projData.fovInDeg, projData.aspectRatio, projData.nearPlane, projData.m_farPlane);
     XMMATRIX projMatrix = XMLoadFloat4x4(&projMatrixF4);
-    BoundingFrustum::CreateFromMatrix(frustum, projMatrix);
+    BoundingFrustum::CreateFromMatrix(frustum, projMatrix); 
 
     XMFLOAT4X4 viewMatrixF4 = camera->GetViewMatrix();
     XMMATRIX worldMatrix = XMMatrixInverse(nullptr, XMLoadFloat4x4(&viewMatrixF4));
     BoundingFrustum worldFrustum;
     frustum.Transform(worldFrustum, worldMatrix);
     frustum = worldFrustum;
-
-	camera->SetFov(originalFov);
 
     return m_quadTree.CheckTree(frustum);
 }

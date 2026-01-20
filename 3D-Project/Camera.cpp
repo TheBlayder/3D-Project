@@ -83,7 +83,7 @@ void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT wid
 void Camera::Update(InputHandler& input, float deltaTime)
 {
 	const float moveAmount = m_cameraSpeed * deltaTime;
-	const float rotateAmount = 90.0f * deltaTime; // 90 degrees per second
+	const float rotateAmount = 75.0f * deltaTime; // 90 degrees per second
 
 	if (input.isDown('W'))
 		MoveInDirection(-moveAmount, GetForward());

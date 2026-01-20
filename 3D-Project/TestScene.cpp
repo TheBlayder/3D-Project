@@ -8,6 +8,9 @@ void TestScene::UpdateScene(const float deltaTime, ID3D11DeviceContext* context)
 
 	m_camera->Update(this->GetWindow()->GetInputHandler(), deltaTime);
 
+	if (this->IsScenePaused()) // If the scene is paused, only update the camera
+		return;
+
 	m_particleHandler.Update(context, deltaTime);
 
 	for(auto& dcem : m_dcemObjects)
@@ -50,7 +53,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
-	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
+	//AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
 
 	// Boat
 	Transform boatTransform;
@@ -59,21 +62,21 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
 	objectName = "boat.obj";
-	AddGameObject(device, boatTransform, folderPath, objectName, "", true);
+	AddGameObject(device, boatTransform, folderPath, objectName, "", false);
 
 	// Floor
 	Transform floorTransform;
 	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -19.f, 0.0f, 0.0f));
 	floorTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	floorTransform.SetScale(DirectX::XMVectorSet(1.f, 0.5f, 1.f, 0.0f));
+	floorTransform.SetScale(DirectX::XMVectorSet(0.7f, 0.2f, 0.7f, 0.0f));
 	folderPath = "./Objects/Desk/metal_table";
 	objectName = "metal_table.obj";
 	textureFolder = "/textures";
-	AddGameObject(device, floorTransform, folderPath, objectName, textureFolder);
+	//AddGameObject(device, floorTransform, folderPath, objectName, textureFolder);
 
 	// Desk
 	Transform deskTransform;
-	deskTransform.SetPosition(DirectX::XMVectorSet(4.0f, -1.1f, 0.0f, 0.0f));
+	deskTransform.SetPosition(DirectX::XMVectorSet(20.0f, -1.1f, 0.0f, 0.0f));
 	deskTransform.SetRotation(DirectX::XMVectorSet(0.0f, 90.f, 0.0f, 0.0f));
 	deskTransform.SetScale(DirectX::XMVectorSet(0.05f, 0.05f, 0.05f, 0.0f));
 	folderPath = "./Objects/Desk/metal_table";

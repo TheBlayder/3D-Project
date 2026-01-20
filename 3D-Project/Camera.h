@@ -61,6 +61,8 @@ public:
 
 	Transform& GetTransform() { return m_transform; }
 
+	ProjectionData GetProjectionData() { return m_projData; }
+
 	DX::XMVECTOR GetForward() const;
 	DX::XMVECTOR GetPosition() const;
 	DX::XMVECTOR GetRight() const;

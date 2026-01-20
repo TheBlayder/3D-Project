@@ -64,6 +64,13 @@ bool Renderer::SetTesselation(const bool enable)
 
 void Renderer::RenderFrame(BaseScene* scene, const float deltaTime)
 {
+	// Update render mode buffer if changed
+	if(scene->GetRenderMode() != m_renderModeData.renderMode)
+	{
+		m_renderModeData.renderMode = scene->GetRenderMode();
+		m_renderModeBuffer.Update(m_immediateContext.Get(), &m_renderModeData);
+	}
+
 	// Update scene (camera, objects, lights, particles, etc.)
 	scene->UpdateScene(deltaTime, m_immediateContext.Get());
 
@@ -176,9 +183,9 @@ void Renderer::GeometryPass(BaseScene* scene)
 	m_activeCamera->GetDeferredHandler()->BindGeometryPass(m_immediateContext.Get());
 
 	// Draw all game objects in the scene
-	//for (auto& obj : scene->GetVisableSceneObjects(m_activeCamera))
 	//scene->PrintThisTree();
-	for (auto& obj : scene->GetSceneObjects())
+	//for (auto& obj : scene->GetSceneObjects())
+	for (auto& obj : scene->GetVisableSceneObjects(m_activeCamera))
 	{
 		// Update world matrix constant buffer for each object
 		DirectX::XMFLOAT4X4 worldMatrix = obj->GetWorldMatrix();
@@ -239,7 +246,7 @@ void Renderer::LightPass(BaseScene* scene, ID3D11UnorderedAccessView** targetUAV
 void Renderer::RenderParticles(BaseScene* scene)
 {
 	// Draw particles
-	scene->GetParticleHandler().Draw(m_immediateContext.Get(), m_activeCamera, m_primitiveTopology, m_inputLayout.Get());
+	scene->GetParticleHandler().Draw(m_immediateContext.Get(), m_activeCamera, m_primitiveTopology, m_inputLayout.Get(), scene->IsScenePaused());
 }
 
 
@@ -556,6 +563,13 @@ bool Renderer::CreateConstantBuffers()
 		return false;
 	}
 
+	// Render mode buffer
+	if (!m_renderModeBuffer.Init(m_device.Get(), sizeof(RenderModeData), &m_renderModeData))
+	{
+		std::cerr << "Error creating render mode constant buffer!" << std::endl;
+		return false;
+	}
+
 	// Tesselation buffer
 	if(!m_tesselationBuffer.Init(m_device.Get(), sizeof(TesselationData), &m_tessData))
 	{
@@ -565,6 +579,7 @@ bool Renderer::CreateConstantBuffers()
 
 	m_immediateContext->VSSetConstantBuffers(0, 1, m_worldBuffer.GetBufferPtr());
 	m_immediateContext->VSSetConstantBuffers(1, 1, m_viewProjectionBuffer.GetBufferPtr());
+	m_immediateContext->CSSetConstantBuffers(9, 1, m_renderModeBuffer.GetBufferPtr());
 
 	return true;
 }

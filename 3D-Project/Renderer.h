@@ -15,6 +15,12 @@ struct TesselationData
 	DirectX::XMFLOAT3 padding = {0.f ,0.f, 0.f};
 };
 
+struct RenderModeData
+{
+	int renderMode = RenderMode::Standard;
+	DirectX::XMFLOAT3 padding = {0.f, 0.f, 0.f};
+};
+
 class Renderer
 {
 private:
@@ -52,6 +58,9 @@ private:
 	// Constant buffers
 	ConstantBuffer m_worldBuffer;
 	ConstantBuffer m_viewProjectionBuffer;
+
+	RenderModeData m_renderModeData = {};
+	ConstantBuffer m_renderModeBuffer;
 
 	TesselationData m_tessData;
 	ConstantBuffer m_tesselationBuffer;

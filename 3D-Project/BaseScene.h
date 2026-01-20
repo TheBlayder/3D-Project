@@ -17,6 +17,16 @@
 
 namespace DX = DirectX;
 
+enum RenderMode
+{
+	Standard = 1,
+	Position = 2,
+	Normals = 3,
+	Ambient = 4,
+	Diffuse = 5,
+	Specular = 6,
+};
+
 // Abstract base class for scenes
 class BaseScene
 {
@@ -32,6 +42,10 @@ protected:
 
 	bool m_hasParticles = false;
 	ParticleHandler m_particleHandler;
+
+	RenderMode m_renderMode = RenderMode::Standard;
+
+	bool m_sceneIsPaused = false;
 
 	void UpdateSceneLights(ID3D11DeviceContext* context);
 
@@ -67,6 +81,12 @@ public:
 	std::vector<std::unique_ptr<BaseObject>>& GetSceneObjects();
 	std::vector<BaseObject*> GetVisableSceneObjects(Camera* camera);
 	std::vector<DCEM*>& GetDCEMObjects();
+
+	RenderMode GetRenderMode() const { return m_renderMode; }
+	void SetRenderMode(RenderMode mode) { m_renderMode = mode; }
+
+	bool IsScenePaused() const { return m_sceneIsPaused; }
+	void SetScenePaused(const bool paused) { m_sceneIsPaused = paused; }
 
 	void PrintThisTree() { m_quadTree.PrintTree(); }
 };

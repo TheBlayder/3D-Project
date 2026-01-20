@@ -87,7 +87,7 @@ void ParticleHandler::Update(ID3D11DeviceContext* context, const float deltaTime
 	context->CSSetUnorderedAccessViews(1, 1, &nullUAV, nullptr);
 }
 
-void ParticleHandler::Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRIMITIVE_TOPOLOGY returnTopology, ID3D11InputLayout* returnInputLayout)
+void ParticleHandler::Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRIMITIVE_TOPOLOGY returnTopology, ID3D11InputLayout* returnInputLayout, const bool isScenePaused)
 {
 	context->IASetInputLayout(nullptr);
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
@@ -99,7 +99,9 @@ void ParticleHandler::Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRI
 	camData.vpMatrix = camera->GetViewProjMatrix();
 	DX::XMVECTOR camPos = camera->GetPosition();
 	DX::XMStoreFloat3(&camData.cameraPosition, camPos);
+	camData.isScenePaused = isScenePaused ? 1 : 0;
 	m_cameraBuffer.Update(context, &camData);
+
 	context->GSSetShader(m_particleGS.Get(), nullptr, 0);
 	context->GSSetConstantBuffers(0, 1, m_cameraBuffer.GetBufferPtr());
 

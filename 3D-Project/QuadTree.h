@@ -44,8 +44,6 @@ public:
 template<typename T>
 void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_t currentDepth)
 {
-	if (!node) return;
-
 	if(currentDepth >= m_maxDepth)
 	{
 		// Max depth reached, add element here
@@ -56,7 +54,8 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_
 		return;
 	}
 
-	bool collides = node->bounds.Intersects(elementAdress->GetBoundingBox());
+	//bool collides = node->bounds.Intersects(elementAdress->GetBoundingBox());
+	bool collides = elementAdress->GetBoundingBox().Intersects(node->bounds);
 	if (!collides) // If no collision, do not add
 		return;
 
@@ -101,20 +100,17 @@ void QuadTree<T>::CheckNode(std::unique_ptr<Node>& node, const DirectX::Bounding
 	bool isLeaf = (node->children[0] == nullptr);
 	if (isLeaf)
 	{
-		if (node->elementAdress)
+		if (node->elementAdress != nullptr)
 		{
-			if (node->elementAdress != nullptr)
+			//Check if there is a collision between the frustum and the object's bounding volume
+			collision = frustum.Intersects(node->elementAdress->GetBoundingBox());
+			if (collision)
 			{
-				//Check if there is a collision between the frustum and the object's bounding volume
-				collision = frustum.Intersects(node->elementAdress->GetBoundingBox());
-				if (collision)
+				// Check if object is already in the list to avoid duplicates
+				auto it = std::find(foundObjects.begin(), foundObjects.end(), node->elementAdress);
+				if (it == foundObjects.end())
 				{
-					// Check if object is already in the list to avoid duplicates
-					auto it = std::find(foundObjects.begin(), foundObjects.end(), node->elementAdress);
-					if (it == foundObjects.end())
-					{
-						foundObjects.push_back(node->elementAdress);
-					}
+					foundObjects.push_back(node->elementAdress);
 				}
 			}
 		}
@@ -124,6 +120,7 @@ void QuadTree<T>::CheckNode(std::unique_ptr<Node>& node, const DirectX::Bounding
 		// If not a leaf, check children
 		for (auto& child : node->children)
 		{
+			if(child == nullptr) continue;
 			this->CheckNode(child, frustum, foundObjects);
 		}
 	}
@@ -141,10 +138,10 @@ void QuadTree<T>::SubdivideNode(std::unique_ptr<Node>& node)
 	// Children bounding volume offsets:
 	const XMVECTOR offsets[4] =
 	{
-		XMVectorSet(-XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f), // Top-Left
-		XMVectorSet(XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f), // Top-Right
 		XMVectorSet(-XMVectorGetX(halfExtents), 0.0f, -XMVectorGetZ(halfExtents), 0.0f), // Bottom-Left
-		XMVectorSet(XMVectorGetX(halfExtents), 0.0f, -XMVectorGetZ(halfExtents), 0.0f)  // Bottom-Right
+		XMVectorSet(XMVectorGetX(halfExtents), 0.0f, -XMVectorGetZ(halfExtents), 0.0f),  // Bottom-Right
+		XMVectorSet(-XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f), // Top-Left
+		XMVectorSet(XMVectorGetX(halfExtents), 0.0f,  XMVectorGetZ(halfExtents), 0.0f)	// Top-Right
 	};
 
 	// Generate children
@@ -208,7 +205,7 @@ template<typename T>
 QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 {
 	m_root = std::make_unique<Node>();
-	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(100.0f, 0.0f, 100.0f));
+	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(100.0f, 100.0f, 100.0f));
 }
 
 template<typename T>

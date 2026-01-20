@@ -38,6 +38,7 @@ int APIENTRY wWinMain(
 
 
 	bool wireframeMode = false;
+
 	// === MAIN LOOP ===
 	MSG msg = { };
 	float deltaTime = 0.0f;
@@ -66,6 +67,23 @@ int APIENTRY wWinMain(
 				renderer.SetWireframe(true);
 			}
 			window->GetInputHandler().setKeyState('T', InputHandler::RELEASED); // Prevent continuous toggling
+		}
+
+		// Check for RenderMode change
+		for(int i = 1; i <= 6; ++i)
+		{
+			if(window->GetInputHandler().isDown('0' + i))
+			{
+				scene->SetRenderMode(static_cast<RenderMode>(i));
+				window->GetInputHandler().setKeyState('0' + i, InputHandler::RELEASED);
+			}
+		}
+
+		// Check for pause toggle
+		if(window->GetInputHandler().isDown('P'))
+		{
+			scene->SetScenePaused(!scene->IsScenePaused());
+			window->GetInputHandler().setKeyState('P', InputHandler::RELEASED);
 		}
 
 		renderer.RenderFrame(scene, deltaTime);

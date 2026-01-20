@@ -14,24 +14,24 @@ namespace DX = DirectX;
 
 struct Particle
 {
-	DX::XMFLOAT3 position;
-	float size;
-	DX::XMFLOAT3 velocity;
+	DX::XMFLOAT3 position = { 0.f, 0.f, 0.f };
+	float size = 0;
+	DX::XMFLOAT3 velocity = { 0.f, 0.f, 0.f };
 	float padding = 0;
-	DX::XMFLOAT4 color;
+	DX::XMFLOAT4 color = { 0.f, 0.f, 0.f , 0.f };
 };
 
 struct TimeBufferData
 {
 	float deltaTime = 0;
-	DX::XMFLOAT3 padding = {0.f, 0.f, 0.f};
+	DX::XMFLOAT3 padding = { 0.f, 0.f, 0.f };
 };
 
 struct CameraBufferData
 {
 	DX::XMFLOAT4X4 vpMatrix;
 	DX::XMFLOAT3 cameraPosition = { 0.f, 0.f, 0.f };
-	float padding = 0;
+	int isScenePaused = 0;
 };
 
 class ParticleHandler
@@ -55,7 +55,7 @@ public:
 	void Init(ID3D11Device* device, ID3D11DeviceContext* context, UINT nrOfParticles, bool dynamic, bool hasSRV, bool hasUAV);
 
 	void Update(ID3D11DeviceContext* context, const float deltaTime);
-	void Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRIMITIVE_TOPOLOGY returnTopology, ID3D11InputLayout* returnInputLayout);
+	void Draw(ID3D11DeviceContext* context, Camera* camera, D3D_PRIMITIVE_TOPOLOGY returnTopology, ID3D11InputLayout* returnInputLayout, const bool isScenePaused);
 
 	// Getters
 	ID3D11VertexShader* GetParticleVS() const { return m_particleVS.Get(); }

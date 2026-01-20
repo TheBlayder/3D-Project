@@ -21,6 +21,20 @@ cbuffer LightData : register(b0)
     float padding2;
 };
 
+cbuffer RenderMode : register(b9)
+{
+    int renderMode;
+    float3 padding3;
+};
+
+// Define render modes
+static const int RENDER_STANDARD = 1;
+static const int RENDER_POSITION = 2;
+static const int RENDER_NORMAL = 3;
+static const int RENDER_AMBIENT = 4;
+static const int RENDER_DIFFUSE = 5;
+static const int RENDER_SPECULAR = 6;
+
 struct SpotLight
 {
     float3 position;
@@ -54,109 +68,131 @@ static const int threadGroupSizeXY = 8;
 [numthreads(threadGroupSizeXY, threadGroupSizeXY, 1)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    float4 diffuseComponent = 0.f;
-    float4 specularComponent = 0.f;
-    float specularExponent = specularGBuffer[DTid.xy].w;   
-    
-    float4 positionSample = float4(positionGBuffer[DTid.xy].xyz, 1.f);
-    float4 normalSample = float4(normalize(normalGBuffer[DTid.xy].xyz), 0.f);
-    float4 viewDirection_n = normalize(float4(cameraPosition, 0.f) - positionSample);
-    
-    const float depthBias = 0.001f;
-    
-    // Process spot lights
-    for (int i = 0; i < nrOfSpotLights; ++i)
+    if(renderMode == RENDER_STANDARD)
     {
-        SpotLight light = spotLights[i];
+        float4 diffuseComponent = 0.f;
+        float4 specularComponent = 0.f;
+        float specularExponent = specularGBuffer[DTid.xy].w;   
+    
+        float4 positionSample = float4(positionGBuffer[DTid.xy].xyz, 1.f);
+        float4 normalSample = float4(normalize(normalGBuffer[DTid.xy].xyz), 0.f);
+        float4 viewDirection_n = normalize(float4(cameraPosition, 0.f) - positionSample);
+    
+        const float depthBias = 0.001f;
+    
+        // Process spot lights
+        for (int i = 0; i < nrOfSpotLights; ++i)
+        {
+            SpotLight light = spotLights[i];
         
-        // Shadow calculation
-        float4 lightClip = mul(positionSample, light.vpMatrix);
-        if(lightClip.w <= 0.f)
-            continue;
-        float3 lightNDC = lightClip.xyz / lightClip.w;
+            // Shadow calculation
+            float4 lightClip = mul(positionSample, light.vpMatrix);
+            if(lightClip.w <= 0.f)
+                continue;
+            float3 lightNDC = lightClip.xyz / lightClip.w;
         
-        float3 lightUV = float3(lightNDC.x * 0.5f + 0.5f, lightNDC.y * -0.5f + 0.5f, i);
-        float depth = spotLightShadowMaps.SampleLevel(shadowSampler, lightUV, 0).r;
-        bool isInShadow = lightNDC.z > depth + depthBias;
-        if (isInShadow)
-            continue;
+            float3 lightUV = float3(lightNDC.x * 0.5f + 0.5f, lightNDC.y * -0.5f + 0.5f, i);
+            float depth = spotLightShadowMaps.SampleLevel(shadowSampler, lightUV, 0).r;
+            bool isInShadow = lightNDC.z > depth + depthBias;
+            if (isInShadow)
+                continue;
      
-        // Check if pixel is within range of light.
-        float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
-        if (length(lightToPixelVec) > light.range)
-            continue;
+            // Check if pixel is within range of light.
+            float4 lightToPixelVec = positionSample - float4(light.position, 0.f);
+            if (length(lightToPixelVec) > light.range)
+                continue;
         
-        float4 lightToPixel_n = normalize(lightToPixelVec);
+            float4 lightToPixel_n = normalize(lightToPixelVec);
     
-        // Check if pixel is facing away from the light
-        if (dot(normalSample, -lightToPixel_n) <= 0.f)
-            continue;
+            // Check if pixel is facing away from the light
+            if (dot(normalSample, -lightToPixel_n) <= 0.f)
+                continue;
         
-        float cosInnerCone = cos(radians(light.innerConeInDeg));
-        float cosOuterCone = cos(radians(light.outerConeInDeg));
+            float cosInnerCone = cos(radians(light.innerConeInDeg));
+            float cosOuterCone = cos(radians(light.outerConeInDeg));
         
-        // Calculate spotlight cone attenuation
-        float theta = dot(normalize(float4(light.direction, 0.f)), lightToPixel_n);
-        float epsilon = cosInnerCone - cosOuterCone;
-        float spotAttenuation = clamp((theta - cosOuterCone) / epsilon, 0.f, 1.f);
+            // Calculate spotlight cone attenuation
+            float theta = dot(normalize(float4(light.direction, 0.f)), lightToPixel_n);
+            float epsilon = cosInnerCone - cosOuterCone;
+            float spotAttenuation = clamp((theta - cosOuterCone) / epsilon, 0.f, 1.f);
         
-        // Check if outside spotlight cone
-        if (spotAttenuation <= 0.f)
-            continue;
+            // Check if outside spotlight cone
+            if (spotAttenuation <= 0.f)
+                continue;
         
-        // Diffuse calculation
-        float irradience = max(dot(normalSample, -lightToPixel_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
-        float distance = length(lightToPixelVec);
-        float falloff = 1.0f / (distance * distance); // Inverse square falloff
-        float combinedIntensity = falloff * light.intensity * spotAttenuation; // Shared variable to spare on computations
+            // Diffuse calculation
+            float irradience = max(dot(normalSample, -lightToPixel_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
+            float distance = length(lightToPixelVec);
+            float falloff = 1.0f / (distance * distance); // Inverse square falloff
+            float combinedIntensity = falloff * light.intensity * spotAttenuation; // Shared variable to spare on computations
         
-        diffuseComponent += combinedIntensity * irradience * light.color;
+            diffuseComponent += combinedIntensity * irradience * light.color;
         
-        // Specular calculation
-        float4 halfVector_n = normalize(-lightToPixel_n + viewDirection_n);
-        float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
-        float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
+            // Specular calculation
+            float4 halfVector_n = normalize(-lightToPixel_n + viewDirection_n);
+            float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
+            float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
         
-        specularComponent += specularIntensity * combinedIntensity * light.color;
+            specularComponent += specularIntensity * combinedIntensity * light.color;
+        }
+    
+        // Process directional lights
+        for (int i = 0; i < nrOfDirectionalLights; ++i)
+        {
+            DirectionalLight light = directionalLights[i];
+        
+            // Shadow calculation
+            float4 lightClip = mul(positionSample, light.vpMatrix);
+            float3 lightNDC = lightClip.xyz / lightClip.w;
+        
+            float3 lightUV = float3(lightNDC.x * 0.5f + 0.5f, lightNDC.y * -0.5f + 0.5f, i);
+            float depth = directionalLightShadowMaps.SampleLevel(shadowSampler, lightUV, 0).r;
+            bool isInShadow = lightNDC.z > depth + depthBias;
+            if (isInShadow)
+                continue;
+        
+            // Check if pixel is facing the light
+            float4 direction_n = normalize(float4(light.direction, 0.f));
+            float irradience = dot(normalSample, -direction_n);
+            if(irradience <= 0.f)
+                continue;
+        
+            // Diffuse
+            float combinedIntensity = light.intensity * irradience;
+        
+            diffuseComponent += combinedIntensity * light.color;
+        
+            // Specular
+            float4 halfVector_n = normalize(-direction_n + viewDirection_n);
+            float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
+            float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
+        
+            specularComponent += combinedIntensity * specularIntensity * light.color;
+        }
+    
+        float4 ambientFinal = ambientGBuffer[DTid.xy];
+        float4 diffuseFinal = diffuseGBuffer[DTid.xy] * diffuseComponent;
+        float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
+        backBufferUAV[float3(DTid.xy, 0.f)] = ambientFinal + diffuseFinal + specularFinal;
     }
-    
-    // Process directional lights
-    for (int i = 0; i < nrOfDirectionalLights; ++i)
+    else if(renderMode == RENDER_POSITION)
     {
-        DirectionalLight light = directionalLights[i];
-        
-        // Shadow calculation
-        float4 lightClip = mul(positionSample, light.vpMatrix);
-        float3 lightNDC = lightClip.xyz / lightClip.w;
-        
-        float3 lightUV = float3(lightNDC.x * 0.5f + 0.5f, lightNDC.y * -0.5f + 0.5f, i);
-        float depth = directionalLightShadowMaps.SampleLevel(shadowSampler, lightUV, 0).r;
-        bool isInShadow = lightNDC.z > depth + depthBias;
-        if (isInShadow)
-            continue;
-        
-        // Check if pixel is facing the light
-        float4 direction_n = normalize(float4(light.direction, 0.f));
-        float irradience = dot(normalSample, -direction_n);
-        if(irradience <= 0.f)
-            continue;
-        
-        // Diffuse
-        float combinedIntensity = light.intensity * irradience;
-        
-        diffuseComponent += combinedIntensity * light.color;
-        
-        // Specular
-        float4 halfVector_n = normalize(-direction_n + viewDirection_n);
-        float angleHalfNormal = max(dot(normalSample, halfVector_n), 0.f);
-        float specularIntensity = pow(max(angleHalfNormal, 0.f), specularExponent);
-        
-        specularComponent += combinedIntensity * specularIntensity * light.color;
+        backBufferUAV[float3(DTid.xy, 0.f)] = normalize(positionGBuffer[DTid.xy]);
     }
-    
-    float4 ambientFinal = ambientGBuffer[DTid.xy];
-    float4 diffuseFinal = diffuseGBuffer[DTid.xy] * diffuseComponent;
-    float4 specularFinal = float4(specularGBuffer[DTid.xy].xyz, 0.f) * specularComponent;
-    
-    backBufferUAV[float3(DTid.xy, 0.f)] = ambientFinal + diffuseFinal + specularFinal;
+    else if(renderMode == RENDER_NORMAL)
+    {
+        backBufferUAV[float3(DTid.xy, 0.f)] = normalGBuffer[DTid.xy];
+    }
+    else if(renderMode == RENDER_AMBIENT)
+    {
+        backBufferUAV[float3(DTid.xy, 0.f)] = ambientGBuffer[DTid.xy];
+    }
+    else if(renderMode == RENDER_DIFFUSE)
+    {
+        backBufferUAV[float3(DTid.xy, 0.f)] = diffuseGBuffer[DTid.xy];
+    }
+    else if(renderMode == RENDER_SPECULAR)
+    {
+        backBufferUAV[float3(DTid.xy, 0.f)] = specularGBuffer[DTid.xy];
+    }
 }
