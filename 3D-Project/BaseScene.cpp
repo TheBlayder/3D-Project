@@ -58,10 +58,15 @@ void BaseScene::AddBaseObject(std::unique_ptr<BaseObject> baseObject)
 }
 
 void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
-	std::string& objectName, const std::string& textureFolder, const bool tesselate, const bool flipUVy)
+	std::string& objectName, const std::string& textureFolder, const bool dynamic, const bool tesselate, const bool flipUVy)
 {
 	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
 
+	if (dynamic)
+	{
+		m_dynamicObjects.emplace_back(newBaseObject.get());
+		return;
+	}
 	m_quadTree.AddElement(newBaseObject.get());
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
 }
@@ -105,7 +110,14 @@ std::vector<BaseObject*> BaseScene::GetVisableSceneObjects(Camera* camera)
     frustum.Transform(worldFrustum, worldMatrix);
     frustum = worldFrustum;
 
-    return m_quadTree.CheckTree(frustum);
+	std::vector<BaseObject*> objects = m_quadTree.CheckTree(frustum);
+
+	for (auto& dynamicObj : m_dynamicObjects)
+	{
+		objects.emplace_back(dynamicObj);
+	}
+
+	return objects;
 }
 
 BaseScene::~BaseScene() = default;

@@ -53,7 +53,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
-	//AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder);
+	//AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder, true);
 
 	// Boat
 	Transform boatTransform;
@@ -62,7 +62,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	boatTransform.SetScale(DirectX::XMVectorSet(0.5f, 0.5f, 0.5f, 0.0f));
 	folderPath = "./Objects/boat";
 	objectName = "boat.obj";
-	AddGameObject(device, boatTransform, folderPath, objectName, "", false);
+	AddGameObject(device, boatTransform, folderPath, objectName, "", false, true);
 
 	// Floor
 	Transform floorTransform;
