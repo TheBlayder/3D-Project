@@ -204,7 +204,7 @@ template<typename T>
 QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 {
 	m_root = std::make_unique<Node>();
-	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(64.0f, 64.f, 64.0f));
+	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(128.0f, 64.f, 128.0f));
 }
 
 template<typename T>
