@@ -11,7 +11,7 @@ void BaseScene::Init(ID3D11Device* device, ID3D11DeviceContext* context, Window*
 {	
 	m_window = window;
 
-	size_t quadTreeMaxDepth = 8;
+	size_t quadTreeMaxDepth = 7;
 	m_quadTree = QuadTree<BaseObject>(quadTreeMaxDepth);
 	LoadScene(device, context, window->GetWidth(), window->GetHeight(), dcemPS, returnPS, hasParticles);
 }
@@ -61,6 +61,7 @@ void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, 
 	std::string& objectName, const std::string& textureFolder, const bool dynamic, const bool tesselate, const bool flipUVy)
 {
 	GameObject* object = new GameObject(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
+
 	std::unique_ptr<BaseObject> newBaseObject(object);
 
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
@@ -81,7 +82,7 @@ void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, 
 {
 	DCEM* dcemObject = new DCEM(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
 	m_dcemObjects.emplace_back(dcemObject);
-	
+
 	std::unique_ptr<BaseObject> newDCEM(dcemObject);
 	m_sceneObjects.emplace_back(std::move(newDCEM));
 

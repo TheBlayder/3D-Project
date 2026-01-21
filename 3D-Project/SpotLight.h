@@ -23,9 +23,14 @@ private:
 public:
 	inline SpotLight(const DX::XMFLOAT3& position, const DX::XMFLOAT4& color, const DX::XMFLOAT3& direction, 
 		float intensity, float innerConeInDeg, float outerConeInDeg, float range)
-		: m_position(position), m_color(color), m_direction(direction), 
+		: m_position(position), m_color(color), 
 		m_intensity(intensity), m_innerConeInDeg(innerConeInDeg), m_outerConeInDeg(outerConeInDeg), m_range(range), padding(0.f, 0.f)
-	{}
+	{
+		// Normalize direction on construction
+		DirectX::XMVECTOR dirVec = DirectX::XMLoadFloat3(&direction);
+		dirVec = DirectX::XMVector3Normalize(dirVec);
+		DirectX::XMStoreFloat3(&m_direction, dirVec);
+	}
 	~SpotLight() = default;
 
 	inline HRESULT Init(ID3D11Device* device, ID3D11Texture2D* depthStencil, D3D11_DEPTH_STENCIL_VIEW_DESC* desc)
@@ -48,7 +53,7 @@ public:
 		using namespace DirectX;
 
 		XMVECTOR pos = XMLoadFloat3(&m_position);
-		XMVECTOR dir_n = XMVector3Normalize(XMLoadFloat3(&m_direction));
+		XMVECTOR dir_n = XMLoadFloat3(&m_direction);
 
 		// Choose an up vector that isn't colinear with the light direction
 		XMVECTOR up = XMVectorSet(0.f, 1.f, 0.f, 0.f);
@@ -64,7 +69,7 @@ public:
 
 		float fovInDeg = m_outerConeInDeg * 2.f;
 		float aspectRatio = 1.f; // square shadow map
-		float nearZ = 0.1f;
+		float nearZ = 0.5f;
 		float farZ = m_range;
 
 		MatrixHelper::CreateViewMatrix(view, pos, dir_n, up);

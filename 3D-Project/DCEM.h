@@ -49,7 +49,6 @@ public:
 	void Update(float deltaTime) override {};
 	void Update(ID3D11DeviceContext* context, float deltaTime, Camera* cam);
 
-	const void GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix);
 	const std::array<Camera*, 6>& GetCameras() { return m_cameras; }
 	std::array<ID3D11UnorderedAccessView**, 6> GetUAVAdresses();
 };

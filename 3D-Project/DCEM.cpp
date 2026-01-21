@@ -139,11 +139,6 @@ void DCEM::Update(ID3D11DeviceContext* context, float deltaTime, Camera* cam)
 	m_cameraBuffer.Update(context, &camPosF4);
 }
 
-const void DCEM::GetWorldMatrix(DX::XMFLOAT4X4& worldMatrix)
-{
-	MatrixHelper::CreateWorldMatrix(worldMatrix, m_transform);
-}
-
 std::array<ID3D11UnorderedAccessView**, 6> DCEM::GetUAVAdresses()
 {
 	std::array<ID3D11UnorderedAccessView**, 6> UAVs;

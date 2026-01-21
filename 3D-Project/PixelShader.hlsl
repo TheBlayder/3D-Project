@@ -39,7 +39,7 @@ struct PSOutput
     float4 specular : SV_Target4;
 };
 
-static const float ambientStrength = 0.3f;
+static const float ambientStrength = 0.2f;
 
 PSOutput main(PSInput input) : SV_TARGET
 {
