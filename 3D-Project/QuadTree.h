@@ -54,7 +54,6 @@ void QuadTree<T>::AddToNode(std::unique_ptr<Node>& node, T* elementAdress, size_
 		return;
 	}
 
-	//bool collides = node->bounds.Intersects(elementAdress->GetBoundingBox());
 	bool collides = elementAdress->GetBoundingBox().Intersects(node->bounds);
 	if (!collides) // If no collision, do not add
 		return;
@@ -205,7 +204,7 @@ template<typename T>
 QuadTree<T>::QuadTree(size_t maxDepth) : m_maxDepth(maxDepth)
 {
 	m_root = std::make_unique<Node>();
-	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(100.0f, 100.0f, 100.0f));
+	m_root->bounds = DirectX::BoundingBox(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f), DirectX::XMFLOAT3(64.0f, 64.f, 64.0f));
 }
 
 template<typename T>

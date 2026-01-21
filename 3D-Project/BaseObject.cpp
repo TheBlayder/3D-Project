@@ -14,9 +14,14 @@ void BaseObject::Init(ID3D11Device* device, const Transform& transform, std::str
 	m_transform = transform;
 	m_tesselationEnabled = tesselate;
 	m_mesh.Init(device, folderPath, objectName, textureFolder, flipUVy);
-	m_boundingBox = m_mesh.GetBoundingBox();
-	DirectX::XMFLOAT4X4 worldMatrix = GetWorldMatrix();
-	m_boundingBox.Transform(m_boundingBox, DirectX::XMLoadFloat4x4(&worldMatrix));
+	
+	DirectX::BoundingBox localBoundingBox = m_mesh.GetBoundingBox();
+	DirectX::XMFLOAT4X4 worldMatrixF4 = GetWorldMatrix();
+	
+	// Transpose back to get the correct matrix for DirectXCollision functions
+	DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&worldMatrixF4));
+	
+	localBoundingBox.Transform(m_boundingBox, worldMatrix);
 }
 
 void BaseObject::Draw(ID3D11DeviceContext* context) const

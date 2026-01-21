@@ -60,25 +60,33 @@ void BaseScene::AddBaseObject(std::unique_ptr<BaseObject> baseObject)
 void BaseScene::AddGameObject(ID3D11Device* device, const Transform& transform, std::string& folderPath, 
 	std::string& objectName, const std::string& textureFolder, const bool dynamic, const bool tesselate, const bool flipUVy)
 {
-	auto newBaseObject = std::make_unique<GameObject>(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
+	GameObject* object = new GameObject(device, transform, folderPath, objectName, textureFolder, tesselate, flipUVy);
+	std::unique_ptr<BaseObject> newBaseObject(object);
 
-	if (dynamic)
-	{
-		m_dynamicObjects.emplace_back(newBaseObject.get());
-		return;
-	}
-	m_quadTree.AddElement(newBaseObject.get());
 	m_sceneObjects.emplace_back(std::move(newBaseObject));
+	BaseObject* objectPtr = m_sceneObjects.back().get();
+
+	if (!dynamic)
+	{
+		m_quadTree.AddElement(objectPtr);
+	}
+	else
+	{
+		m_dynamicObjects.emplace_back(objectPtr);
+	}
 }
 
 void BaseScene::AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, 
 	std::string& folderPath, std::string& objectName, ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS)
 {
-	auto newDCEM = std::make_unique<DCEM>(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
+	DCEM* dcemObject = new DCEM(device, transform, resolution, folderPath, objectName, dcemPS, returnPS);
+	m_dcemObjects.emplace_back(dcemObject);
 	
-	m_quadTree.AddElement(newDCEM.get());
-	m_dcemObjects.emplace_back(newDCEM.get());
+	std::unique_ptr<BaseObject> newDCEM(dcemObject);
 	m_sceneObjects.emplace_back(std::move(newDCEM));
+
+	BaseObject* dcemPtr = m_sceneObjects.back().get();
+	m_quadTree.AddElement(dcemPtr);
 }
 
 std::vector<std::unique_ptr<BaseObject>>& BaseScene::GetSceneObjects()
@@ -96,7 +104,7 @@ std::vector<BaseObject*> BaseScene::GetVisableSceneObjects(Camera* camera)
     using namespace DirectX;
 
 	ProjectionData projData = camera->GetProjectionData();
-	projData.fovInDeg -= 20.f;
+	projData.fovInDeg -= 30.f;
 
     BoundingFrustum frustum;
 	XMFLOAT4X4 projMatrixF4; 

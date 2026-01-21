@@ -53,7 +53,7 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 	std::string folderPath = "./Objects/Cake";
 	std::string objectName = "strawberry cake.obj";
 	std::string textureFolder = "/TEXTURES";
-	//AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder, true);
+	AddGameObject(device, strawberryTransform, folderPath, objectName, textureFolder, true);
 
 	// Boat
 	Transform boatTransform;
@@ -66,13 +66,13 @@ void TestScene::LoadSceneGameObjects(ID3D11Device* device, ID3D11DeviceContext* 
 
 	// Floor
 	Transform floorTransform;
-	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -19.f, 0.0f, 0.0f));
+	floorTransform.SetPosition(DirectX::XMVectorSet(0.0f, -9.f, 0.0f, 0.0f));
 	floorTransform.SetRotation(DirectX::XMVectorSet(0.0f, 0.f, 0.0f, 0.0f));
-	floorTransform.SetScale(DirectX::XMVectorSet(0.7f, 0.2f, 0.7f, 0.0f));
+	floorTransform.SetScale(DirectX::XMVectorSet(0.6f, 0.3f, 0.6f, 0.0f));
 	folderPath = "./Objects/Desk/metal_table";
 	objectName = "metal_table.obj";
 	textureFolder = "/textures";
-	//AddGameObject(device, floorTransform, folderPath, objectName, textureFolder);
+	AddGameObject(device, floorTransform, folderPath, objectName, textureFolder);
 
 	// Desk
 	Transform deskTransform;
