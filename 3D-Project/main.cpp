@@ -56,16 +56,9 @@ int APIENTRY wWinMain(
 		// Enable/disable wireframe mode to show tesselation effect
 		if(window->GetInputHandler().isDown('T'))
 		{
-			if (wireframeMode)
-			{
-				wireframeMode = false;
-				renderer.SetWireframe(false);
-			}
-			else
-			{
-				wireframeMode = true;
-				renderer.SetWireframe(true);
-			}
+			wireframeMode = !wireframeMode;
+			renderer.SetWireframe(wireframeMode);
+
 			window->GetInputHandler().setKeyState('T', InputHandler::RELEASED); // Prevent continuous toggling
 		}
 
