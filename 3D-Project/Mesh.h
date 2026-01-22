@@ -34,7 +34,6 @@ public:
 
 	void BindMeshBuffers(ID3D11DeviceContext* context) const;
 	void PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const;
-	void PerformSubMeshDCEMDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const;
 
 	void UnbindSubMeshResources(ID3D11DeviceContext* context) const;
 

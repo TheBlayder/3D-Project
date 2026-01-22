@@ -21,7 +21,7 @@ struct MaterialProperties
 	DX::XMFLOAT3 SpecularComponent;
 
 	float SpecularExponent;
-	float padding[3] = { 0.f,0.f,0.f }; // Padding to make size multiple of 16 bytes
+	DX::XMFLOAT3 padding = { 0.f, 0.f, 0.f };
 };
 
 
@@ -53,7 +53,6 @@ public:
 		DX::XMFLOAT3 ambientComponent, DX::XMFLOAT3 diffuseComponent, DX::XMFLOAT3 specularComponent, float specularExponent);
 
 	void PerformDrawCall(ID3D11DeviceContext* context) const;
-	void PerformDCEMDrawCall(ID3D11DeviceContext* context) const;
 	
 	void UnbindResources(ID3D11DeviceContext* context) const;
 

@@ -23,14 +23,14 @@ struct ProjectionData
 class Camera
 {
 private:
-	DeferredHandler* m_DH = nullptr;
+	std::unique_ptr<DeferredHandler> m_DH = nullptr;
 	D3D11_VIEWPORT m_viewport;
 
 	Transform m_transform;
 	DX::XMVECTOR m_up = { 0.f, 1.f, 0.f, 0.f };
 
 	ProjectionData m_projData;
-	ConstantBuffer* m_cameraBuffer = nullptr;
+	std::unique_ptr<ConstantBuffer> m_cameraBuffer = nullptr;
 	
 	void MoveInDirection(float amount, const DirectX::XMVECTOR& direction);
 	
@@ -43,7 +43,7 @@ private:
 public:
 	Camera() = default;
 	Camera(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
-	~Camera();
+	~Camera() = default;
 
 	void Init(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition = DX::XMFLOAT3(0.f, 0.f, 0.f));
 
@@ -51,7 +51,6 @@ public:
 
 	void Update(InputHandler& input, float deltaTime);
 
-	// Constant buffer
 	void UpdateConstantBuffer(ID3D11DeviceContext* context);
 
 	DirectX::XMFLOAT4X4 GetViewMatrix();

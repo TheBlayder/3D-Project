@@ -51,11 +51,6 @@ void SubMesh::PerformDrawCall(ID3D11DeviceContext* context) const
 	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
 }
 
-void SubMesh::PerformDCEMDrawCall(ID3D11DeviceContext* context) const
-{
-	context->DrawIndexed(static_cast<UINT>(m_nrOfIndices), static_cast<UINT>(m_startIndex), 0);
-}
-
 void SubMesh::UnbindResources(ID3D11DeviceContext* context) const
 {
 	// Unbind SRVs

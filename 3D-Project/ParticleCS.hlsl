@@ -16,22 +16,16 @@ cbuffer TimeBuffer : register(b1)
 
 RWStructuredBuffer<Particle> Particles : register(u1);
 
-// Hash function for pseudo-random number generation
-float hash(uint seed)
+// Hash function from https://www.shadertoy.com/view/4djSRW
+float hashOld12(float2 p)
 {
-    seed = (seed ^ 61) ^ (seed >> 16);
-    seed *= 9;
-    seed = seed ^ (seed >> 4);
-    seed *= 0x27d4eb2d;
-    seed = seed ^ (seed >> 15);
-    return float(seed) * (1.0 / 4294967296.0);
+    return frac(sin(dot(p, float2(12.9898, 78.233))) * 43758.5453);
 }
 
-// Returns a random float2 value clamped between -10 and 10
-float2 getRandomFloat2(uint seed)
+float2 getRandomFloat2(float2 seed)
 {
-    float x = hash(seed) * 20.0f - 10.0f;
-    float y = hash(seed + 1) * 20.0f - 10.0f;
+    float x = hashOld12(seed) * 20.0f - 10.0f;
+    float y = hashOld12(seed + 1) * 20.0f - 10.0f;
     return float2(x, y);
 }
 

@@ -151,11 +151,6 @@ void Mesh::PerformSubMeshDrawCall(ID3D11DeviceContext* context, size_t subMeshIn
 	m_subMeshes[subMeshIndex].PerformDrawCall(context);
 }
 
-void Mesh::PerformSubMeshDCEMDrawCall(ID3D11DeviceContext* context, size_t subMeshIndex) const
-{
-	m_subMeshes[subMeshIndex].PerformDCEMDrawCall(context);
-}
-
 void Mesh::UnbindSubMeshResources(ID3D11DeviceContext* context) const
 {
 	for(auto& subMesh : m_subMeshes)

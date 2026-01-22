@@ -84,9 +84,9 @@ void DCEM::Init(ID3D11Device* device)
 	float rotations[6][3] = {
 		{ 0.0f,   90.0f,  0.0f },   // +X: Right
 		{ 0.0f,  -90.0f,  0.0f },   // -X: Left
-		{ -90.0f,  180.0f,  0.0f },   // +Y: Top (inverted from standard to match DirectX LH)
-		{ 90.0f,  0.0f,  0.0f },   // -Y: Bottom
-		{ 0.0f,    0.0f,  0.0001f }, // +Z: Front
+		{ -90.0f,  180.0f,  0.0f }, // +Y: Top
+		{ 90.0f,  0.0f,  0.0f },    // -Y: Bottom
+		{ 0.0f,    0.0f,  0.0001f },// +Z: Front
 		{ 0.0f,  180.0f,  0.0f }    // -Z: Back
 	};
 

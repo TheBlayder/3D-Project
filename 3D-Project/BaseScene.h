@@ -71,8 +71,8 @@ public:
 	void AddDCEMObject(ID3D11Device* device, const Transform& transform, const UINT& resolution, std::string& folderPath, std::string& objectName,
 		ID3D11PixelShader* dcemPS, ID3D11PixelShader* returnPS);
 
-	Camera* GetCamera() const;
-	LightHandler* GetLightHandler() const;
+	Camera* GetCamera() const { return m_camera.get(); }
+	LightHandler* GetLightHandler() const { return m_lightHandler.get(); }
 	void BindLights(ID3D11DeviceContext* context);
 	Window* GetWindow() const { return m_window; }
 

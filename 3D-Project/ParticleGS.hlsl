@@ -21,46 +21,56 @@ struct GSOutput
     float2 UV : UV;
 };
 
-const float3 PAUSED_NORMAL = float3(0.f, 0.f, -1.f);
-
 [maxvertexcount(6)]
 void main(
 	point GSInput input[1] : POSITION,
 	inout TriangleStream<GSOutput> output
 )
 {
-    float3 frontVec = normalize(input[0].position - cameraPosition);
-    float3 rightVec = normalize(cross(frontVec, float3(0.0, 1.0, 0.0)));
-    float3 upVec = normalize(cross(frontVec, rightVec));
+    
+    float3 frontVec;
+    float3 rightVec;
+    float3 upVec;
+    
+    if(isScenePaused == 1)
+    {
+        frontVec = float3(0.f, 0.f, -1.f);
+        rightVec = float3(1.f, 0.f, 0.f);
+        upVec = float3(0.f, 1.f, 0.f);
+    }
+    else
+    {
+        frontVec = normalize(input[0].position - cameraPosition);
+        rightVec = normalize(cross(frontVec, float3(0.0, 1.0, 0.0)));
+        upVec = normalize(cross(frontVec, rightVec));
+    }
 	
     rightVec = rightVec * 0.2f * input[0].size; // Scale width by size
     upVec = upVec * 0.5f * input[0].size; // Scale height by size
     
-    float3 normalDir = isScenePaused == 1 ? PAUSED_NORMAL : frontVec;
-	
     GSOutput corners[4];
 	
 	// Top left
     corners[0].position = mul(float4(input[0].position - rightVec + upVec, 1.f), vpMatrix);
-    corners[0].NORMAL = float4(normalDir, 0.f);
+    corners[0].NORMAL = float4(frontVec, 0.f);
     corners[0].color = input[0].color;
     corners[0].UV = float2(0, 0);
 	
 	// Top right
     corners[1].position = mul(float4(input[0].position + rightVec + upVec, 1.f), vpMatrix);
-    corners[1].NORMAL = float4(normalDir, 0.f);
+    corners[1].NORMAL = float4(frontVec, 0.f);
     corners[1].color = input[0].color;
     corners[1].UV = float2(1, 0);
     
 	// Bottom left
     corners[2].position = mul(float4(input[0].position - rightVec - upVec, 1.f), vpMatrix);
-    corners[2].NORMAL = float4(normalDir, 0.f);
+    corners[2].NORMAL = float4(frontVec, 0.f);
     corners[2].color = input[0].color;
     corners[2].UV = float2(0, 1);
 	
 	// Bottom right
     corners[3].position = mul(float4(input[0].position + rightVec - upVec, 1.f), vpMatrix);
-    corners[3].NORMAL = float4(normalDir, 0.f);
+    corners[3].NORMAL = float4(frontVec, 0.f);
     corners[3].color = input[0].color;
     corners[3].UV = float2(1, 1);
     

@@ -43,25 +43,10 @@ Camera::Camera(ID3D11Device* device, ProjectionData& projData, const UINT width,
 	Init(device, projData, width, height, initialPosition);
 }
 
-Camera::~Camera()
-{
-	if (m_cameraBuffer != nullptr)
-	{
-		delete m_cameraBuffer;
-		m_cameraBuffer = nullptr;
-	}
-	
-	if (m_DH != nullptr)
-	{
-		delete m_DH;
-		m_DH = nullptr;
-	}
-}
-
 void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT width, const UINT height, const DX::XMFLOAT3& initialPosition)
 {
 	m_projData = projData;
-	m_DH = new DeferredHandler(device, width, height);
+	m_DH = std::make_unique<DeferredHandler>(device, width, height);
 
 	m_viewport.TopLeftX = 0.0f;
 	m_viewport.TopLeftY = 0.0f;
@@ -76,7 +61,7 @@ void Camera::Init(ID3D11Device* device, ProjectionData& projData, const UINT wid
 
 	XMFLOAT4X4 viewProjMatrix;
 	GenerateViewProjMatrix(viewProjMatrix);
-	m_cameraBuffer = new ConstantBuffer(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
+	m_cameraBuffer = std::make_unique<ConstantBuffer>(device, sizeof(DX::XMFLOAT4X4), &viewProjMatrix);
 }
 
 
@@ -158,7 +143,7 @@ DirectX::XMFLOAT4X4 Camera::GetViewProjMatrix()
 
 DeferredHandler* Camera::GetDeferredHandler()
 {
-	return m_DH;
+	return m_DH.get();
 }
 
 DirectX::XMVECTOR Camera::GetForward() const

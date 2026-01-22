@@ -35,16 +35,6 @@ void BaseScene::UpdateSceneLights(ID3D11DeviceContext* context)
 	}
 }
 
-Camera* BaseScene::GetCamera() const
-{
-	return m_camera.get();
-}
-
-LightHandler* BaseScene::GetLightHandler() const
-{
-	return m_lightHandler.get();
-}
-
 void BaseScene::BindLights(ID3D11DeviceContext* context)
 {
 	if (m_lightHandler)

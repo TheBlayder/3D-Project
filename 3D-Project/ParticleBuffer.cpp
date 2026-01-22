@@ -11,10 +11,10 @@ ParticleBuffer::ParticleBuffer(ID3D11Device* device, UINT size, UINT nrOf, bool 
 void ParticleBuffer::Init(ID3D11Device* device, UINT size, UINT nrOf, bool dynamic, bool hasSRV, bool hasUAV, void* initData)
 {
 	if(size == 0 || nrOf == 0)
-		throw std::runtime_error("ParticleBuffer::Init - size and number of particles must be greater than zero.");
+		throw std::runtime_error("ParticleBuffer size and number of particles must be greater than zero.");
 
 	if(initData == nullptr)
-		throw std::runtime_error("ParticleBuffer::Init - buffer must have initial data.");
+		throw std::runtime_error("ParticleBuffer buffer must have initial data.");
 
 	m_particleSize = size;
 	m_nrOfParticles = nrOf;
@@ -35,7 +35,7 @@ void ParticleBuffer::Init(ID3D11Device* device, UINT size, UINT nrOf, bool dynam
 
 	HRESULT hr = device->CreateBuffer(&bufferDesc, &initialData, m_buffer.GetAddressOf());
 	if(FAILED(hr))
-		throw std::runtime_error("ParticleBuffer::Init - failed to create Structured-buffer.");
+		throw std::runtime_error("Failed to create particle Structured-buffer.");
 	
 	if(hasSRV)
 	{
@@ -47,7 +47,7 @@ void ParticleBuffer::Init(ID3D11Device* device, UINT size, UINT nrOf, bool dynam
 
 		hr = device->CreateShaderResourceView(m_buffer.Get(), &srvDesc, m_SRV.GetAddressOf());
 		if(FAILED(hr))
-			throw std::runtime_error("ParticleBuffer::Init - failed to create Shader Resource View.");
+			throw std::runtime_error("Failed to create Particle Shader Resource View.");
 	}
 	if(hasUAV)
 	{
@@ -60,6 +60,6 @@ void ParticleBuffer::Init(ID3D11Device* device, UINT size, UINT nrOf, bool dynam
 
 		hr = device->CreateUnorderedAccessView(m_buffer.Get(), &uavDesc, m_UAV.GetAddressOf());
 		if(FAILED(hr))
-			throw std::runtime_error("ParticleBuffer::Init - failed to create Unordered Access View.");
+			throw std::runtime_error("Failed to create Particle Unordered Access View.");
 	}
 }
