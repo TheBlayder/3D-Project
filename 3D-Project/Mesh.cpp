@@ -42,7 +42,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		XMFLOAT3 ambientComponent = XMFLOAT3(mesh.MeshMaterial.Ka.X, mesh.MeshMaterial.Ka.Y, mesh.MeshMaterial.Ka.Z);
 		if (!mesh.MeshMaterial.map_Ka.empty())
 		{
-			// Load texture from file
+			// Load texture from file Ka
 			std::string ambientTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Ka;
 			std::wstring wStr(ambientTexturePath.begin(), ambientTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, ambientSRV.GetAddressOf());
@@ -61,7 +61,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		XMFLOAT3 diffuseComponent = XMFLOAT3(mesh.MeshMaterial.Kd.X, mesh.MeshMaterial.Kd.Y, mesh.MeshMaterial.Kd.Z);
 		if (!mesh.MeshMaterial.map_Kd.empty())
 		{
-			// Load texture from file
+			// Load texture from file Kd
 			std::string diffuseTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Kd;
 			std::wstring wStr(diffuseTexturePath.begin(), diffuseTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, diffuseSRV.GetAddressOf());
@@ -81,7 +81,7 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		float specularExponent = mesh.MeshMaterial.Ns == 0.0f ? 100.f : mesh.MeshMaterial.Ns; // Default exponent att 100 if none specified
 		if (!mesh.MeshMaterial.map_Ks.empty())
 		{
-			// Load texture from file
+			// Load texture from file Ks
 			std::string specularTexturePath = folderPath + textureFolder + "/" + mesh.MeshMaterial.map_Ks;
 			std::wstring wStr(specularTexturePath.begin(), specularTexturePath.end());
 			HRESULT hr = CreateWICTextureFromFile(device, wStr.c_str(), nullptr, specularSRV.GetAddressOf());
@@ -112,10 +112,10 @@ void Mesh::Init(ID3D11Device* device, const std::string& folderPath, const std::
 		startIndex += mesh.Indices.size(); // Update start index for next sub-mesh
 
 		// Converting objl::Vertex to SimpleVertex and appending to tempVertices
-		// Note: flipV=true if your textures appear upside-down
+		// Note: flipV=true if textures appear upside-down
 		for(auto& vertex : mesh.Vertices)
 		{
-			SimpleVertex tempVertex = SimpleVertex(vertex, flipUVy); // Try with true if textures are flipped
+			SimpleVertex tempVertex = SimpleVertex(vertex, flipUVy);
 			tempVertices.emplace_back(tempVertex);
 		}
 	}

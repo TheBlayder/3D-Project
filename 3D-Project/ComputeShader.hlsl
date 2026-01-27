@@ -105,7 +105,8 @@ void main(uint3 DTid : SV_DispatchThreadID)
             float4 lightToPixel_n = normalize(lightToPixelVec);
     
             // Check if pixel is facing away from the light
-            if (dot(normalSample, -lightToPixel_n) <= 0.f)
+            float irradience = dot(normalSample, -lightToPixel_n); // Lambertian reflectance (amount of light hitting the surface)
+            if (irradience <= 0.f)
                 continue;
         
             float cosInnerCone = cos(radians(light.innerConeInDeg));
@@ -121,7 +122,6 @@ void main(uint3 DTid : SV_DispatchThreadID)
                 continue;
         
             // Diffuse calculation
-            float irradience = max(dot(normalSample, -lightToPixel_n), 0.f); // Lambertian reflectance (amount of light hitting the surface)
             float distance = length(lightToPixelVec);
             float falloff = 1.0f / (distance * distance); // Inverse square falloff
             float combinedIntensity = falloff * light.intensity * spotAttenuation; // Shared variable to spare on computations
